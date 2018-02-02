@@ -5,3 +5,5 @@ coverage/
 yarn-error.log
 lerna-debug.log
 npm-debug.log
+.cache/
+dist/
