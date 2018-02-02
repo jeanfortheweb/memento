@@ -69,7 +69,7 @@ describe('@memento/store', () => {
       );
 
     class Job1 extends Command<State> {
-      *execute() {
+      *run() {
         yield this.dispatch(state => state.set('username', 'Meh'));
         yield this.call(wait, 1000);
         const state = yield this.select(state => state.username);
@@ -78,7 +78,7 @@ describe('@memento/store', () => {
     }
 
     class Job2 extends Command<State> {
-      *execute() {
+      *run() {
         yield this.call(wait, 2000);
         yield this.dispatch(state => state.set('username', 'Meh2'));
         const state: string = yield this.select(state => state.username);

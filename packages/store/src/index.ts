@@ -17,12 +17,9 @@ export interface Selector<TState extends Record<any>, TOutput extends SelectorOu
 }
 
 export abstract class Command<TState extends Record<any>> {
-  public abstract execute(): IterableIterator<Instruction>;
+  public abstract run(): IterableIterator<Instruction>;
 
-  protected call<TResult>(
-    method: (...args: any[]) => Promise<TResult> | TResult,
-    ...args: any[]
-  ): Instruction {
+  protected call(method: Function, ...args: any[]): Instruction {
     return {
       kind: 'call',
       method,
@@ -44,11 +41,25 @@ export abstract class Command<TState extends Record<any>> {
       action,
     };
   }
+
+  protected execute(command: Command<TState>): Instruction {
+    return {
+      kind: 'execute',
+      command,
+    };
+  }
+
+  protected resolve(value: any): Instruction {
+    return {
+      kind: 'resolve',
+      value,
+    };
+  }
 }
 
-export interface Resolve {
+export interface Call {
   kind: 'call';
-  method: () => Promise<any> | any;
+  method: Function;
   args: any[];
 }
 
@@ -57,13 +68,23 @@ export interface Dispatch {
   action: Action<any>;
 }
 
+export interface Execute {
+  kind: 'execute';
+  command: Command<any>;
+}
+
 export interface Select {
   kind: 'select';
   selector: Selector<any, any>;
   args: any[];
 }
 
-export type Instruction = Resolve | Dispatch | Select;
+export interface Resolve {
+  kind: 'resolve';
+  value: any;
+}
+
+export type Instruction = Call | Dispatch | Execute | Select | Resolve;
 
 export class Store<TState extends Record<any>> {
   private _state: TState;
@@ -78,44 +99,81 @@ export class Store<TState extends Record<any>> {
     this._subscriptions = List();
   }
 
-  execute(command: Command<TState>) {
-    return new Promise(resolve => {
-      const iterator = command.execute();
-      const next = (iteratorResult: IteratorResult<Instruction>) => {
-        const { value, done } = iteratorResult;
+  execute(command: Command<TState>): Promise<any> {
+    return new Promise((resolve, reject) => {
+      try {
+        const iterator = command.run();
+        const next = (iteratorResult: IteratorResult<Instruction>) => {
+          const { value, done } = iteratorResult;
 
-        if (value) {
-          switch (value.kind) {
-            case 'call':
-              const result = value.method.apply(value.method, value.args);
+          if (value) {
+            switch (value.kind) {
+              case 'call':
+                try {
+                  const result = value.method.apply(null, value.args);
 
-              if (result && typeof (result as Promise<any>).then === 'function') {
-                result
+                  if (result && typeof (result as Promise<any>).then === 'function') {
+                    result.then(result => next(iterator.next(result))).catch(error => {
+                      if (iterator.throw) {
+                        next(iterator.throw(error));
+                      } else {
+                        next(iterator.next(error));
+                      }
+                    });
+                  } else {
+                    next(iterator.next(result));
+                  }
+                } catch (error) {
+                  if (iterator.throw) {
+                    next(iterator.throw(error));
+                  } else {
+                    next(iterator.next(error));
+                  }
+                }
+
+                break;
+
+              case 'dispatch':
+                next(iterator.next(this.dispatch(value.action)));
+                break;
+
+              case 'execute':
+                this.execute(value.command)
                   .then(result => next(iterator.next(result)))
-                  .catch(error => next(iterator.next(error)));
-              } else {
-                next(iterator.next(result));
-              }
-              break;
+                  .catch(error => {
+                    if (iterator.throw) {
+                      next(iterator.throw(error));
+                    } else {
+                      next(iterator.next(error));
+                    }
+                  });
+                break;
 
-            case 'dispatch':
-              next(iterator.next(this.dispatch(value.action)));
-              break;
+              case 'select':
+                next(
+                  iterator.next(value.selector.apply(value.selector, [this.state, ...value.args])),
+                );
+                break;
 
-            case 'select':
-              next(
-                iterator.next(value.selector.apply(value.selector, [this.state, ...value.args])),
-              );
-              break;
+              case 'resolve':
+                resolve(value.value);
+                return;
+
+              default:
+                console.log(value);
+                break;
+            }
           }
-        }
 
-        if (done) {
-          resolve();
-        }
-      };
+          if (done) {
+            resolve();
+          }
+        };
 
-      next(iterator.next(this.state));
+        next(iterator.next(this.state));
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
