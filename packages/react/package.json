@@ -1,0 +1,40 @@
+{
+  "name": "@memento/react",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "es5/index.js",
+  "types": "es5/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "prepublish": "tsc --p ./tsconfig.publish.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": ["acl", "security"],
+  "author": "jeanfortheweb",
+  "devDependencies": {
+    "@types/jest": "^22.1.1",
+    "@types/react-test-renderer": "^16.0.0",
+    "@types/react": "^16.0.36",
+    "jest": "^22.1.4",
+    "ts-jest": "^22.0.2",
+    "typescript": "^2.7.1"
+  },
+  "dependencies": {
+    "@memento/store": "^0.0.1",
+    "immutable": "4.0.0-rc.9",
+    "react": "^16.2.0",
+    "react-test-renderer": "^16.2.0"
+  },
+  "jest": {
+    "bail": true,
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "moduleFileExtensions": ["ts", "tsx", "js"],
+    "testRegex": "\\.spec\\.tsx?$",
+    "mapCoverage": true
+  }
+}

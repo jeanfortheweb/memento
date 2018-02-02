@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "lib": ["es6", "dom"],
+    "outDir": "./es5",
+    "declaration": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "strictNullChecks": true,
+    "jsx": "react",
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true
+  },
+  "include": ["src", "node_modules/@types"]
+}
