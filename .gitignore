@@ -7,3 +7,4 @@ lerna-debug.log
 npm-debug.log
 .cache/
 dist/
+/packages/react-example
