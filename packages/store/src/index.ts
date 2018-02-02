@@ -10,8 +10,10 @@ export interface Subscriber<TState extends Record<any>> {
   (store: Store<TState>, prevState: TState, nextState: TState): void;
 }
 
-export interface Selector<TState extends Record<any>, TSelection = any> {
-  (state: TState, ...args: any[]): TSelection;
+export type SelectorOutput<T> = T;
+
+export interface Selector<TState extends Record<any>, TOutput extends SelectorOutput<any>> {
+  (state: TState, ...args: any[]): TOutput;
 }
 
 export abstract class Command<TState extends Record<any>> {
@@ -57,7 +59,7 @@ export interface Dispatch {
 
 export interface Select {
   kind: 'select';
-  selector: Selector<any>;
+  selector: Selector<any, any>;
   args: any[];
 }
 
@@ -125,7 +127,7 @@ export class Store<TState extends Record<any>> {
       return;
     }
 
-    if (reaction instanceof Record) {
+    if (Object.getPrototypeOf(reaction) === Object.getPrototypeOf(this.state)) {
       const prevState = this.state;
       const nextState = reaction as TState;
 
