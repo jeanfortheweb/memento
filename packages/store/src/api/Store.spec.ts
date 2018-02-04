@@ -31,7 +31,7 @@ test('store setups workers on construction', () => {
   expect(mockWorkerInstance.setup).toBeCalled();
 });
 
-test('task reaches target worker', async () => {
+test('task reaches target worker', () => {
   const mockWorkerInstance = new MockWorker();
   const store = new Store(new State(), [mockWorkerInstance]);
 
@@ -40,7 +40,7 @@ test('task reaches target worker', async () => {
   expect(mockWorkerInstance.for).toBeCalled();
 });
 
-test('action from worker gets dispatched', async () => {
+test('action from worker gets dispatched', () => {
   const mockWorkerInstance = new MockWorker();
   const store = new Store(new State(), [mockWorkerInstance]);
 
@@ -49,7 +49,7 @@ test('action from worker gets dispatched', async () => {
   expect(mockActionInstance.dispatch).toBeCalledWith(store);
 });
 
-test('update does evolve the state', async () => {
+test('update does evolve the state', () => {
   const initialState = new State();
   const store = new Store(initialState);
   const mockUpdater = jest.fn<Updater<State>>(state => {
@@ -62,7 +62,7 @@ test('update does evolve the state', async () => {
   expect(mockUpdater).toBeCalledWith(initialState);
 });
 
-test('listener gets called with correct states', async () => {
+test('listener gets called with correct states', () => {
   const mockListener = jest.fn<Listener<State>>();
   const initialState = new State();
   const store = new Store(initialState);
@@ -77,7 +77,7 @@ test('listener gets called with correct states', async () => {
   expect(mockListener).toBeCalledWith(initialState, nextState);
 });
 
-test('listener does not get called with same state', async () => {
+test('listener does not get called with same state', () => {
   const mockListener = jest.fn<Listener<State>>();
   const initialState = new State();
   const store = new Store(initialState);
@@ -93,7 +93,7 @@ test('listener does not get called with same state', async () => {
   expect(mockListener).toHaveBeenCalledTimes(1);
 });
 
-test('listener gets unregistered as expected', async () => {
+test('listener gets unregistered as expected', () => {
   const mockListener = jest.fn<Listener<State>>();
   const initialState = new State();
   const store = new Store(initialState);
