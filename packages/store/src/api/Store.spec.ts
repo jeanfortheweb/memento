@@ -15,6 +15,7 @@ const MockAction = jest.fn<Action<State>>(() => ({
 const mockActionInstance = new MockAction();
 
 const MockTask = jest.fn<Task<State>>();
+const MockTask2 = jest.fn<Task<State>>();
 
 const MockWorker = jest.fn<Worker<State, MockTask>>(() => ({
   for: jest.fn().mockReturnValue(MockTask),
@@ -31,6 +32,15 @@ test('store setups workers on construction', () => {
   expect(mockWorkerInstance.setup).toBeCalled();
 });
 
+test('a different task does not reach target worker', () => {
+  const mockWorkerInstance = new MockWorker();
+  const store = new Store(new State(), [mockWorkerInstance]);
+
+  store.assign(new MockTask2());
+
+  expect(mockActionInstance.dispatch).toHaveBeenCalledTimes(0);
+});
+
 test('task reaches target worker', () => {
   const mockWorkerInstance = new MockWorker();
   const store = new Store(new State(), [mockWorkerInstance]);
@@ -38,6 +48,7 @@ test('task reaches target worker', () => {
   store.assign(new MockTask());
 
   expect(mockWorkerInstance.for).toBeCalled();
+  expect(mockActionInstance.dispatch).toHaveBeenCalledTimes(1);
 });
 
 test('action from worker gets dispatched', () => {
