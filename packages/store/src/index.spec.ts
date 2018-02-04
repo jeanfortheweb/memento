@@ -1,6 +1,6 @@
 import { Record } from 'immutable';
 
-import Store, { Task, Listener, Updater, Worker, TaskObservable } from './';
+import Store, { Task, Listener, Updater, Worker, TaskObservable, Selector } from './';
 import { Observable } from '@reactivex/rxjs';
 
 class State extends Record<{ property: string }>({ property: 'value' }) {}
@@ -89,4 +89,14 @@ test('store does invoke listeners when state changes', () => {
   store.assign(task);
 
   expect(listener).toHaveBeenCalledTimes(1);
+});
+
+test('selector gets called', () => {
+  const initialState = new State();
+  const selector = jest.fn<Selector<State, string>>().mockImplementation(state => state.property);
+
+  const store = new Store(initialState, []);
+  const selection = store.select(selector);
+
+  expect(selection).toEqual('value');
 });

@@ -11,6 +11,10 @@ export interface Listener<TState extends State> {
   (prevState: TState, nextState: TState): void;
 }
 
+export interface Selector<TState extends State, TOutput = any> {
+  (state: TState, ...args: any[]): TOutput;
+}
+
 export interface Task<TState extends State> {
   kind: string;
   state?: TState;
@@ -52,6 +56,10 @@ export class Store<TState extends State> implements Store<TState> {
     });
 
     workers.map(worker => worker(this._task$).subscribe(this._updater$));
+  }
+
+  public select<T>(selector: Selector<TState, T>): T {
+    return selector(this._state);
   }
 
   public assign(task: Task<TState>) {
