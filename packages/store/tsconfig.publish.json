@@ -1,7 +1,8 @@
 {
-  "compilerOptions": {
-    "skipLibCheck": true
-  },
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
   "exclude": ["**/*.spec.ts"]
 }
