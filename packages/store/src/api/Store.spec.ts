@@ -69,8 +69,6 @@ test('update does evolve the state', () => {
 });
 
 test('listener gets called with correct states', done => {
-  let nextState: State;
-
   const mockListener = jest.fn<Listener<State>>((prev, next) => {
     expect(prev).toEqual(initialState);
     expect(next).toBeDefined();
@@ -82,10 +80,7 @@ test('listener gets called with correct states', done => {
 
   const initialState = new State();
   const store = new Store(initialState);
-  const mockUpdater = jest.fn<Updater<State>>(state => {
-    nextState = state.set('property', 'anotherValue');
-    return nextState;
-  });
+  const mockUpdater = jest.fn<Updater<State>>(state => state.set('property', 'anotherValue'));
 
   store.listen(mockListener);
   store.update(mockUpdater);
