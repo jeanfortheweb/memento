@@ -22,8 +22,6 @@ const MockWorker = jest.fn<Worker<State, MockTask>>(() => ({
   setup: jest.fn().mockImplementation(task$ => task$.map(() => mockActionInstance)),
 }));
 
-let nextState: State;
-
 test('store setups workers on construction', () => {
   const mockWorkerInstance = new MockWorker();
 
@@ -63,18 +61,25 @@ test('action from worker gets dispatched', () => {
 test('update does evolve the state', () => {
   const initialState = new State();
   const store = new Store(initialState);
-  const mockUpdater = jest.fn<Updater<State>>(state => {
-    nextState = state.set('property', 'anotherValue');
-    return nextState;
-  });
+  const mockUpdater = jest.fn<Updater<State>>(state => state.set('property', 'anotherValue'));
 
   store.update(mockUpdater);
 
   expect(mockUpdater).toBeCalledWith(initialState);
 });
 
-test('listener gets called with correct states', () => {
-  const mockListener = jest.fn<Listener<State>>();
+test('listener gets called with correct states', done => {
+  let nextState: State;
+
+  const mockListener = jest.fn<Listener<State>>((prev, next) => {
+    expect(prev).toEqual(initialState);
+    expect(next).toBeDefined();
+    expect(next !== initialState).toBeTruthy();
+    expect(next.property).toEqual('anotherValue');
+
+    done();
+  });
+
   const initialState = new State();
   const store = new Store(initialState);
   const mockUpdater = jest.fn<Updater<State>>(state => {
@@ -84,34 +89,26 @@ test('listener gets called with correct states', () => {
 
   store.listen(mockListener);
   store.update(mockUpdater);
-
-  expect(mockListener).toBeCalledWith(initialState, nextState);
 });
 
 test('listener does not get called with same state', () => {
   const mockListener = jest.fn<Listener<State>>();
   const initialState = new State();
   const store = new Store(initialState);
-  const mockUpdater = jest.fn<Updater<State>>(state => {
-    nextState = state.set('property', 'anotherValue');
-    return nextState;
-  });
+  const mockUpdater = jest.fn<Updater<State>>(state => state.set('property', 'value'));
 
   store.listen(mockListener);
   store.update(mockUpdater);
   store.update(mockUpdater);
 
-  expect(mockListener).toHaveBeenCalledTimes(1);
+  expect(mockListener).toHaveBeenCalledTimes(0);
 });
 
 test('listener gets unregistered as expected', () => {
   const mockListener = jest.fn<Listener<State>>();
   const initialState = new State();
   const store = new Store(initialState);
-  const mockUpdater = jest.fn<Updater<State>>(state => {
-    nextState = state.set('property', 'anotherValue');
-    return nextState;
-  });
+  const mockUpdater = jest.fn<Updater<State>>(state => state.set('property', 'anotherValue'));
 
   store.listen(mockListener)();
   store.update(mockUpdater);
