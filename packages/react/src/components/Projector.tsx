@@ -1,31 +1,28 @@
 import * as React from 'react';
 import { Record } from 'immutable';
-import { Store, Selector, SelectorOutput } from '@memento/store';
+import { Store, Selector } from '@memento/store';
 
-export interface RenderFunction<TSelectorOutput extends SelectorOutput<any>> {
-  (data: TSelectorOutput): React.ReactElement<any>;
+export interface RenderFunction<TOutput> {
+  (data: TOutput): React.ReactElement<any>;
 }
 
-export interface Props<TState extends Record<any>, TSelectorOutput extends SelectorOutput<any>> {
+export interface Props<TState extends Record<any>, TOutput> {
   store: Store<TState>;
-  selector: Selector<TState, TSelectorOutput>;
-  children?: RenderFunction<TSelectorOutput>;
+  selector: Selector<TState, TOutput>;
+  children?: RenderFunction<TOutput>;
 }
 
-export interface State<TSelectorOutput extends SelectorOutput<any> = any> {
-  output?: TSelectorOutput;
+export interface State<TOutput = any> {
+  output?: TOutput;
 }
 
-export default class Projector<
-  TProps extends Props<any, any>,
-  TState extends State = State
-> extends React.Component<TProps, TState> {
-  public static for<TState extends Record<any>, TSelectorOutput extends SelectorOutput<any>>() {
+export default class Projector<TProps extends Props<any, any>> extends React.Component<
+  TProps,
+  State
+> {
+  public static for<TState extends Record<any>, TOutput>() {
     return Projector as {
-      new (props?: Props<TState, TSelectorOutput>): Projector<
-        Props<TState, TSelectorOutput>,
-        State<TSelectorOutput>
-      >;
+      new (props?: Props<TState, TOutput>): Projector<Props<TState, TOutput>>;
     };
   }
 
@@ -40,10 +37,10 @@ export default class Projector<
   }
 
   componentWillMount() {
-    this._unsubcribe = this.props.store.subscribe(this.handleStoreUpdate);
+    this._unsubcribe = this.props.store.listen(this.handleStoreUpdate);
 
     this.setState({
-      output: this.props.selector(this.props.store.state),
+      output: this.props.store.select(this.props.selector),
     });
   }
 
@@ -53,7 +50,7 @@ export default class Projector<
     }
   }
 
-  handleStoreUpdate = (store, prevState, nextState) => {
+  handleStoreUpdate = (prevState, nextState) => {
     this.setState({
       output: this.props.selector(nextState),
     });

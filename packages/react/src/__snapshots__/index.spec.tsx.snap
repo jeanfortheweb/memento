@@ -1,9 +1,3 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`@memento/react initial render as expected 1`] = `
-<div>
-  Hello 
-  Foo
-  !
-</div>
-`;
+exports[`@memento/react initial render as expected 1`] = `"Foo"`;

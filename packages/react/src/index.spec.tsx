@@ -25,7 +25,7 @@ describe('@memento/react', () => {
     age2: 1337,
   }) {}
 
-  const store = new Store(new State());
+  const store = new Store(new State(), []);
   const StringProjector = Projector.for<State, string>();
 
   const getUsername: Selector<State, string> = state => state.username;
