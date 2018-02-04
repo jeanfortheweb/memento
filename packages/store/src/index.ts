@@ -42,7 +42,14 @@ export class Store<TState extends State> implements Store<TState> {
     this._state = initialState;
     this._task$ = new TaskSubject<TState>();
     this._updater$ = new Subject();
-    this._updater$.subscribe(updater => this.update(updater));
+    this._updater$.subscribe(updater => {
+      const prevState = this._state;
+      this._state = updater(prevState);
+
+      if (prevState !== this._state) {
+        this._listeners.forEach(listener => listener(prevState, this._state));
+      }
+    });
 
     workers.map(worker => worker(this._task$).subscribe(this._updater$));
   }
@@ -57,15 +64,6 @@ export class Store<TState extends State> implements Store<TState> {
     return () => {
       this._listeners = this._listeners.remove(listener);
     };
-  }
-
-  protected update(updater: Updater<TState>) {
-    const prevState = this._state;
-    this._state = updater(prevState);
-
-    if (prevState !== this._state) {
-      this._listeners.forEach(listener => listener(prevState, this._state));
-    }
   }
 }
 
