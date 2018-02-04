@@ -90,7 +90,7 @@ test('listener does not get called with same state', () => {
   const mockListener = jest.fn<Listener<State>>();
   const initialState = new State();
   const store = new Store(initialState);
-  const mockUpdater = jest.fn<Updater<State>>(state => state.set('property', 'value'));
+  const mockUpdater = jest.fn<Updater<State>>(state => initialState);
 
   store.listen(mockListener);
   store.update(mockUpdater);
