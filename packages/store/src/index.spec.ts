@@ -1,6 +1,14 @@
 import { Record } from 'immutable';
 
-import Store, { Task, Listener, Updater, Worker, TaskObservable, Selector } from './';
+import Store, {
+  Task,
+  Listener,
+  Updater,
+  Worker,
+  TaskObservable,
+  Selector,
+  StateObservable,
+} from './';
 import { Observable } from '@reactivex/rxjs';
 
 class State extends Record<{ property: string }>({ property: 'value' }) {}
@@ -43,7 +51,7 @@ test('store does forward assigned tasks to workers', () => {
     value: 52,
   };
 
-  const updater = jest.fn();
+  const updater = jest.fn(state => state);
   const initialState = new State();
 
   const worker = jest
@@ -56,6 +64,60 @@ test('store does forward assigned tasks to workers', () => {
   store.assign(task);
 
   expect(updater).toBeCalledWith(initialState);
+});
+
+test('store does forward state changes to workers', () => {
+  interface TestTask extends Task<State> {
+    kind: 'TEST';
+    value: string;
+  }
+
+  const taskToUpdater = jest.fn(value => state => state.set('property', value));
+  const selectionToUpdater = jest.fn(value => state => state);
+  const initialState = new State();
+
+  const updateWorker = jest
+    .fn<Worker<State>>()
+    .mockImplementation((task$: TaskObservable<State>) =>
+      task$.accept<TestTask>('TEST').map(task => taskToUpdater(task.value)),
+    );
+
+  const watchWorker = jest
+    .fn<Worker<State>>()
+    .mockImplementation((task$: TaskObservable<State>, state$: StateObservable<State>) =>
+      state$.select(state => state.property).map(selectionToUpdater),
+    );
+
+  const store = new Store(initialState, [updateWorker, watchWorker]);
+
+  store.assign({
+    kind: 'TEST',
+    value: 'differentValue',
+  } as TestTask);
+
+  store.assign({
+    kind: 'TEST',
+    value: 'differentValue',
+  } as TestTask);
+
+  store.assign({
+    kind: 'TEST',
+    value: 'more different',
+  } as TestTask);
+
+  expect(taskToUpdater.mock.calls.length).toEqual(3);
+  expect(taskToUpdater.mock.calls.map(args => args[0])).toEqual([
+    'differentValue',
+    'differentValue',
+    'more different',
+  ]);
+
+  expect(selectionToUpdater.mock.calls.length).toEqual(3);
+  expect(selectionToUpdater.mock.calls.map(args => args[0])).toEqual([
+    'value',
+    'differentValue',
+    'more different',
+  ]);
 });
 
 test('store does invoke listeners when state changes', () => {

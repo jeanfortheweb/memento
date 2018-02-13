@@ -1,4 +1,4 @@
-import { Observable, Subject } from '@reactivex/rxjs';
+import { Observable, Subject, BehaviorSubject } from '@reactivex/rxjs';
 import { Set, Record } from 'immutable';
 
 export interface State<TStateProps = any> extends Record<TStateProps> {}
@@ -29,7 +29,7 @@ export interface Task<TState extends State> {
 }
 
 export interface Worker<TState extends State> {
-  (task$: TaskSubject<TState>): Observable<Updater<TState>>;
+  (task$: TaskSubject<TState>, state$: StateSubject<TState>): Observable<Updater<TState>>;
 }
 
 export interface WorkerFactory<TState extends State, TParameters extends Object = any> {
@@ -47,8 +47,35 @@ export class TaskSubject<TState extends State> extends Subject<Task<TState>>
   }
 }
 
+export interface StateObservable<TState extends State> extends Observable<TState> {
+  select<T = any>(selector: Selector<TState, T>): Observable<T>;
+}
+
+export interface SelectorMemory<TOutput = any> {
+  previous: TOutput;
+  current: TOutput;
+}
+
+export class StateSubject<TState extends State> extends BehaviorSubject<TState>
+  implements StateObservable<TState> {
+  public select<T>(selector: Selector<TState, T>): Observable<T> {
+    const memory: Observable<SelectorMemory<T>> = this.scan<TState, Partial<SelectorMemory<T>>>(
+      (acc, value) => ({
+        previous: acc.current,
+        current: selector(value),
+      }),
+      {},
+    ) as Observable<SelectorMemory<T>>;
+
+    return memory
+      .filter<SelectorMemory<T>>(value => value.previous !== value.current)
+      .map<SelectorMemory<T>, T>(value => value.current);
+  }
+}
+
 export class Store<TState extends State> implements Store<TState> {
   private _task$: TaskSubject<TState>;
+  private _state$: StateSubject<TState>;
   private _updater$: Subject<Updater<TState>>;
   private _state: TState;
   private _listeners: Set<Listener<TState>>;
@@ -57,6 +84,7 @@ export class Store<TState extends State> implements Store<TState> {
     this._listeners = Set();
     this._state = initialState;
     this._task$ = new TaskSubject<TState>();
+    this._state$ = new StateSubject<TState>(initialState);
     this._updater$ = new Subject();
     this._updater$.subscribe(updater => {
       const prevState = this._state;
@@ -64,10 +92,11 @@ export class Store<TState extends State> implements Store<TState> {
 
       if (prevState !== this._state) {
         this._listeners.forEach(listener => listener(prevState, this._state));
+        this._state$.next(this._state);
       }
     });
 
-    workers.map(worker => worker(this._task$).subscribe(this._updater$));
+    workers.map(worker => worker(this._task$, this._state$).subscribe(this._updater$));
   }
 
   public select<T>(selector: Selector<TState, T>): T {
