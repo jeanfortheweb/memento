@@ -16,10 +16,9 @@ export interface State<TOutput = any> {
   output?: TOutput;
 }
 
-export default class Projector<TProps extends Props<any, any>> extends React.Component<
-  TProps,
-  State
-> {
+export default class Projector<
+  TProps extends Props<any, any> = Props<any, any>
+> extends React.Component<TProps, State> {
   public static for<TState extends Record<any>, TOutput>() {
     return Projector as {
       new (props?: Props<TState, TOutput>): Projector<Props<TState, TOutput>>;
