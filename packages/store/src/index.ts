@@ -7,9 +7,12 @@ export interface Updater<TState extends State> {
   (state: TState): TState;
 }
 
-export interface UpdaterFactory<TState extends State, TParameters extends Object = any> {
-  (parameters: TParameters): Updater<TState>;
+export interface Factory<TProduct, TParameters extends Object = any> {
+  (parameters: TParameters): TProduct;
 }
+
+export interface UpdaterFactory<TState extends State, TParameters extends Object = any>
+  extends Factory<Updater<TState>, TParameters> {}
 
 export interface Listener<TState extends State> {
   (prevState: TState, nextState: TState): void;
@@ -19,9 +22,8 @@ export interface Selector<TState extends State, TOutput = any> {
   (state: TState): TOutput;
 }
 
-export interface SelectorFactory<TState extends State, TParameters extends Object = any> {
-  (parameters: TParameters): Selector<TState>;
-}
+export interface SelectorFactory<TState extends State, TParameters extends Object = any>
+  extends Factory<Selector<TState>, TParameters> {}
 
 export interface Task<TState extends State> {
   kind: string;
@@ -32,9 +34,8 @@ export interface Worker<TState extends State> {
   (task$: TaskSubject<TState>, state$: StateSubject<TState>): Observable<Updater<TState>>;
 }
 
-export interface WorkerFactory<TState extends State, TParameters extends Object = any> {
-  (parameters: TParameters): Worker<TState>;
-}
+export interface WorkerFactory<TState extends State, TParameters extends Object = any>
+  extends Factory<Worker<TState>, TParameters> {}
 
 export interface TaskObservable<TState extends State> extends Observable<Task<TState>> {
   accept<TTask extends Task<TState>>(kind: string): Observable<TTask>;
