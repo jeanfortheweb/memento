@@ -5,8 +5,6 @@ export interface UpdateStateTask<TStateProps> extends Task<State<TStateProps>> {
   data: Partial<TStateProps>;
 }
 
-export interface StateWorkerTask {}
-
 export const updateState = <TStateProps extends Object>(
   data: Partial<TStateProps>,
 ): UpdateStateTask<TStateProps> => ({
