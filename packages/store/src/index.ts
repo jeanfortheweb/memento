@@ -7,12 +7,20 @@ export interface Updater<TState extends State> {
   (state: TState): TState;
 }
 
+export interface UpdaterFactory<TState extends State, TParameters extends Object = any> {
+  (parameters: TParameters): Updater<TState>;
+}
+
 export interface Listener<TState extends State> {
   (prevState: TState, nextState: TState): void;
 }
 
 export interface Selector<TState extends State, TOutput = any> {
-  (state: TState, ...args: any[]): TOutput;
+  (state: TState): TOutput;
+}
+
+export interface SelectorFactory<TState extends State, TParameters extends Object = any> {
+  (parameters: TParameters): Selector<TState>;
 }
 
 export interface Task<TState extends State> {
