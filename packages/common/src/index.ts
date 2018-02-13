@@ -1,22 +1,24 @@
 import { Worker, State, Task, Updater } from '@memento/store';
 
-export interface UpdateStateTask<TStateProps> extends Task<State<TStateProps>> {
+export interface UpdateStateTask<TState extends State<TStateProps>, TStateProps>
+  extends Task<TState> {
   kind: '@STATE_UPDATER/STATE_UPDATE';
   data: Partial<TStateProps>;
 }
 
-export const updateState = <TStateProps extends Object>(
+export const updateState = <TState extends State<TStateProps>, TStateProps extends Object>(
   data: Partial<TStateProps>,
-): UpdateStateTask<TStateProps> => ({
+): UpdateStateTask<TState, TStateProps> => ({
   kind: '@STATE_UPDATER/STATE_UPDATE',
   data,
 });
 
-export const createStateUpdater = <TStateProps extends Object>(): Worker<
-  State<TStateProps>
-> => task$ =>
+export const createStateUpdater = <
+  TState extends State<TStateProps>,
+  TStateProps extends Object
+>(): Worker<TState> => task$ =>
   task$
-    .accept<UpdateStateTask<TStateProps>>('@STATE_UPDATER/STATE_UPDATE')
-    .map<UpdateStateTask<TStateProps>, Updater<State<TStateProps>>>(task => state =>
+    .accept<UpdateStateTask<TState, TStateProps>>('@STATE_UPDATER/STATE_UPDATE')
+    .map<UpdateStateTask<TState, TStateProps>, Updater<TState>>(task => state =>
       state.merge(task.data),
     );
