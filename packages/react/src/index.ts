@@ -1,3 +1,3 @@
-import Projector from './components/Projector';
+import View, { Props as ViewProps } from './components/View';
 
-export { Projector };
+export { View, ViewProps };
