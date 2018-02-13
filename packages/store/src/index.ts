@@ -28,12 +28,16 @@ export interface Task<TState extends State> {
   state?: TState;
 }
 
-export interface TaskObservable<TState extends State> extends Observable<Task<TState>> {
-  accept<TTask extends Task<TState>>(kind: string): Observable<TTask>;
-}
-
 export interface Worker<TState extends State> {
   (task$: TaskSubject<TState>): Observable<Updater<TState>>;
+}
+
+export interface WorkerFactory<TState extends State, TParameters extends Object = any> {
+  (parameters: TParameters): Worker<TState>;
+}
+
+export interface TaskObservable<TState extends State> extends Observable<Task<TState>> {
+  accept<TTask extends Task<TState>>(kind: string): Observable<TTask>;
 }
 
 export class TaskSubject<TState extends State> extends Subject<Task<TState>>
