@@ -22,7 +22,7 @@ class TestState extends Record<StateProps>({
 }) {}
 
 test('updateState creates the expected task object', () => {
-  const task = updateState<StateProps>({
+  const task = updateState<TestState, StateProps>({
     property1: 'a',
     property3: {
       a: 2,
@@ -43,12 +43,12 @@ test('updateState creates the expected task object', () => {
 });
 
 test('the update worker produces the expected output state', done => {
-  const worker = createStateUpdater<StateProps>();
-  const taskSubject = new TaskSubject<State<StateProps>>();
-  const updaterSubject = new Subject<Updater<State<StateProps>>>();
+  const worker = createStateUpdater<TestState, StateProps>();
+  const taskSubject = new TaskSubject<TestState>();
+  const updaterSubject = new Subject<Updater<TestState>>();
   const state = new TestState();
 
-  const task = updateState<StateProps>({
+  const task = updateState<TestState, StateProps>({
     property1: 'a',
     property3: {
       a: 2,
