@@ -1,5 +1,5 @@
 {
-  "name": "@memento/store",
+  "name": "@memento/common",
   "version": "0.0.1",
   "license": "MIT",
   "main": "es5/index.js",
@@ -16,11 +16,13 @@
   "author": "jeanfortheweb",
   "devDependencies": {
     "@types/jest": "^22.1.1",
+    "immutable": "4.0.0-rc.9",
     "jest": "^22.1.4",
     "ts-jest": "^22.0.2",
     "typescript": "^2.7.1"
   },
   "dependencies": {
+    "@memento/store": "^0.0.1",
     "@reactivex/rxjs": "^5.5.6",
     "immutable": "4.0.0-rc.9"
   },
