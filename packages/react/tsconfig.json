@@ -11,7 +11,8 @@
     "strictNullChecks": true,
     "jsx": "react",
     "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "skipLibCheck": true
   },
   "include": ["src", "node_modules/@types"]
 }
