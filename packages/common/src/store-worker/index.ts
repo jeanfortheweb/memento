@@ -1,10 +1,10 @@
 import { Worker, State } from '@memento/store';
 import { Observable } from '@reactivex/rxjs';
-import merge, { MergeTask, MergeParameters, accept as mergeAccept } from './merge';
-import push, { PushTask, PushParameters, accept as pushAccept } from './push';
+import merge, { MergeTask, accept as mergeAccept } from './merge';
+import push, { PushTask, accept as pushAccept } from './push';
 
-export { MergeTask, MergeParameters, merge };
-export { PushTask, PushParameters, push };
+export { MergeTask, merge };
+export { PushTask, push };
 
 export const createStoreWorker = <
   TState extends State<TStateProps>,

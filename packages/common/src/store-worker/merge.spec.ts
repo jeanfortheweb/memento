@@ -5,12 +5,10 @@ import merge, { accept } from './merge';
 test('merge creates the expected task object', () => {
   expect(
     merge<TestState, TestProps>({
-      data: {
-        a: 'a',
-        child: {
-          a: 2,
-          b: 3,
-        },
+      a: 'a',
+      child: {
+        a: 2,
+        b: 3,
       },
     }),
   ).toMatchObject({
@@ -30,12 +28,10 @@ test('merge produces the expected output state', async () => {
 
   await run(
     merge<TestState, TestProps>({
-      data: {
-        a: 'a',
-        child: {
-          a: 2,
-          b: 3,
-        },
+      a: 'a',
+      child: {
+        a: 2,
+        b: 3,
       },
     }),
     {
@@ -55,33 +51,9 @@ test('merge produces the expected output state', async () => {
   );
 
   await run(
-    merge<TestState, InnerTestProps>({
-      path: 'child',
-      data: {
-        a: 2,
-        b: 3,
-      },
-    }),
-    {
-      child: {
-        a: 0,
-        b: 0,
-      },
-    },
-    {
-      child: {
-        a: 2,
-        b: 3,
-      },
-    },
-  );
-
-  await run(
     merge<TestState, TestProps>({
-      data: {
-        a: 'a',
-        list: List([{ a: 2, b: 2 }, { a: 1, b: 1 }]),
-      },
+      a: 'a',
+      list: List([{ a: 2, b: 2 }, { a: 1, b: 1 }]),
     }),
     {
       a: '',
@@ -94,15 +66,14 @@ test('merge produces the expected output state', async () => {
   );
 
   await run(
-    merge<TestState, InnerTestProps>({
-      path: 'list.1',
-      data: { a: 5, b: 5 },
+    merge<TestState, TestProps>({
+      list: List([{ a: 5, b: 5 }]),
     }),
     {
       list: [{ a: 0, b: 0 }],
     },
     {
-      list: [{ a: 0, b: 0 }, { a: 5, b: 5 }],
+      list: [{ a: 5, b: 5 }],
     },
   );
 });

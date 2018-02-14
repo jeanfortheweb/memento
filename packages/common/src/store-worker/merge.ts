@@ -16,7 +16,9 @@ export const accept = <TState extends State>(task$: TaskObservable<TState>) =>
       return state.merge(task.data);
     });
 
-export default <TState extends State, TData = any>(data: TData): MergeTask<TState, TData> => ({
+export default <TState extends State, TData = any>(
+  data: Partial<TData>,
+): MergeTask<TState, TData> => ({
   kind: '@STATE_WORKER/MERGE',
   data,
 });
