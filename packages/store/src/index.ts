@@ -77,10 +77,14 @@ export class StateSubject<TState extends State> extends BehaviorSubject<TState>
   }
 }
 
+const isUpdater = <TState extends State>(
+  value: Updater<TState> | Task<TState>,
+): value is Updater<TState> => typeof value === 'function';
+
 export class Store<TState extends State> implements Store<TState> {
   private _task$: TaskSubject<TState>;
   private _state$: StateSubject<TState>;
-  private _updater$: Subject<Updater<TState>>;
+  private _updater$: Subject<Updater<TState> | Task<TState>>;
   private _state: TState;
   private _listeners: Set<Listener<TState>>;
 
@@ -90,13 +94,17 @@ export class Store<TState extends State> implements Store<TState> {
     this._task$ = new TaskSubject<TState>();
     this._state$ = new StateSubject<TState>(initialState);
     this._updater$ = new Subject();
-    this._updater$.subscribe(updater => {
-      const prevState = this._state;
-      this._state = updater(prevState);
+    this._updater$.subscribe(updaterOrTask => {
+      if (isUpdater(updaterOrTask)) {
+        const prevState = this._state;
+        this._state = updaterOrTask(prevState);
 
-      if (prevState !== this._state) {
-        this._listeners.forEach(listener => listener(prevState, this._state));
-        this._state$.next(this._state);
+        if (prevState !== this._state) {
+          this._listeners.forEach(listener => listener(prevState, this._state));
+          this._state$.next(this._state);
+        }
+      } else {
+        this._task$.next(updaterOrTask);
       }
     });
 

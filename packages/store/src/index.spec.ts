@@ -40,6 +40,28 @@ test('store does call emitted updaters', () => {
   expect(updater).toBeCalledWith(initialState);
 });
 
+test('store does emit emitted tasks', () => {
+  const updater = jest.fn();
+
+  const taskA: Task<State> = {
+    kind: 'TASK_A',
+  };
+  const taskB: Task<State> = {
+    kind: 'TASK_B',
+  };
+
+  const initialState = new State();
+
+  const worker = jest.fn<Worker<State>>(task$ =>
+    Observable.merge(task$.accept('TASK_A').mapTo(taskB), task$.accept('TASK_B').mapTo(updater)),
+  );
+
+  const store = new Store(initialState, [worker]);
+  store.assign(taskA);
+
+  expect(updater).toBeCalledWith(initialState);
+});
+
 test('store does forward assigned tasks to workers', () => {
   interface TestTask extends Task<State> {
     kind: 'TEST';
