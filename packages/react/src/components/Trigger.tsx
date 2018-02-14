@@ -1,15 +1,12 @@
 import * as React from 'react';
 import { Record } from 'immutable';
 import { Store, TaskFactory } from '@memento/store';
-
-export interface RenderFunction<TParameters> {
-  (trigger: (parameters: TParameters) => void): React.ReactElement<any>;
-}
+import Render, { RenderFunction } from './Render';
 
 export interface Props<TState extends Record<any>, TParameters> {
   store: Store<TState>;
   factory: TaskFactory<TState, TParameters>;
-  children?: RenderFunction<TParameters>;
+  children?: RenderFunction<(parameters: TParameters) => void>;
 }
 
 export interface State<TOutput = any> {
@@ -32,8 +29,6 @@ export default class Trigger<
   };
 
   render() {
-    const children = this.props.children as RenderFunction<any>;
-
-    return children(this.handleTrigger);
+    return <Render data={this.handleTrigger}>{this.props.children as RenderFunction<any>}</Render>;
   }
 }

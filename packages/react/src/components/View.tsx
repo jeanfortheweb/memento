@@ -1,10 +1,7 @@
 import * as React from 'react';
 import { Record } from 'immutable';
 import { Store, Selector } from '@memento/store';
-
-export interface RenderFunction<TOutput> {
-  (data: TOutput): React.ReactElement<any>;
-}
+import Render, { RenderFunction } from './Render';
 
 export interface Props<TState extends Record<any>, TOutput> {
   store: Store<TState>;
@@ -25,10 +22,6 @@ export default class View<TProps extends Props<any, any> = Props<any, any>> exte
       new (props?: Props<TState, TOutput>): View<Props<TState, TOutput>>;
     };
   }
-
-  public static defaultProps: Partial<Props<any, any>> = {
-    children: output => output,
-  };
 
   private _unsubcribe: Function;
 
@@ -55,8 +48,6 @@ export default class View<TProps extends Props<any, any> = Props<any, any>> exte
   };
 
   render() {
-    const children = this.props.children as RenderFunction<any>;
-
-    return children(this.state.output);
+    return <Render data={this.state.output}>{this.props.children as RenderFunction<any>}</Render>;
   }
 }
