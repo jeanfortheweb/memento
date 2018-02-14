@@ -6,7 +6,7 @@ import Render, { RenderFunction } from './Render';
 export interface Props<TState extends Record<any>, TParameters> {
   store: Store<TState>;
   factory: TaskFactory<TState, TParameters>;
-  children?: RenderFunction<(parameters: TParameters) => void>;
+  children: RenderFunction<(parameters: TParameters) => void>;
 }
 
 export default class Trigger<
