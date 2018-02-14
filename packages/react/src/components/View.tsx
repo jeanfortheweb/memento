@@ -30,7 +30,7 @@ export default class View<TProps extends Props<any, any> = Props<any, any>> exte
     children: output => output,
   };
 
-  private _unsubcribe?: Function;
+  private _unsubcribe: Function;
 
   shouldComponentUpdate(nextProps, nextState) {
     return !(nextState.output === this.state.output);
@@ -45,9 +45,7 @@ export default class View<TProps extends Props<any, any> = Props<any, any>> exte
   }
 
   componentWillUnmount() {
-    if (this._unsubcribe) {
-      this._unsubcribe();
-    }
+    this._unsubcribe();
   }
 
   handleStoreUpdate = (prevState, nextState) => {
@@ -59,10 +57,6 @@ export default class View<TProps extends Props<any, any> = Props<any, any>> exte
   render() {
     const children = this.props.children as RenderFunction<any>;
 
-    if (typeof children === 'function') {
-      return children(this.state.output);
-    }
-
-    return [this.state.output];
+    return children(this.state.output);
   }
 }

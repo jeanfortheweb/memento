@@ -18,18 +18,38 @@ class State extends Record<StateProps>({
 
 const store = new Store(new State(), [createStateUpdater<State, StateProps>()]);
 const getText: Selector<State, string> = state => state.text;
+const StringView = View.for<State, string>();
 
-test('a view renders pure', () => {
+test('a view does subscribe and unsubscribe from the given store', () => {
+  const listen = store.listen;
+  const stop = jest.fn();
+
+  store.listen = jest.fn(listener => {
+    stop.mockImplementation(listen.apply(store, [listener]));
+
+    return stop;
+  });
+
+  const wrapper = mount(<StringView store={store} selector={getText} />);
+
+  expect(store.listen).toHaveBeenCalledTimes(1);
+
+  wrapper.unmount();
+
+  expect(stop).toHaveBeenCalledTimes(1);
+
+  store.listen = listen;
+});
+
+test('a view renders with explicit render function', () => {
   const render = jest.fn(text => <div>{text}</div>);
   const wrapper = mount(
-    <View store={store} selector={getText}>
+    <StringView store={store} selector={getText}>
       {render}
-    </View>,
+    </StringView>,
   );
 
   expect(wrapper.find('div').length).toEqual(1);
-  expect(wrapper.prop('store')).toEqual(store);
-  expect(wrapper.prop('selector')).toEqual(getText);
   expect(render).toBeCalledWith('');
 
   store.assign(
@@ -47,4 +67,10 @@ test('a view renders pure', () => {
   );
 
   expect(render).toHaveBeenCalledTimes(2);
+});
+
+test('a view renders without explicit render function', () => {
+  const wrapper = mount(<StringView store={store} selector={getText} />);
+
+  expect(wrapper.contains('Hello')).toEqual(true);
 });
