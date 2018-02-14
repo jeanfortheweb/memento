@@ -6,11 +6,7 @@ import { Record } from 'immutable';
 class State extends Record({}) {}
 
 test('sequence creates the expected task object', () => {
-  expect(
-    sequence<State>({
-      tasks: [{ kind: 'A' }, { kind: 'B' }],
-    }),
-  ).toMatchObject({
+  expect(sequence<State>({ kind: 'A' }, { kind: 'B' })).toMatchObject({
     kind: '@SEQUENCE_WORKER/SEQUENCE',
     tasks: [{ kind: 'A' }, { kind: 'B' }],
   });
@@ -25,11 +21,7 @@ test('sequence does forward all given tasks', () => {
 
   updaterSubject.subscribe(subscriber);
 
-  taskSubject.next(
-    sequence<State>({
-      tasks: [{ kind: 'A' }, { kind: 'B' }],
-    }),
-  );
+  taskSubject.next(sequence<State>({ kind: 'A' }, { kind: 'B' }));
 
   expect(subscriber).toHaveBeenCalledTimes(2);
   expect(subscriber.mock.calls).toMatchObject([[{ kind: 'A' }], [{ kind: 'B' }]]);
