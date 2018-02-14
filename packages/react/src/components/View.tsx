@@ -23,7 +23,7 @@ export default class View<TProps extends Props<any, any> = Props<any, any>> exte
     };
   }
 
-  private _unsubcribe: Function;
+  private _unsubcribe: Function = () => null;
 
   shouldComponentUpdate(nextProps, nextState) {
     return !(nextState.output === this.state.output);
