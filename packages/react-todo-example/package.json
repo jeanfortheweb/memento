@@ -1,0 +1,34 @@
+{
+  "name": "@memento/react-todo-example",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "parcel ./src/index.html"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "flux",
+    "state management"
+  ],
+  "author": "jeanfortheweb",
+  "devDependencies": {
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "typescript": "^2.7.1"
+  },
+  "dependencies": {
+    "@memento/common": "^0.0.1",
+    "@memento/react": "^0.0.1",
+    "@memento/store": "^0.0.1",
+    "@reactivex/rxjs": "^5.5.6",
+    "antd": "^3.2.1",
+    "immutable": "4.0.0-rc.9",
+    "parcel-bundler": "^1.5.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
+  }
+}
