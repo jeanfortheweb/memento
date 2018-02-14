@@ -9,13 +9,9 @@ export interface Props<TState extends Record<any>, TParameters> {
   children?: RenderFunction<(parameters: TParameters) => void>;
 }
 
-export interface State<TOutput = any> {
-  output?: TOutput;
-}
-
 export default class Trigger<
   TProps extends Props<any, any> = Props<any, any>
-> extends React.PureComponent<TProps, State> {
+> extends React.PureComponent<TProps> {
   public static for<TState extends Record<any>, TParameters>() {
     return Trigger as {
       new (props?: Props<TState, TParameters>): Trigger<Props<TState, TParameters>>;
