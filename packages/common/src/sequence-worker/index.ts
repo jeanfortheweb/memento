@@ -1,8 +1,8 @@
 import { Worker, State } from '@memento/store';
 import { Observable } from '@reactivex/rxjs';
-import sequence, { SequenceTask, SequenceParameters, accept as sequenceAccept } from './sequence';
+import sequence, { SequenceTask, accept as sequenceAccept } from './sequence';
 
-export { SequenceTask, SequenceParameters, sequence };
+export { SequenceTask, sequence };
 
 export const createSequenceWorker = <
   TState extends State<TStateProps>,
