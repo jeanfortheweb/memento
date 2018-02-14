@@ -9,7 +9,7 @@ const TodoList = () => (
   <View store={todoStore} selector={getTodos}>
     {list => (
       <List
-        header={<div>Header</div>}
+        header={<div>Todos</div>}
         footer={<Footer />}
         bordered
         dataSource={list.toJS()}
