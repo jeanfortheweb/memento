@@ -12,13 +12,21 @@
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["flux", "state management"],
+  "keywords": [
+    "flux",
+    "state management"
+  ],
   "author": "jeanfortheweb",
   "devDependencies": {
+    "@memento/common": "^0.0.1",
+    "@types/enzyme": "^3.1.9",
     "@types/jest": "^22.1.1",
-    "@types/react-test-renderer": "^16.0.0",
     "@types/react": "^16.0.36",
+    "@types/react-test-renderer": "^16.0.0",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
     "jest": "^22.1.4",
+    "react-dom": "^16.2.0",
     "ts-jest": "^22.0.2",
     "typescript": "^2.7.1"
   },
@@ -33,7 +41,11 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "moduleFileExtensions": ["ts", "tsx", "js"],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
     "testRegex": "\\.spec\\.tsx?$",
     "mapCoverage": true
   }
