@@ -26,7 +26,7 @@ export class TestState extends Record<TestProps>({
 
 export const wire = <TState extends State>(worker: Worker<TState>, state: TState) => {
   const taskSubject = new TaskSubject<TState>();
-  const updaterSubject = new Subject<Updater<TState>>();
+  const updaterSubject = new Subject<Updater<TState> | Task<TState>>();
 
   worker(taskSubject, null as any).subscribe(updaterSubject);
 
@@ -35,7 +35,7 @@ export const wire = <TState extends State>(worker: Worker<TState>, state: TState
       expect(state.toJS()).toMatchObject(before);
 
       const subscription = updaterSubject.subscribe(updater => {
-        expect(updater(state).toJS()).toMatchObject(after);
+        expect((updater as Updater<TState>)(state).toJS()).toMatchObject(after);
         subscription.unsubscribe();
         resolve();
       });
