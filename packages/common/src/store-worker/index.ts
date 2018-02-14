@@ -6,6 +6,7 @@ import push, { PushTask, PushParameters, accept as pushAccept } from './push';
 export { MergeTask, MergeParameters, merge };
 export { PushTask, PushParameters, push };
 
-export default <TState extends State<TStateProps>, TStateProps extends Object>(): Worker<
-  TState
-> => task$ => Observable.merge(mergeAccept(task$), pushAccept(task$));
+export const createStoreWorker = <
+  TState extends State<TStateProps>,
+  TStateProps extends Object
+>(): Worker<TState> => task$ => Observable.merge(mergeAccept(task$), pushAccept(task$));
