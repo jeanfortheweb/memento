@@ -5,11 +5,7 @@ import todoStore, { addTodo, setTodoText, getTodoText } from '../../stores/todo'
 
 const AddButton = () => (
   <Trigger store={todoStore} factory={addTodo}>
-    {onClick => (
-      <View store={todoStore} selector={getTodoText}>
-        {text => <Button onClick={() => onClick(text)}>Add Todo</Button>}
-      </View>
-    )}
+    {onClick => <Button onClick={onClick}>Add Todo</Button>}
   </Trigger>
 );
 

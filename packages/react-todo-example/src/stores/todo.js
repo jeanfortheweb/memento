@@ -1,5 +1,5 @@
 import { Store } from '@memento/store';
-import { createStoreWorker, push, merge } from '@memento/common';
+import { createStoreWorker, createSequenceWorker, sequence, push, merge } from '@memento/common';
 import { Record, List } from 'immutable';
 
 export class Todo extends Record({
@@ -13,13 +13,23 @@ export class State extends Record({
   text: '',
 }) {}
 
-const clearTextWorker = (task$, state$) =>
-  state$.select(getTodos).mapTo(state => state.set('text', ''));
+const todoWorker = (task$, state$) =>
+  task$
+    // we could also do this by using sequence, push and set from @memento/common without
+    // the need of a custom worker, but this way, we can pull the text to set from the state
+    // so it doesn't have to be passed to addTodo().
+    .accept('@TODO/ADD')
+    .withLatestFrom(state$, (task, state) => state =>
+      state.update('todos', todos => todos.push(new Todo({ text: state.text }))).set('text', ''),
+    );
 
-export const addTodo = text => push({ path: 'todos', data: [new Todo({ text })] });
-export const setTodoText = event => merge({ data: { text: event.target.value } });
+export const addTodo = () => ({
+  kind: '@TODO/ADD',
+});
+
+export const setTodoText = event => merge({ text: event.target.value });
 
 export const getTodos = state => state.todos;
 export const getTodoText = state => state.text;
 
-export default new Store(new State(), [createStoreWorker(), clearTextWorker]);
+export default new Store(new State(), [createStoreWorker(), todoWorker]);
