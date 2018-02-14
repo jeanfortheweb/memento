@@ -34,7 +34,9 @@ export interface TaskFactory<TState extends State, TParameters extends Object = 
   extends Factory<Task<TState>, TParameters> {}
 
 export interface Worker<TState extends State> {
-  (task$: TaskSubject<TState>, state$: StateSubject<TState>): Observable<Updater<TState>>;
+  (task$: TaskSubject<TState>, state$: StateSubject<TState>): Observable<
+    Updater<TState> | Task<TState>
+  >;
 }
 
 export interface WorkerFactory<TState extends State, TParameters extends Object = any>
