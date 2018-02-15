@@ -3,7 +3,6 @@ import { Store } from '@memento/store';
 import { createStoreWorker, createSequenceWorker, sequence, push, merge } from '@memento/common';
 import { Record, List } from 'immutable';
 import shortid from 'shortid';
-import { identity, memoizeWith } from 'ramda';
 
 export class Todo extends Record({
   id: null,
