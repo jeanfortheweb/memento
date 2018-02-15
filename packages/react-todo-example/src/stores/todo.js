@@ -33,8 +33,11 @@ export const addTodo = text => () => {
 
 export const toggleTodo = id => () =>
   update(state =>
-    state.todos.update(todos.findKey(todo => todo.id === task.id), todo =>
-      todo.set('done', !todo.done),
+    state.set(
+      'todos',
+      state.todos.update(state.todos.findKey(todo => todo.id === id), todo =>
+        todo.set('done', !todo.done),
+      ),
     ),
   );
 
