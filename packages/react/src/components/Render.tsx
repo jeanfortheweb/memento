@@ -10,6 +10,6 @@ export interface Props<TData> {
 }
 
 const Render: React.SFC<Props<any>> = ({ children, data }) =>
-  children ? (children as RenderFunction<any>)(data) : (data => data)(data);
+  children ? (children as RenderFunction<any>)(data) : data;
 
 export default Render;
