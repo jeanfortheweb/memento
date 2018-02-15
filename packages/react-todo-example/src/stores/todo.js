@@ -3,6 +3,7 @@ import { Store } from '@memento/store';
 import { createStoreWorker, createSequenceWorker, sequence, push, merge } from '@memento/common';
 import { Record, List } from 'immutable';
 import shortid from 'shortid';
+import { identity, memoizeWith } from 'ramda';
 
 export class Todo extends Record({
   id: null,
@@ -46,7 +47,12 @@ export const toggleTodo = id => ({ kind: '@TODO/TOGGLE', id });
 export const setTodoText = event => merge({ text: event.target.value });
 
 // selectors
-export const getTodos = state => state.todos;
+export const getTodos = filter => state =>
+  state.todos.filter(
+    todo =>
+      filter === 'ALL' || (filter === 'DONE' && todo.done) || (filter === 'PENDING' && !todo.done),
+  );
+
 export const getTodoText = state => state.text;
 
 export default new Store(new State(), [createStoreWorker(), createSequenceWorker(), todoWorker]);
