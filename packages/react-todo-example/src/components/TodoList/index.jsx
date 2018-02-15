@@ -23,7 +23,7 @@ const TodoList = () => (
             )
           }
         >
-          {list => list.map(todo => <Item key={todo.id} data={todo} />)}
+          {todos => todos.map(todo => <Item key={todo.id} data={todo} />)}
         </View>
       )}
     </View>

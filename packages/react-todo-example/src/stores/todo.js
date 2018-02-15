@@ -1,7 +1,15 @@
 import { Observable, withLatestFrom, flatMap } from '@reactivex/rxjs';
 import { Store } from '@memento/store';
-import { createStoreWorker, createSequenceWorker, sequence, push, merge } from '@memento/common';
-import { Record, List, is } from 'immutable';
+import {
+  createStoreWorker,
+  createSequenceWorker,
+  sequence,
+  push,
+  merge,
+  update,
+  set,
+} from '@memento/common';
+import { Record, List } from 'immutable';
 import shortid from 'shortid';
 
 export class Todo extends Record({
@@ -15,58 +23,24 @@ export class State extends Record({
   text: '',
 }) {}
 
-const todoWorker = (task$, state$) =>
-  Observable.merge(
-    // we could also do this by using sequence, push and set from @memento/common without
-    // the need of a custom worker, but this way, we can pull the text to set from the state
-    // so it doesn't have to be passed to addTodo().
-    task$
-      .accept('@TODO/ADD')
-      .withLatestFrom(state$)
-      .map(([task, state]) =>
-        sequence(
-          push('todos', new Todo({ id: shortid.generate(), text: state.text })),
-          merge({ text: '' }),
-        ),
-      ),
-    task$
-      .accept('@TODO/TOGGLE')
-      .map(task => state =>
-        state.update('todos', todos =>
-          todos.update(todos.findKey(todo => todo.id === task.id), todo =>
-            todo.set('done', !todo.done),
-          ),
-        ),
-      ),
+// task creators.
+export const addTodo = text => () => {
+  const pushTodo = push('todos', new Todo({ id: shortid.generate(), text }));
+  const clearText = set('text', '');
+
+  return sequence(pushTodo, clearText);
+};
+
+export const toggleTodo = id => () =>
+  update(state =>
+    state.todos.update(todos.findKey(todo => todo.id === task.id), todo =>
+      todo.set('done', !todo.done),
+    ),
   );
 
-// task creators.
-export const addTodo = () => ({ kind: '@TODO/ADD' });
-export const toggleTodo = id => ({ kind: '@TODO/TOGGLE', id });
-export const setTodoText = event => merge({ text: event.target.value });
+export const setTodoText = event => set('text', event.target.value);
 
-const createSelector = (...selectors) => {
-  let prevState;
-  let prevParameters;
-  let cache;
-  let cachedSelectors = [];
-
-  const selector = selectors.pop();
-
-  return (state, parameters = {}) => {
-    if (state !== prevState || (prevParameters !== parameters && is(prevParameters, parameters))) {
-      if (selectors.some((s, i) => s(state, parameters) !== cachedSelectors[i])) {
-        cachedSelectors = selectors.map(s => s(state, parameters));
-        cache = selector.apply(null, [...cachedSelectors, parameters]);
-      }
-
-      prevState = state;
-      prevParameters = parameters;
-    }
-
-    return cache;
-  };
-};
+// set, update, remove
 
 // selectors
 export const getState = state => state;
@@ -74,4 +48,4 @@ export const getTodos = state => state.todos;
 
 export const getTodoText = state => state.text;
 
-export default new Store(new State(), [createStoreWorker(), createSequenceWorker(), todoWorker]);
+export default new Store(new State(), [createStoreWorker(), createSequenceWorker()]);

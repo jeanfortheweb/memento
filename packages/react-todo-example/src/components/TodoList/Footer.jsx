@@ -28,6 +28,12 @@ const renderTodoTextInput = ({ text }) => (
   </Trigger>
 );
 
+const renderAddTodoButton = ({ text }) => (
+  <Trigger store={todoStore} onClick={addTodo(text)}>
+    {({ onClick }) => <Button onClick={onClick}>Add Todo</Button>}
+  </Trigger>
+);
+
 const Footer = () => (
   <div>
     <Row type="flex" justify="start">
@@ -35,9 +41,7 @@ const Footer = () => (
         <View store={todoStore} text={getTodoText} render={renderTodoTextInput} />
       </Col>
       <Col offset={2} span={2}>
-        <Trigger store={todoStore} onClick={addTodo}>
-          {({ onClick }) => <Button onClick={onClick}>Add Todo</Button>}
-        </Trigger>
+        <View store={todoStore} text={getTodoText} render={renderAddTodoButton} />
       </Col>
     </Row>
 
