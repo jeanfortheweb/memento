@@ -22,19 +22,17 @@ const FilterCheckbox = ({ value }) => (
   </View>
 );
 
+const renderTodoTextInput = ({ text }) => (
+  <Trigger store={todoStore} factory={setTodoText}>
+    {onChange => <Input value={text} onChange={onChange} placeholder="Enter todo text..." />}
+  </Trigger>
+);
+
 const Footer = () => (
   <div>
     <Row type="flex" justify="start">
       <Col span={18}>
-        <Trigger store={todoStore} factory={setTodoText}>
-          {onChange => (
-            <View store={todoStore} text={getTodoText}>
-              {({ text }) => (
-                <Input value={text} onChange={onChange} placeholder="Enter todo text..." />
-              )}
-            </View>
-          )}
-        </Trigger>
+        <View store={todoStore} text={getTodoText} render={renderTodoTextInput} />
       </Col>
       <Col offset={2} span={2}>
         <Trigger store={todoStore} factory={addTodo}>
