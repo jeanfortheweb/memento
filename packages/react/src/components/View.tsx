@@ -6,6 +6,7 @@ import Render, { RenderFunction } from './Render';
 export type Props<TState extends Record<any>, TProps, TOutput> = {
   store: Store<TState>;
   compute?: (props: TProps) => TOutput;
+  render?: RenderFunction<TOutput>;
   children?: RenderFunction<TOutput>;
 };
 
@@ -64,7 +65,7 @@ export default class View<
   ) {
     const { store, compute, ...props } = propsToUse as any;
     const data = Object.keys(props).reduce((output, prop) => {
-      if (prop !== 'children') {
+      if (prop !== 'children' && prop !== 'render') {
         if (typeof props[prop] === 'function') {
           return { ...output, [prop]: props[prop](nextState) };
         }
@@ -116,6 +117,10 @@ export default class View<
   }
 
   render() {
-    return <Render data={this.state.output}>{this.props.children as RenderFunction<any>}</Render>;
+    return (
+      <Render data={this.state.output}>
+        {(this.props.children || this.props.render) as RenderFunction<any>}
+      </Render>
+    );
   }
 }

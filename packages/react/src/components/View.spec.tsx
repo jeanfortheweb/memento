@@ -108,11 +108,7 @@ test('a view recomputes when store changes', () => {
 
 test('a view renders without explicit compute function', () => {
   const render = jest.fn(({ value }) => value);
-  const wrapper = mount(
-    <StringView store={store} value={getText}>
-      {render}
-    </StringView>,
-  );
+  const wrapper = mount(<StringView store={store} value={getText} render={render} />);
 
   wrapper.setProps({
     store: anotherStore,
