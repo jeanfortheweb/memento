@@ -15,7 +15,6 @@ const TodoList = () => (
           filter={filter}
           todos={state => state.todos}
           compute={props =>
-            console.log(props) ||
             props.todos.filter(
               todo =>
                 props.filter === 'ALL' ||

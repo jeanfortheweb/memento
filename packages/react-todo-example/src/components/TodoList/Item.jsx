@@ -7,8 +7,8 @@ const Item = ({ data }) => (
   <List.Item>
     <Row align="middle" type="flex" style={{ width: '100%' }}>
       <Col span={2}>
-        <Trigger store={todoStore} factory={toggleTodo}>
-          {onClick => <Checkbox checked={data.done} onClick={() => onClick(data.id)} />}
+        <Trigger store={todoStore} onClick={toggleTodo}>
+          {({ onClick }) => <Checkbox checked={data.done} onClick={() => onClick(data.id)} />}
         </Trigger>
       </Col>
       <Col span={22}>{data.text}</Col>

@@ -8,8 +8,8 @@ const FilterCheckbox = ({ value }) => (
   <View store={settingsStore} filter={getFilter}>
     {({ filter }) => (
       <div>
-        <Trigger store={settingsStore} factory={setFilter}>
-          {onClick => (
+        <Trigger store={settingsStore} onClick={setFilter}>
+          {({ onClick }) => (
             <Checkbox
               checked={filter === value.toUpperCase()}
               onClick={() => onClick(value.toUpperCase())}
@@ -23,8 +23,8 @@ const FilterCheckbox = ({ value }) => (
 );
 
 const renderTodoTextInput = ({ text }) => (
-  <Trigger store={todoStore} factory={setTodoText}>
-    {onChange => <Input value={text} onChange={onChange} placeholder="Enter todo text..." />}
+  <Trigger store={todoStore} onChange={setTodoText}>
+    {({ onChange }) => <Input value={text} onChange={onChange} placeholder="Enter todo text..." />}
   </Trigger>
 );
 
@@ -35,8 +35,8 @@ const Footer = () => (
         <View store={todoStore} text={getTodoText} render={renderTodoTextInput} />
       </Col>
       <Col offset={2} span={2}>
-        <Trigger store={todoStore} factory={addTodo}>
-          {onClick => <Button onClick={onClick}>Add Todo</Button>}
+        <Trigger store={todoStore} onClick={addTodo}>
+          {({ onClick }) => <Button onClick={onClick}>Add Todo</Button>}
         </Trigger>
       </Col>
     </Row>
