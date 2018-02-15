@@ -7,7 +7,7 @@ const Item = ({ data }) => (
   <List.Item>
     <Row align="middle" type="flex" style={{ width: '100%' }}>
       <Col span={2}>
-        <Trigger store={todoStore} onClick={toggleTodo(data.id)}>
+        <Trigger store={todoStore} onClick={toggleTodo(data)}>
           {({ onClick }) => <Checkbox checked={data.done} onClick={onClick} />}
         </Trigger>
       </Col>

@@ -31,14 +31,9 @@ export const addTodo = text => () => {
   return sequence(pushTodo, clearText);
 };
 
-export const toggleTodo = id => () =>
+export const toggleTodo = todo => () =>
   update(state =>
-    state.set(
-      'todos',
-      state.todos.update(state.todos.findKey(todo => todo.id === id), todo =>
-        todo.set('done', !todo.done),
-      ),
-    ),
+    state.set('todos', state.todos.set(state.todos.indexOf(todo), todo.set('done', !todo.done))),
   );
 
 export const setTodoText = event => set('text', event.target.value);
