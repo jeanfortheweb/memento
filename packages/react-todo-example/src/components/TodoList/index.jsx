@@ -8,9 +8,22 @@ import Item from './Item';
 
 const TodoList = () => (
   <List header={<div>Todos</div>} footer={<Footer />} bordered>
-    <View store={settingsStore} selector={getFilter}>
-      {filter => (
-        <View store={todoStore} selector={getTodos(filter)}>
+    <View store={settingsStore} filter={state => state.filter}>
+      {({ filter }) => (
+        <View
+          store={todoStore}
+          filter={filter}
+          todos={state => state.todos}
+          compute={props =>
+            console.log(props) ||
+            props.todos.filter(
+              todo =>
+                props.filter === 'ALL' ||
+                (props.filter === 'DONE' && todo.done) ||
+                (props.filter === 'PENDING' && !todo.done),
+            )
+          }
+        >
           {list => list.map(todo => <Item key={todo.id} data={todo} />)}
         </View>
       )}

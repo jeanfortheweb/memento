@@ -1,7 +1,7 @@
 import { Observable, withLatestFrom, flatMap } from '@reactivex/rxjs';
 import { Store } from '@memento/store';
 import { createStoreWorker, createSequenceWorker, sequence, push, merge } from '@memento/common';
-import { Record, List } from 'immutable';
+import { Record, List, is } from 'immutable';
 import shortid from 'shortid';
 
 export class Todo extends Record({
@@ -40,17 +40,37 @@ const todoWorker = (task$, state$) =>
       ),
   );
 
-// task creators
+// task creators.
 export const addTodo = () => ({ kind: '@TODO/ADD' });
 export const toggleTodo = id => ({ kind: '@TODO/TOGGLE', id });
 export const setTodoText = event => merge({ text: event.target.value });
 
+const createSelector = (...selectors) => {
+  let prevState;
+  let prevParameters;
+  let cache;
+  let cachedSelectors = [];
+
+  const selector = selectors.pop();
+
+  return (state, parameters = {}) => {
+    if (state !== prevState || (prevParameters !== parameters && is(prevParameters, parameters))) {
+      if (selectors.some((s, i) => s(state, parameters) !== cachedSelectors[i])) {
+        cachedSelectors = selectors.map(s => s(state, parameters));
+        cache = selector.apply(null, [...cachedSelectors, parameters]);
+      }
+
+      prevState = state;
+      prevParameters = parameters;
+    }
+
+    return cache;
+  };
+};
+
 // selectors
-export const getTodos = filter => state =>
-  state.todos.filter(
-    todo =>
-      filter === 'ALL' || (filter === 'DONE' && todo.done) || (filter === 'PENDING' && !todo.done),
-  );
+export const getState = state => state;
+export const getTodos = state => state.todos;
 
 export const getTodoText = state => state.text;
 
