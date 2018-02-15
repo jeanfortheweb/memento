@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Record, Map } from 'immutable';
+import { Record } from 'immutable';
 import { Store } from '@memento/store';
 import Render, { RenderFunction } from './Render';
 
