@@ -1,19 +1,18 @@
 import React from 'react';
-import { Layout, Row, Col, List } from 'antd';
+import { Container, Divider, Grid } from 'semantic-ui-react';
 import TodoList from './TodoList';
 
 const data = ['a', 'b'];
 
 const App = () => (
-  <Layout style={{ height: '100vh' }}>
-    <Layout.Content style={{ padding: 24 }}>
-      <Row type="flex" align="middle">
-        <Col span={12} offset={6}>
-          <TodoList />
-        </Col>
-      </Row>
-    </Layout.Content>
-  </Layout>
+  <Container>
+    <Divider hidden />
+    <Grid centered>
+      <Grid.Column width={9}>
+        <TodoList />
+      </Grid.Column>
+    </Grid>
+  </Container>
 );
 
 export default App;

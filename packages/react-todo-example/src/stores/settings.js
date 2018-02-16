@@ -9,7 +9,7 @@ export class State extends Record({
 }) {}
 
 // task creators
-export const setFilter = value => merge({ filter: value.toUpperCase() });
+export const setFilter = value => () => merge({ filter: value.toUpperCase() });
 
 // selectors
 export const getFilter = state => state.filter;

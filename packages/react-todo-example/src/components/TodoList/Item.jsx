@@ -1,18 +1,16 @@
 import React from 'react';
-import { List, Col, Row, Checkbox } from 'antd';
+import { List, Checkbox } from 'semantic-ui-react';
 import { Trigger } from '@memento/react';
 import todoStore, { toggleTodo } from '../../stores/todo';
 
 const Item = ({ data }) => (
   <List.Item>
-    <Row align="middle" type="flex" style={{ width: '100%' }}>
-      <Col span={2}>
-        <Trigger store={todoStore} onClick={toggleTodo(data)}>
-          {({ onClick }) => <Checkbox checked={data.done} onClick={onClick} />}
-        </Trigger>
-      </Col>
-      <Col span={22}>{data.text}</Col>
-    </Row>
+    <List.Content floated="right">
+      <Trigger store={todoStore} onClick={toggleTodo(data)}>
+        {({ onClick }) => <Checkbox checked={data.done} onClick={onClick} />}
+      </Trigger>
+    </List.Content>
+    <List.Content>{data.text}</List.Content>
   </List.Item>
 );
 

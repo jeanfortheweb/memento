@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Button, Input, Checkbox } from 'antd';
+import { Grid, Button, Input, Checkbox } from 'semantic-ui-react';
 import { View, Trigger } from '@memento/react';
 import todoStore, { addTodo, setTodoText, getTodoText } from '../../stores/todo';
 import settingsStore, { getFilter, setFilter } from '../../stores/settings';
@@ -23,40 +23,35 @@ const FilterCheckbox = ({ value }) => (
 );
 
 const renderTodoTextInput = ({ text }) => (
-  <Trigger store={todoStore} onChange={setTodoText}>
-    {({ onChange }) => <Input value={text} onChange={onChange} placeholder="Enter todo text..." />}
-  </Trigger>
-);
-
-const renderAddTodoButton = ({ text }) => (
-  <Trigger store={todoStore} onClick={addTodo(text)}>
-    {({ onClick }) => <Button onClick={onClick}>Add Todo</Button>}
+  <Trigger store={todoStore} onAddClick={addTodo(text)} onChange={setTodoText}>
+    {({ onChange, onAddClick }) => (
+      <Input
+        fluid
+        value={text}
+        onChange={onChange}
+        placeholder="Enter todo text..."
+        action={
+          <Button
+            color="teal"
+            icon="add"
+            content="Add Todo"
+            onClick={onAddClick}
+            disabled={text.length === 0}
+          />
+        }
+      />
+    )}
   </Trigger>
 );
 
 const Footer = () => (
-  <div>
-    <Row type="flex" justify="start">
-      <Col span={18}>
+  <Grid>
+    <Grid.Row>
+      <Grid.Column width={16}>
         <View store={todoStore} text={getTodoText} render={renderTodoTextInput} />
-      </Col>
-      <Col offset={2} span={2}>
-        <View store={todoStore} text={getTodoText} render={renderAddTodoButton} />
-      </Col>
-    </Row>
-
-    <Row style={{ height: 40 }} type="flex" align="middle">
-      <Col span={6}>
-        <FilterCheckbox value="All" />
-      </Col>
-      <Col span={6}>
-        <FilterCheckbox value="Pending" />
-      </Col>
-      <Col span={6}>
-        <FilterCheckbox value="Done" />
-      </Col>
-    </Row>
-  </div>
+      </Grid.Column>
+    </Grid.Row>
+  </Grid>
 );
 
 export default Footer;
