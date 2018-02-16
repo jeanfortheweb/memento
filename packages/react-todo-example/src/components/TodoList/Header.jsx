@@ -5,7 +5,7 @@ import todoStore from '../../stores/todo';
 import settingsStore, { setFilter } from '../../stores/settings';
 
 const StatLabel = ({ name, value }) => (
-  <Trigger store={settingsStore} onClick={setFilter(name.toUpperCase())}>
+  <Trigger store={settingsStore} onClick={setFilter(name)}>
     {({ onClick }) => (
       <Label as="a" color="teal" onClick={onClick}>
         {name}
