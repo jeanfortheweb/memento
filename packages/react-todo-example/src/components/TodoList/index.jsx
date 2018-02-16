@@ -8,11 +8,11 @@ import Footer from './Footer';
 import Item from './Item';
 
 const TodoList = () => (
-  <div>
-    <Segment attached="top" secondary>
+  <Segment.Group>
+    <Segment secondary>
       <Header />
     </Segment>
-    <Segment attached>
+    <Segment>
       <List divided>
         <View store={settingsStore} filter={state => state.filter}>
           {({ filter }) => (
@@ -35,10 +35,10 @@ const TodoList = () => (
         </View>
       </List>
     </Segment>
-    <Segment attached="bottom" secondary>
+    <Segment secondary>
       <Footer />
     </Segment>
-  </div>
+  </Segment.Group>
 );
 
 export default TodoList;
