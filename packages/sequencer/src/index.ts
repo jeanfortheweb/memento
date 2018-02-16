@@ -4,7 +4,6 @@ import sequence, { SequenceTask, accept as sequenceAccept } from './sequence';
 
 export { SequenceTask, sequence };
 
-export const createSequenceWorker = <
-  TState extends State<TStateProps>,
-  TStateProps extends Object
->(): Worker<TState> => task$ => Observable.merge(sequenceAccept(task$));
+export default <TState extends State<TStateProps>, TStateProps extends Object>(): Worker<
+  TState
+> => task$ => Observable.merge(sequenceAccept(task$));
