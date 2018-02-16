@@ -13,7 +13,7 @@ const TodoList = () => (
       <Header />
     </Segment>
     <Segment>
-      <List divided>
+      <List divided color="teal" relaxed="very" selection>
         <View store={settingsStore} filter={state => state.filter}>
           {({ filter }) => (
             <View

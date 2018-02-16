@@ -14,6 +14,7 @@ import shortid from 'shortid';
 
 export class Todo extends Record({
   id: null,
+  date: Date.now(),
   text: 'Enter a todo text',
   done: false,
 }) {}
