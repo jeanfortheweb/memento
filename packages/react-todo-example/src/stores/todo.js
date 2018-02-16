@@ -50,4 +50,10 @@ export const getTodos = state => state.todos;
 
 export const getTodoText = state => state.text;
 
-export default new Store(new State(), [createStoreWorker(), createSequenceWorker()]);
+const store = new Store(new State(), [createStoreWorker(), createSequenceWorker()]);
+
+// add some default todos
+store.assign(addTodo('Add more features')());
+store.assign(addTodo('Update documentation')());
+
+export default store;
