@@ -37,7 +37,7 @@ export const getTodos = state => state.todos;
 
 export const getTodoText = state => state.text;
 
-const store = new Store(new State(), [createMade(), createSequenceWorker()]);
+const store = new Store(new State(), [createMade(), createSequencer()]);
 
 // add some default todos
 store.assign(addTodo('Add more features')());
