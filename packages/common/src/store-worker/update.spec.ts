@@ -1,25 +1,35 @@
 import { TestState, InnerTestProps, wire } from './test/helpers';
+import { List } from 'immutable';
 import update, { accept } from './update';
 
-test('update creates the expected task object', () => {
-  const updater = jest.fn();
+const element = { a: 1, b: 1 };
 
-  expect(update<TestState>(updater)).toMatchObject({
+test('update creates the expected task object', () => {
+  expect(update<TestState, InnerTestProps>('list', element, { b: 2 })).toMatchObject({
     kind: '@STATE_WORKER/UPDATE',
-    updater,
+    path: 'list',
+    element,
+    data: {
+      b: 2,
+    },
   });
 });
 
 test('update produces the expected output state', async () => {
-  const run = wire<TestState>(accept, new TestState());
+  const run = wire<TestState>(
+    accept,
+    new TestState({
+      list: List([{ a: 0, b: 0 }, element]),
+    }),
+  );
 
   await run(
-    update<TestState>(state => state.set('a', 'foo')),
+    update<TestState, InnerTestProps>('list', element, { b: 2 }),
     {
-      a: '',
+      list: [{ a: 0, b: 0 }, { a: 1, b: 1 }],
     },
     {
-      a: 'foo',
+      list: [{ a: 0, b: 0 }, { a: 1, b: 2 }],
     },
   );
 });
