@@ -32,13 +32,7 @@ export const addTodo = text => () => {
   return sequence(pushTodo, clearText);
 };
 
-export const toggleTodo = todo => () =>
-  update(state => {
-    const index = state.todos.indexOf(todo);
-    const updatedTodo = todo.set('done', !todo.done);
-
-    return state.update('todos', todos => todos.set(index, updatedTodo));
-  });
+export const toggleTodo = todo => () => update('todos', todo, todo.set('done', !todo.done));
 
 export const setTodoText = event => set('text', event.target.value);
 
