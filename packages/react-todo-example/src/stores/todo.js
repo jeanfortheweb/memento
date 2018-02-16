@@ -1,14 +1,7 @@
 import { Observable, withLatestFrom, flatMap } from '@reactivex/rxjs';
 import { Store } from '@memento/store';
-import {
-  createStoreWorker,
-  createSequenceWorker,
-  sequence,
-  push,
-  merge,
-  update,
-  set,
-} from '@memento/common';
+import { createSequenceWorker, sequence } from '@memento/common';
+import createMade, { push, merge, update, set } from '@memento/made';
 import { Record, List } from 'immutable';
 import shortid from 'shortid';
 
@@ -44,7 +37,7 @@ export const getTodos = state => state.todos;
 
 export const getTodoText = state => state.text;
 
-const store = new Store(new State(), [createStoreWorker(), createSequenceWorker()]);
+const store = new Store(new State(), [createMade(), createSequenceWorker()]);
 
 // add some default todos
 store.assign(addTodo('Add more features')());

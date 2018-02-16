@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@memento/common": "^0.0.1",
+    "@memento/made": "^0.0.1",
     "@memento/react": "^0.0.1",
     "@memento/store": "^0.0.1",
     "@reactivex/rxjs": "^5.5.6",
