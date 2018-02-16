@@ -12,10 +12,9 @@ export { RemoveTask, remove };
 export { SetTask, set };
 export { UpdateTask, update };
 
-export const createStoreWorker = <
-  TState extends State<TStateProps>,
-  TStateProps extends Object
->(): Worker<TState> => task$ =>
+export default <TState extends State<TStateProps>, TStateProps extends Object>(): Worker<
+  TState
+> => task$ =>
   Observable.merge(
     mergeAccept(task$),
     pushAccept(task$),
