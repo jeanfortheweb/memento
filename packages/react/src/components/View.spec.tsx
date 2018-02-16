@@ -3,7 +3,7 @@ import { Record } from 'immutable';
 import { configure, mount } from 'enzyme';
 import * as Adapter from 'enzyme-adapter-react-16';
 import { Store, Selector } from '@memento/store';
-import { createStoreWorker, merge } from '@memento/common';
+import createMade, { merge } from '@memento/made';
 import View from './View';
 
 configure({ adapter: new Adapter() });
@@ -16,10 +16,8 @@ class State extends Record<StateProps>({
   text: '',
 }) {}
 
-const store = new Store(new State(), [createStoreWorker<State, StateProps>()]);
-const anotherStore = new Store(new State({ text: 'foo' }), [
-  createStoreWorker<State, StateProps>(),
-]);
+const store = new Store(new State(), [createMade<State, StateProps>()]);
+const anotherStore = new Store(new State({ text: 'foo' }), [createMade<State, StateProps>()]);
 const getText: Selector<State, string> = state => state.text;
 const StringView = View.for<State, { value: string }, string>();
 
