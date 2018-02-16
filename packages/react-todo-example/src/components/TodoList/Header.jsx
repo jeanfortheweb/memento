@@ -20,19 +20,19 @@ const Header = () => (
     store={todoStore}
     todos={state => state.todos}
     compute={({ todos }) => ({
-      total: todos.size,
+      all: todos.size,
       pending: todos.filter(todo => !todo.done).size,
       done: todos.filter(todo => todo.done).size,
     })}
   >
-    {({ total, done, pending }) => (
+    {({ all, done, pending }) => (
       <Grid>
         <Grid.Row>
           <Grid.Column width={8}>
             <SemanticHeader content="Todos" subheader="A memento example" />
           </Grid.Column>
           <Grid.Column width={8} textAlign="right" verticalAlign="middle">
-            <StatLabel name="All" value={total} />
+            <StatLabel name="All" value={all} />
             <StatLabel name="Pending" value={pending} />
             <StatLabel name="Done" value={done} />
           </Grid.Column>
