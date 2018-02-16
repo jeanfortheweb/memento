@@ -1,9 +1,9 @@
 import { Observable, withLatestFrom, flatMap } from '@reactivex/rxjs';
-import { Store } from '@memento/store';
-import { createSequenceWorker, sequence } from '@memento/common';
-import createMade, { push, merge, update, set } from '@memento/made';
 import { Record, List } from 'immutable';
 import shortid from 'shortid';
+import { Store } from '@memento/store';
+import createSequencer, { sequence } from '@memento/sequencer';
+import createMade, { push, merge, update, set } from '@memento/made';
 
 export class Todo extends Record({
   id: null,
