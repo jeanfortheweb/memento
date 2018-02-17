@@ -21,6 +21,7 @@
     "typescript": "^2.7.1"
   },
   "dependencies": {
+    "@memento/fetcher": "^0.0.1",
     "@memento/made": "^0.0.1",
     "@memento/react": "^0.0.1",
     "@memento/sequencer": "^0.0.1",

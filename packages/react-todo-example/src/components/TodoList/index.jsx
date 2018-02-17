@@ -1,7 +1,7 @@
 import React from 'react';
-import { Segment, List } from 'semantic-ui-react';
-import { View } from '@memento/react';
-import todoStore, { getTodos } from '../../stores/todo';
+import { Segment, Button, List } from 'semantic-ui-react';
+import { View, Trigger } from '@memento/react';
+import todoStore, { getTodos, saveTodos } from '../../stores/todo';
 import settingsStore, { getFilter } from '../../stores/settings';
 import Header from './Header';
 import Footer from './Footer';
@@ -37,6 +37,13 @@ const TodoList = () => (
     </Segment>
     <Segment secondary>
       <Footer />
+      <View store={todoStore} todos={getTodos}>
+        {({ todos }) => (
+          <Trigger store={todoStore} onClick={saveTodos(todos)}>
+            {({ onClick }) => <Button icon="save" content="Save" onClick={onClick} />}
+          </Trigger>
+        )}
+      </View>
     </Segment>
   </Segment.Group>
 );

@@ -1,6 +1,6 @@
 import { State, Task, TaskObservable } from '@memento/store';
 import { Observable, AjaxRequest, AjaxResponse } from '@reactivex/rxjs';
-import { ConfigurationState, AjaxRequestState } from './configuration';
+import { ConfigurationState } from './configuration';
 
 export interface TriggerParameters {
   request: AjaxRequest;
@@ -69,10 +69,7 @@ const createAjaxRequest = (
   parameters: AjaxRequest,
   configuration: ConfigurationState,
 ): AjaxRequest => {
-  return configuration.defaults
-    .merge(parameters)
-    .set('url', `${configuration.baseURL}${parameters.url}`)
-    .toJS();
+  return configuration.merge(parameters).toJS();
 };
 
 const getTrigger = <TState extends State>(trigger?: Trigger<TState>): Trigger<TState> =>
@@ -146,6 +143,7 @@ export const accept = <TState extends State>(
               ...lifeCycleParameters,
               kind: '@FETCHER/FAILURE',
               trigger: 'failure',
+              error,
             }),
           ),
         after$,

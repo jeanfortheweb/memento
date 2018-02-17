@@ -1,6 +1,6 @@
 import { Worker, State } from '@memento/store';
 import { Observable, BehaviorSubject } from '@reactivex/rxjs';
-import { Configuration, ConfigurationState, AjaxRequestState } from './configuration';
+import { Configuration, ConfigurationState } from './configuration';
 import {
   accept as requestAccept,
   request,
@@ -29,13 +29,10 @@ export {
 };
 
 export default <TState extends State>(
-  configuration: Partial<Configuration<TState>>,
+  configuration: Partial<Configuration> = {},
 ): Worker<TState> => task$ => {
   const configuration$ = new BehaviorSubject<ConfigurationState>(
-    new ConfigurationState({
-      baseURL: configuration.baseURL,
-      defaults: new AjaxRequestState(configuration.defaults),
-    }),
+    new ConfigurationState(configuration),
   );
 
   return Observable.merge(requestAccept(configuration$, task$));

@@ -46,7 +46,9 @@ export const run = <TState extends State>(
   new Promise(resolve => {
     const XHR2 = xhr2;
     const task$ = new TaskSubject<TState>();
-    const fetcher$ = createFetcher<TState>({})(task$, null as any);
+    const fetcher$ = createFetcher<TState>(
+      Math.random() * 20 > 5 ? { headers: { 'Content-Type': 'text/html' } } : undefined,
+    )(task$, null as any);
     const subscription = fetcher$.subscribe({
       next: value => {
         if (typeof value !== 'function' && value.kind === '@FETCHER/NO_TRIGGER') {
