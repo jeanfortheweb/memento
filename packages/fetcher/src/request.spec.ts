@@ -49,8 +49,6 @@ const fooAfter = {
 };
 
 const fetcher = {
-  name: request.name,
-  tags: request.tags,
   request: {
     url: request.url,
   },
@@ -82,28 +80,32 @@ const fetcherAfter = {
 };
 
 test('fetcher does run requests without triggers', async () => {
-  await run<FetcherState>({
-    url: request.url,
-    method: request.method,
-  });
+  await run<FetcherState>(
+    {
+      url: request.url,
+      method: request.method,
+    },
+    successResponse,
+    [fetcherBefore, fetcherSuccess, fetcherAfter],
+  );
 });
 
 test('fetcher does abort open requests', async () => {
-  const success = jest.fn();
+  const successMock = jest.fn(success);
 
   await run<FetcherState>(
     {
       ...request,
       triggers: {
         before: () => abort('foo'),
-        success,
+        success: successMock,
       },
     },
     successResponse,
-    [fetcherAbort, fetcherAfter],
+    [fetcherBefore, fetcherAbort, fetcherAfter],
   );
 
-  expect(success).toHaveBeenCalledTimes(0);
+  expect(successMock).toHaveBeenCalledTimes(0);
 });
 
 test('fetcher does not abort on unknown names', async () => {
@@ -116,7 +118,7 @@ test('fetcher does not abort on unknown names', async () => {
       },
     },
     successResponse,
-    [fooSuccess],
+    [fetcherBefore, fetcherSuccess, fooSuccess, fetcherAfter],
   );
 });
 
@@ -135,7 +137,7 @@ test('fetcher run all life cycle triggers', async () => {
       },
     },
     successResponse,
-    [fooBefore, fooSuccess, fooAfter],
+    [fetcherBefore, fooBefore, fetcherSuccess, fooSuccess, fooAfter, fetcherAfter],
   );
 
   await run<FetcherState>(
@@ -148,7 +150,7 @@ test('fetcher run all life cycle triggers', async () => {
     },
 
     failureResponse,
-    [fooBefore, fooFailure, fooAfter],
+    [fetcherBefore, fooBefore, fetcherFailure, fooFailure, fooAfter, fetcherAfter],
   );
 });
 

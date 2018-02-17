@@ -103,7 +103,7 @@ export const accept = <TState extends State>(
   task$
     .accept<RequestTask<TState>>('@FETCHER/REQUEST')
     .withLatestFrom(configuration$)
-    .concatMap(([task, configuration]) => {
+    .flatMap(([task, configuration]) => {
       const { name = '', tags = [], triggers = {}, ...parameters } = task.request;
       const request = createAjaxRequest(name, tags, parameters, configuration);
       const lifeCycleParameters = {
@@ -127,34 +127,27 @@ export const accept = <TState extends State>(
 
       const abort$ = task$
         .accept<AbortTask<TState>>('@FETCHER/ABORT')
-        .filter(abortTask => abortTask.name === name)
-        .flatMap(() => after$);
+        .filter(abortTask => abortTask.name === name);
 
       const ajax$ = Observable.ajax(request).concatMap(response =>
-        Observable.merge(
-          createLifeCycleObservable({
-            ...lifeCycleParameters,
-            kind: '@FETCHER/SUCCESS',
-            response,
-            trigger: 'success',
-          }),
-          after$,
-        ),
+        createLifeCycleObservable({
+          ...lifeCycleParameters,
+          kind: '@FETCHER/SUCCESS',
+          response,
+          trigger: 'success',
+        }),
       );
 
-      return Observable.merge(
-        abort$,
-        Observable.merge(before$, ajax$)
+      return Observable.concat(
+        Observable.concat(before$, ajax$)
           .takeUntil(abort$)
           .catch<any, any>(error =>
-            Observable.merge(
-              createLifeCycleObservable({
-                ...lifeCycleParameters,
-                kind: '@FETCHER/FAILURE',
-                trigger: 'failure',
-              }),
-              after$,
-            ),
+            createLifeCycleObservable({
+              ...lifeCycleParameters,
+              kind: '@FETCHER/FAILURE',
+              trigger: 'failure',
+            }),
           ),
+        after$,
       );
     });

@@ -5,6 +5,7 @@ import { Record } from 'immutable';
 export interface Configuration<TState extends State> {
   baseURL: string;
   defaults: Partial<AjaxRequest>;
+  _temp?: TState;
 }
 
 export class ConfigurationState extends Record<Configuration<any>>({

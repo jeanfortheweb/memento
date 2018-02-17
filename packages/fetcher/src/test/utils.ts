@@ -40,28 +40,34 @@ const unmock = () => {
 
 export const run = <TState extends State>(
   configuration: Request<TState>,
-  response: Partial<AjaxResponse> = {},
-  expectedTasks: any[] = [],
+  response: Partial<AjaxResponse>,
+  expectedTasks: any[],
 ) =>
   new Promise(resolve => {
     const XHR2 = xhr2;
     const task$ = new TaskSubject<TState>();
     const fetcher$ = createFetcher<TState>({})(task$, null as any);
-    const subscription = fetcher$.subscribe(value => {
-      task$.next(value as Task<TState>);
+    const subscription = fetcher$.subscribe({
+      next: value => {
+        if (typeof value !== 'function' && value.kind === '@FETCHER/NO_TRIGGER') {
+          return;
+        }
 
-      const index = expectedTasks.findIndex(task => task && task.kind === (value as any).kind);
+        task$.next(value as Task<TState>);
 
-      if (index >= 0) {
-        const expectedTask = expectedTasks.splice(index, 1)[0];
-        expect(value).toMatchObject(expectedTask);
-      }
+        const index = expectedTasks.findIndex(task => task && task.kind === (value as any).kind);
 
-      if (expectedTasks.length === 0) {
-        subscription.unsubscribe();
-        unmock();
-        resolve();
-      }
+        if (index >= 0) {
+          const expectedTask = expectedTasks.splice(index, 1)[0];
+          expect(value).toMatchObject(expectedTask);
+        }
+
+        if (expectedTasks.length === 0) {
+          subscription.unsubscribe();
+          unmock();
+          resolve();
+        }
+      },
     });
 
     mock(response);
