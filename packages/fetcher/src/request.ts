@@ -1,6 +1,6 @@
 import { State, Task, TaskObservable } from '@memento/store';
 import { Observable, AjaxRequest, AjaxResponse } from '@reactivex/rxjs';
-import { Configuration } from './configuration';
+import { ConfigurationState, AjaxRequestState } from './configuration';
 
 export interface TriggerParameters {
   request: AjaxRequest;
@@ -63,16 +63,16 @@ export const request = <TState extends State>(
   request,
 });
 
-const createAjaxRequest = <TState extends State>(
+const createAjaxRequest = (
   name: string | undefined,
   tags: string[] | undefined,
-  request: AjaxRequest,
-  configuration: Configuration<TState>,
+  parameters: AjaxRequest,
+  configuration: ConfigurationState,
 ): AjaxRequest => {
-  return {
-    ...request,
-    url: `${configuration.baseURL}${request.url}`,
-  };
+  return configuration.defaults
+    .merge(parameters)
+    .set('url', `${configuration.baseURL}${parameters.url}`)
+    .toJS();
 };
 
 const getTrigger = <TState extends State>(trigger?: Trigger<TState>): Trigger<TState> =>
@@ -97,7 +97,7 @@ const createLifeCycleObservable = <TState extends State>({
   Observable.from([parameters, getTrigger(triggers[trigger])(parameters)]);
 
 export const accept = <TState extends State>(
-  configuration$: Observable<Configuration<TState>>,
+  configuration$: Observable<ConfigurationState>,
   task$: TaskObservable<TState>,
 ): Observable<Task<TState>> =>
   task$
