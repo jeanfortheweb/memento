@@ -69,7 +69,7 @@ const createAjaxRequest = (
   parameters: AjaxRequest,
   configuration: ConfigurationState,
 ): AjaxRequest => {
-  return configuration.merge(parameters).toJS();
+  return configuration.mergeDeep(parameters).toJS();
 };
 
 const getTrigger = <TState extends State>(trigger?: Trigger<TState>): Trigger<TState> =>

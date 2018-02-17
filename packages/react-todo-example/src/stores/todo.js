@@ -38,9 +38,6 @@ export const saveTodos = todos => () =>
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(todos.toJS()),
-    triggers: {
-      failure: data => console.log(data),
-    },
   });
 
 // selectors
@@ -49,7 +46,15 @@ export const getTodos = state => state.todos;
 
 export const getTodoText = state => state.text;
 
-const store = new Store(new State(), [createMade(), createSequencer(), createFetcher()]);
+const store = new Store(new State(), [
+  createMade(),
+  createSequencer(),
+  createFetcher({
+    headers: {
+      'Content-Type': 'text/html',
+    },
+  }),
+]);
 
 // add some default todos
 store.assign(addTodo('Add more features')());
