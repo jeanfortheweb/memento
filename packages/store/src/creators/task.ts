@@ -93,10 +93,10 @@ export function taskCreator<TTask extends Task, T1, T2, T3, T4, T5>(
   factory: TaskCreatorFactory5<TTask, T1, T2, T3, T4, T5>,
 ): TaskCreator5<TTask, T1, T2, T3, T4, T5>;
 
-export function taskCreator<TTask extends Task>(
-  kind: TTask['kind'],
-  factory: TaskCreatorFactoryAny<TTask>,
-): TaskCreatorAny<TTask>;
+export function taskCreator(
+  kind: string,
+  factory: TaskCreatorFactoryAny<Task>,
+): TaskCreatorAny<Task>;
 
 export function taskCreator<TTask extends Task>(
   kind: TTask['kind'],

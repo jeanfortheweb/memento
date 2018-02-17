@@ -1,5 +1,5 @@
 import { Set } from 'immutable';
-import { State, Task, Worker, Listener, Selector } from './core';
+import { State, Task, Worker, Listener, Selector, Updater } from './core';
 import { isUpdater } from './utils';
 import TaskSubject from './TaskSubject';
 import StateSubject from './StateSubject';
@@ -16,21 +16,9 @@ class Store<TState extends State> implements Store<TState> {
     this._task$ = new TaskSubject();
     this._state$ = new StateSubject<TState>(initialState);
 
-    const subscriber = function(updaterOrTask) {
-      if (isUpdater(updaterOrTask)) {
-        const prevState = this._state;
-        this._state = updaterOrTask(prevState);
-
-        if (prevState !== this._state) {
-          this._listeners.forEach(listener => listener(prevState, this._state));
-          this._state$.next(this._state);
-        }
-      } else {
-        this._task$.next(updaterOrTask);
-      }
-    }.bind(this);
-
-    workers.map(worker => worker(this._task$, this._state$).subscribe(subscriber));
+    workers.map(worker =>
+      worker(this._task$, this._state$).subscribe(this._workerSubscriber.bind(this)),
+    );
   }
 
   public select<T>(selector: Selector<TState, T>): T {
@@ -47,6 +35,20 @@ class Store<TState extends State> implements Store<TState> {
     return () => {
       this._listeners = this._listeners.remove(listener);
     };
+  }
+
+  private _workerSubscriber(updaterOrTask: Updater<TState> | Task) {
+    if (isUpdater(updaterOrTask)) {
+      const prevState = this._state;
+      this._state = updaterOrTask(prevState);
+
+      if (prevState !== this._state) {
+        this._listeners.forEach(listener => listener(prevState, this._state));
+        this._state$.next(this._state);
+      }
+    } else {
+      this._task$.next(updaterOrTask);
+    }
   }
 }
 
