@@ -1,7 +1,6 @@
 import { TaskSubject, Task, State } from '@memento/store';
 import { Record } from 'immutable';
 import { Observable, AjaxResponse, AjaxError } from '@reactivex/rxjs';
-import * as xhr2 from 'xhr2';
 import createFetcher, { request, Request } from '../';
 
 export interface FetcherStateProps {
@@ -44,7 +43,6 @@ export const run = <TState extends State>(
   expectedTasks: any[],
 ) =>
   new Promise(resolve => {
-    const XHR2 = xhr2;
     const task$ = new TaskSubject<TState>();
     const fetcher$ = createFetcher<TState>(
       Math.random() * 20 > 5 ? { headers: { 'Content-Type': 'text/html' } } : undefined,
@@ -77,7 +75,6 @@ export const run = <TState extends State>(
     task$.next(
       request<TState>({
         ...configuration,
-        createXHR: () => new XHR2(),
       }),
     );
   });

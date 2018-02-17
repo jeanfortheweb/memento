@@ -110,6 +110,12 @@ export const accept = <TState extends State>(
         triggers,
       };
 
+      /* istanbul ignore next */
+      if (process.env.NODE_ENV === 'test') {
+        const XHR2 = require('xhr2');
+        request.createXHR = () => new XHR2();
+      }
+
       const before$ = createLifeCycleObservable({
         ...lifeCycleParameters,
         kind: '@FETCHER/BEFORE',

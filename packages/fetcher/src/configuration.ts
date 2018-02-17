@@ -13,7 +13,6 @@ export class ConfigurationState extends Record<AjaxRequest>({
   password: undefined,
   user: undefined,
   url: undefined,
-  responseType: 'application/json',
+  responseType: 'json',
   timeout: 5000,
-  createXHR: undefined,
 }) {}
