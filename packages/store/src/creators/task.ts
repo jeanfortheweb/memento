@@ -1,35 +1,26 @@
 import { Task } from '../core';
 
-export interface TaskCreatorFacade<TKind extends string> {
-  kind: TKind;
-  toString: () => string;
-}
-
-export interface TaskCreator0<TKind extends string, TPayload> extends TaskCreatorFacade<TKind> {
+export interface TaskCreator0<TKind extends string, TPayload> {
   (): Task<TKind, TPayload>;
 }
 
-export interface TaskCreator1<TKind extends string, TPayload, T1> extends TaskCreatorFacade<TKind> {
+export interface TaskCreator1<TKind extends string, TPayload, T1> {
   (arg1: T1): Task<TKind, TPayload>;
 }
 
-export interface TaskCreator2<TKind extends string, TPayload, T1, T2>
-  extends TaskCreatorFacade<TKind> {
+export interface TaskCreator2<TKind extends string, TPayload, T1, T2> {
   (arg1: T1, arg2: T2): Task<TKind, TPayload>;
 }
 
-export interface TaskCreator3<TKind extends string, TPayload, T1, T2, T3>
-  extends TaskCreatorFacade<TKind> {
+export interface TaskCreator3<TKind extends string, TPayload, T1, T2, T3> {
   (arg1: T1, arg2: T2, arg3: T3): Task<TKind, TPayload>;
 }
 
-export interface TaskCreator4<TKind extends string, TPayload, T1, T2, T3, T4>
-  extends TaskCreatorFacade<TKind> {
+export interface TaskCreator4<TKind extends string, TPayload, T1, T2, T3, T4> {
   (arg1: T1, arg2: T2, arg3: T3, arg4: T4): Task<TKind, TPayload>;
 }
 
-export interface TaskCreator5<TKind extends string, TPayload, T1, T2, T3, T4, T5>
-  extends TaskCreatorFacade<TKind> {
+export interface TaskCreator5<TKind extends string, TPayload, T1, T2, T3, T4, T5> {
   (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5): Task<TKind, TPayload>;
 }
 
@@ -68,7 +59,6 @@ export function createTask<TPayload, TKind extends string, T1, T2, T3, T4, T5>(
 export function createTask(kind, factory?) {
   const creator: any = (...args) => ({ kind, payload: factory ? factory.apply(this, args) : {} });
 
-  creator.kind = kind;
   creator.toString = () => kind;
 
   return creator;
