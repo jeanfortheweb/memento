@@ -20,8 +20,9 @@ export interface Selector<TState extends State, TOutput = any> {
   (state: TState): TOutput;
 }
 
-export interface Task {
-  kind: string;
+export interface Task<TKind extends string = string, TPayload = any> {
+  kind: TKind;
+  payload: TPayload;
 }
 
 export interface TaskObservable extends Observable<Task> {

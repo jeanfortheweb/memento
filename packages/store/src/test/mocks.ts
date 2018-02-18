@@ -28,26 +28,34 @@ export class State extends Record<StateProps>({
   }),
 }) {}
 
-export interface TaskA extends Task {
-  kind: '@TEST/TASK_A';
-  parameterA: string;
-  parameterB: string;
-}
+export type TaskA = Task<
+  '@TEST/TASK_A',
+  {
+    parameterA: string;
+    parameterB: string;
+  }
+>;
 
-export interface TaskB extends Task {
-  kind: '@TEST/TASK_B';
-  parameterA: number;
-  parameterB: number;
-}
+export type TaskB = Task<
+  '@TEST/TASK_B',
+  {
+    parameterA: number;
+    parameterB: number;
+  }
+>;
 
 export const taskA: TaskA = {
   kind: '@TEST/TASK_A',
-  parameterA: 'parameterA',
-  parameterB: 'parameterB',
+  payload: {
+    parameterA: 'parameterA',
+    parameterB: 'parameterB',
+  },
 };
 
 export const taskB: TaskB = {
   kind: '@TEST/TASK_B',
-  parameterA: 0,
-  parameterB: 1,
+  payload: {
+    parameterA: 0,
+    parameterB: 1,
+  },
 };

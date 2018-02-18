@@ -1,4 +1,3 @@
-import taskCreator from './creators/task';
 import Store from './Store';
 import {
   State,
@@ -11,7 +10,8 @@ import {
   Listener,
 } from './core';
 
-export { Store, taskCreator };
+export * from './creators/task';
+export { Store };
 export { State, StateObservable, Task, TaskObservable, Selector, Updater, Worker, Listener };
 
 export default Store;

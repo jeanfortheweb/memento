@@ -1,8 +1,7 @@
 import taskCreator from './task';
-import { TaskA, TaskB } from '../test/mocks';
 
 test('does create a task creator as expected', () => {
-  const creator0 = taskCreator<TaskA>('@TEST/TASK_A');
+  const creator0 = taskCreator('@TEST/TASK_A');
 
   expect(creator0).toBeInstanceOf(Function);
   expect(creator0.kind).toEqual('@TEST/TASK_A');
@@ -11,7 +10,7 @@ test('does create a task creator as expected', () => {
     kind: '@TEST/TASK_A',
   });
 
-  const creator1 = taskCreator<TaskB>('@TEST/TASK_B', () => ({ parameterA: 0, parameterB: 0 }));
+  const creator1 = taskCreator('@TEST/TASK_B', () => ({ parameterA: 0, parameterB: 0 }));
 
   expect(creator1).toBeInstanceOf(Function);
   expect(creator1.kind).toEqual('@TEST/TASK_B');
@@ -22,7 +21,7 @@ test('does create a task creator as expected', () => {
     parameterB: 0,
   });
 
-  const creator2 = taskCreator<TaskA, string, string>('@TEST/TASK_A', (parameterA, parameterB) => ({
+  const creator2 = taskCreator('@TEST/TASK_A', (parameterA: string, parameterB: string) => ({
     parameterA,
     parameterB,
   }));
