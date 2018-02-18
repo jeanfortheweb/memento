@@ -1,71 +1,91 @@
 import { Observable } from '@reactivex/rxjs';
 import { TaskObservable, Task } from '@memento/store';
 
-export const KIND = '@SNITCH/LISTEN';
+export const KIND_LISTEN = '@SNITCH/LISTEN';
+export const KIND_UNLISTEN = '@SNITCH/UNLISTEN';
 
 export type ListenTask = Task<
-  typeof KIND,
+  typeof KIND_LISTEN,
   {
     target: Function | string | Target<any>;
     assign: AssignFunction<any>;
   }
 >;
 
+export type UnListenTask = Task<typeof KIND_UNLISTEN, string>;
+
 export interface AssignFunction<TTask extends Task> {
   (task: TTask): Task;
 }
 
 export interface Target<TPayload> {
+  name?: string;
   kind: Function | string;
   payload?: Partial<TPayload>;
   predicate?: (payload: TPayload) => boolean;
 }
 
-const getTargetObservable = (task$: TaskObservable, target: Function | string | Target<any>) => {
+const getKind = (target: Function | string | Target<any>) => {
   if (typeof target === 'function' || typeof target === 'string') {
-    return task$.accept(target.toString());
+    return target.toString();
   }
 
-  return getTargetObservableFor(task$, target);
+  return target.kind.toString();
 };
 
-const getTargetObservableFor = (task$: TaskObservable, target: Target<any>) => {
-  const { payload, predicate } = target;
-  let target$: Observable<Task> = task$.accept(target.kind.toString());
+const getFilter = (target: Function | string | Target<any>) =>
+  getPredicateFilter(target) || getPayloadFilter(target) || (() => true);
 
-  if (typeof predicate === 'function') {
-    target$ = target$.filter(targetTask => predicate(targetTask.payload));
+const getPredicateFilter = (target: Function | string | Target<any>) =>
+  typeof target === 'object' &&
+  typeof target.predicate === 'function' &&
+  (task => (target.predicate as any)(task.payload));
+
+const getPayloadFilter = (target: Function | string | Target<any>) =>
+  typeof target === 'object' &&
+  target.payload !== undefined &&
+  (task =>
+    Object.keys(target.payload as any).every(
+      prop => task.payload[prop] === (target.payload as any)[prop],
+    ));
+
+const getName = (target: Function | string | Target<any>) => {
+  if (typeof target !== 'function' && typeof target !== 'string') {
+    return target.name;
   }
 
-  if (payload !== undefined) {
-    target$ = target$.filter(targetTask =>
-      Object.keys(payload).every(prop => targetTask.payload[prop] === payload[prop]),
-    );
-  }
-
-  return target$;
+  return '';
 };
 
 export const accept = (task$: TaskObservable & Observable<Task>): Observable<Task> =>
-  task$
-    .accept<ListenTask>(KIND)
-    .flatMap(task =>
-      getTargetObservable(task$, task.payload.target).map(targetTask =>
-        task.payload.assign(targetTask),
+  task$.accept<ListenTask>(KIND_LISTEN).flatMap(({ payload: { target, assign } }) =>
+    task$
+      .accept(getKind(target))
+      .filter(getFilter(target))
+      .map(targetTask => assign(targetTask))
+      .takeUntil(
+        task$
+          .accept<UnListenTask>(KIND_UNLISTEN)
+          .filter(unlistenTask => unlistenTask.payload === getName(target)),
       ),
-    );
+  );
 
-const listen = <TTask extends Task>(
+export const unlisten = (name: string): UnListenTask => ({
+  kind: KIND_UNLISTEN,
+  payload: name,
+});
+
+unlisten.toString = () => KIND_UNLISTEN;
+
+export const listen = <TTask extends Task>(
   target: Function | string | Target<TTask['payload']>,
   assign: AssignFunction<TTask>,
 ): ListenTask => ({
-  kind: KIND,
+  kind: KIND_LISTEN,
   payload: {
     target,
     assign,
   },
 });
 
-listen.toString = () => KIND;
-
-export default listen;
+listen.toString = () => KIND_LISTEN;

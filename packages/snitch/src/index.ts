@@ -1,8 +1,8 @@
 import { Worker, State } from '@memento/store';
 import { Observable } from '@reactivex/rxjs';
-import listen, { ListenTask, accept as listenAccept } from './listen';
+import { listen, unlisten, ListenTask, UnListenTask, accept as listenAccept } from './listen';
 
-export { ListenTask, listen };
+export { ListenTask, UnListenTask, listen, unlisten };
 
 export default <TState extends State<TStateProps>, TStateProps extends Object>(): Worker<
   TState
