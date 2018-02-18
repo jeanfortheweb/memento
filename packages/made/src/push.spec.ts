@@ -1,29 +1,33 @@
 import { TestState, InnerTestProps, wire } from './test/helpers';
-import push, { accept } from './push';
+import push, { accept, KIND } from './push';
 
-test('push creates the expected task object', () => {
+test('creates the expected task object', () => {
   expect(
-    push<TestState, InnerTestProps>('list', {
+    push<InnerTestProps>('list', {
       a: 2,
       b: 3,
     }),
   ).toMatchObject({
-    kind: '@STATE_WORKER/PUSH',
-    path: 'list',
-    data: [
-      {
-        a: 2,
-        b: 3,
-      },
-    ],
+    kind: KIND,
+    payload: {
+      path: 'list',
+      data: [
+        {
+          a: 2,
+          b: 3,
+        },
+      ],
+    },
   });
+
+  expect(push.toString()).toEqual(KIND);
 });
 
-test('push produces the expected output state', async () => {
+test('produces the expected output state', async () => {
   const run = wire<TestState>(accept, new TestState());
 
   await run(
-    push<TestState, InnerTestProps>(
+    push<InnerTestProps>(
       'list',
       {
         a: 1,

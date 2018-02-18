@@ -3,32 +3,37 @@ import { Observable } from '@reactivex/rxjs';
 import { List, merge } from 'immutable';
 import { pathToArray } from './utils';
 
-// temporary fix for the observable shadowing.
-export let observable: Observable<any>;
+export const KIND = '@MADE/UPDATE';
 
-export interface UpdateTask<TState extends State, TData> extends Task<TState> {
-  kind: '@STATE_WORKER/UPDATE';
-  path: string;
-  element: TData;
-  data: Partial<TData>;
-}
+export type UpdateTask<TData> = Task<
+  typeof KIND,
+  { path: string; element: TData; data: Partial<TData> }
+>;
 
-export const accept = <TState extends State>(task$: TaskObservable<TState>) =>
+export const accept = <TState extends State>(task$: TaskObservable & Observable<Task>) =>
   task$
-    .accept<UpdateTask<TState, any>>('@STATE_WORKER/UPDATE')
-    .map<UpdateTask<TState, any>, Updater<TState>>(task => state =>
-      state.updateIn(pathToArray(task.path), (target: List<any>) =>
-        target.update(target.indexOf(task.element), element => merge(element, task.data)),
+    .accept<UpdateTask<any>>(KIND)
+    .map<UpdateTask<any>, Updater<TState>>(task => state =>
+      state.updateIn(pathToArray(task.payload.path), (target: List<any>) =>
+        target.update(target.indexOf(task.payload.element), element =>
+          merge(element, task.payload.data),
+        ),
       ),
     );
 
-export default <TState extends State, TData = any>(
+const update = <TData = any>(
   path: string,
   element: TData,
   data: Partial<TData>,
-): UpdateTask<TState, TData> => ({
-  kind: '@STATE_WORKER/UPDATE',
-  path,
-  element,
-  data,
+): UpdateTask<TData> => ({
+  kind: KIND,
+  payload: {
+    path,
+    element,
+    data,
+  },
 });
+
+update.toString = () => KIND;
+
+export default update;

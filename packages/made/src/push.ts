@@ -2,27 +2,25 @@ import { State, Task, Updater, TaskObservable } from '@memento/store';
 import { Observable } from '@reactivex/rxjs';
 import { pathToArray } from './utils';
 
-// temporary fix for the observable shadowing.
-export let observable: Observable<any>;
+export const KIND = '@MADE/PUSH';
 
-export interface PushTask<TState extends State, TData> extends Task<TState> {
-  kind: '@STATE_WORKER/PUSH';
-  path: string;
-  data: TData[];
-}
+export type PushTask<TData> = Task<typeof KIND, { path: string; data: TData[] }>;
 
-export const accept = <TState extends State>(task$: TaskObservable<TState>) =>
-  task$
-    .accept<PushTask<TState, any>>('@STATE_WORKER/PUSH')
-    .map<PushTask<TState, any>, Updater<TState>>(task => state => {
-      return state.updateIn(pathToArray(task.path), target => target.push(...task.data));
-    });
+export const accept = <TState extends State>(task$: TaskObservable & Observable<Task>) =>
+  task$.accept<PushTask<any>>(KIND).map<PushTask<any>, Updater<TState>>(task => state => {
+    return state.updateIn(pathToArray(task.payload.path), target =>
+      target.push(...task.payload.data),
+    );
+  });
 
-export default <TState extends State, TData = any>(
-  path: string,
-  ...data: TData[]
-): PushTask<TState, TData> => ({
-  kind: '@STATE_WORKER/PUSH',
-  path,
-  data,
+const push = <TData = any>(path: string, ...data: TData[]): PushTask<TData> => ({
+  kind: KIND,
+  payload: {
+    path,
+    data,
+  },
 });
+
+push.toString = () => KIND;
+
+export default push;

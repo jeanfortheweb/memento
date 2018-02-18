@@ -1,21 +1,25 @@
 import { TestState, InnerTestProps, wire } from './test/helpers';
 import { List } from 'immutable';
-import update, { accept } from './update';
+import update, { accept, KIND } from './update';
 
 const element = { a: 1, b: 1 };
 
-test('update creates the expected task object', () => {
-  expect(update<TestState, InnerTestProps>('list', element, { b: 2 })).toMatchObject({
-    kind: '@STATE_WORKER/UPDATE',
-    path: 'list',
-    element,
-    data: {
-      b: 2,
+test('creates the expected task object', () => {
+  expect(update<InnerTestProps>('list', element, { b: 2 })).toMatchObject({
+    kind: KIND,
+    payload: {
+      path: 'list',
+      element,
+      data: {
+        b: 2,
+      },
     },
   });
+
+  expect(update.toString()).toEqual(KIND);
 });
 
-test('update produces the expected output state', async () => {
+test('produces the expected output state', async () => {
   const run = wire<TestState>(
     accept,
     new TestState({
@@ -24,7 +28,7 @@ test('update produces the expected output state', async () => {
   );
 
   await run(
-    update<TestState, InnerTestProps>('list', element, { b: 2 }),
+    update<InnerTestProps>('list', element, { b: 2 }),
     {
       list: [{ a: 0, b: 0 }, { a: 1, b: 1 }],
     },

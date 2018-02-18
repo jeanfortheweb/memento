@@ -1,10 +1,10 @@
 import { List } from 'immutable';
-import { TestProps, TestState, InnerTestProps, wire } from './test/helpers';
-import merge, { accept } from './merge';
+import { TestProps, TestState, wire } from './test/helpers';
+import merge, { accept, KIND } from './merge';
 
-test('merge creates the expected task object', () => {
+test('creates the expected task object', () => {
   expect(
-    merge<TestState, TestProps>({
+    merge<TestProps>({
       a: 'a',
       child: {
         a: 2,
@@ -12,8 +12,8 @@ test('merge creates the expected task object', () => {
       },
     }),
   ).toMatchObject({
-    kind: '@STATE_WORKER/MERGE',
-    data: {
+    kind: KIND,
+    payload: {
       a: 'a',
       child: {
         a: 2,
@@ -21,13 +21,15 @@ test('merge creates the expected task object', () => {
       },
     },
   });
+
+  expect(merge.toString()).toEqual(KIND);
 });
 
-test('merge produces the expected output state', async () => {
+test('produces the expected output state', async () => {
   const run = wire<TestState>(accept, new TestState());
 
   await run(
-    merge<TestState, TestProps>({
+    merge<TestProps>({
       a: 'a',
       child: {
         a: 2,
@@ -51,7 +53,7 @@ test('merge produces the expected output state', async () => {
   );
 
   await run(
-    merge<TestState, TestProps>({
+    merge<TestProps>({
       a: 'a',
       list: List([{ a: 2, b: 2 }, { a: 1, b: 1 }]),
     }),
@@ -66,7 +68,7 @@ test('merge produces the expected output state', async () => {
   );
 
   await run(
-    merge<TestState, TestProps>({
+    merge<TestProps>({
       list: List([{ a: 5, b: 5 }]),
     }),
     {

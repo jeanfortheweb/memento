@@ -16,9 +16,9 @@ export default <TState extends State<TStateProps>, TStateProps extends Object>()
   TState
 > => task$ =>
   Observable.merge(
-    mergeAccept(task$),
-    pushAccept(task$),
-    removeAccept(task$),
-    setAccept(task$),
-    updateAccept(task$),
+    mergeAccept<TState>(task$),
+    pushAccept<TState>(task$),
+    removeAccept<TState>(task$),
+    setAccept<TState>(task$),
+    updateAccept<TState>(task$),
   );
