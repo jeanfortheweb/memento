@@ -1,39 +1,26 @@
-import { State, Task, TaskObservable } from '@memento/store';
+import { Task, TaskObservable, createTask, TaskCreator1 } from '@memento/store';
 import { Observable, AjaxRequest, AjaxResponse } from '@reactivex/rxjs';
 import { ConfigurationState } from './configuration';
 
-export interface TriggerParameters {
-  request: AjaxRequest;
-  response?: AjaxResponse;
-  error?: Error;
-}
+export const KIND_REQUEST = '@FETCHER/REQUEST';
+export const KIND_BEFORE = '@FETCHER/REQUEST/BEFORE';
+export const KIND_SUCCESS = '@FETCHER/REQUEST/SUCCESS';
+export const KIND_FAILURE = '@FETCHER/REQUEST/FAILURE';
+export const KIND_AFTER = '@FETCHER/REQUEST/AFTER';
+export const KIND_ABORT = '@FETCHER/ABORT';
 
-export interface Trigger<TState extends State> {
-  (parameters: TriggerParameters): Task<TState>;
-}
-
-export interface TriggerMap<TState extends State> {
-  before: Trigger<TState>;
-  success: Trigger<TState>;
-  failure: Trigger<TState>;
-  after: Trigger<TState>;
-}
-
-export interface Request<TState extends State> extends AjaxRequest {
+export interface Request extends AjaxRequest {
   name?: string;
   tags?: string[];
-  triggers?: Partial<TriggerMap<TState>>;
 }
 
 export type LifeCycleTaskKind =
-  | '@FETCHER/BEFORE'
-  | '@FETCHER/SUCCESS'
-  | '@FETCHER/FAILURE'
-  | '@FETCHER/AFTER'
-  | '@FETCHER/NO_TRIGGER';
+  | typeof KIND_BEFORE
+  | typeof KIND_SUCCESS
+  | typeof KIND_FAILURE
+  | typeof KIND_AFTER;
 
-export interface LifeCycleTask<TState extends State> extends Task<TState> {
-  kind: LifeCycleTaskKind;
+export interface LifeCycleTaskPayload {
   request: AjaxRequest;
   name?: string;
   tags?: string[];
@@ -41,27 +28,26 @@ export interface LifeCycleTask<TState extends State> extends Task<TState> {
   error?: Error;
 }
 
-export interface RequestTask<TState extends State> extends Task<TState> {
-  kind: '@FETCHER/REQUEST';
-  request: Partial<Request<TState>>;
-}
+export type LifeCycleTask = Task<LifeCycleTaskKind, LifeCycleTaskPayload>;
 
-export interface AbortTask<TState extends State> extends Task<TState> {
-  kind: '@FETCHER/ABORT';
-  name: string;
-}
+export type RequestTask = Task<typeof KIND_REQUEST, Partial<Request>>;
+export type AbortTask = Task<typeof KIND_ABORT, string>;
 
-export const abort = <TState extends State>(name: string): AbortTask<TState> => ({
-  kind: '@FETCHER/ABORT',
-  name,
-});
+export const abort: TaskCreator1<typeof KIND_ABORT, string, string> = createTask(
+  KIND_ABORT,
+  (name: string) => name,
+);
 
-export const request = <TState extends State>(
-  request: Partial<Request<TState>>,
-): RequestTask<TState> => ({
-  kind: '@FETCHER/REQUEST',
-  request,
-});
+export const request: TaskCreator1<
+  typeof KIND_REQUEST,
+  Partial<Request>,
+  Partial<Request>
+> = createTask(KIND_REQUEST, (request: Partial<Request>) => request);
+
+const before = createTask(KIND_BEFORE, (payload: Partial<LifeCycleTaskPayload>) => payload);
+const success = createTask(KIND_SUCCESS, (payload: Partial<LifeCycleTaskPayload>) => payload);
+const failure = createTask(KIND_FAILURE, (payload: Partial<LifeCycleTaskPayload>) => payload);
+const after = createTask(KIND_AFTER, (payload: Partial<LifeCycleTaskPayload>) => payload);
 
 const createAjaxRequest = (
   name: string | undefined,
@@ -72,42 +58,20 @@ const createAjaxRequest = (
   return configuration.mergeDeep(parameters).toJS();
 };
 
-const getTrigger = <TState extends State>(trigger?: Trigger<TState>): Trigger<TState> =>
-  typeof trigger === 'function' ? trigger : () => ({ kind: '@FETCHER/NO_TRIGGER' });
-
-interface CreateLifeCycleObservableParameters<TState extends State> {
-  kind: LifeCycleTaskKind;
-  name?: string;
-  tags?: string[];
-  request: AjaxRequest;
-  response?: AjaxResponse;
-  triggers: Partial<TriggerMap<TState>>;
-  trigger: keyof TriggerMap<TState>;
-  error?: Error;
-}
-
-const createLifeCycleObservable = <TState extends State>({
-  triggers,
-  trigger,
-  ...parameters
-}: CreateLifeCycleObservableParameters<TState>): Observable<Task<TState>> =>
-  Observable.from([parameters, getTrigger(triggers[trigger])(parameters)]);
-
-export const accept = <TState extends State>(
+export const accept = (
   configuration$: Observable<ConfigurationState>,
-  task$: TaskObservable<TState>,
-): Observable<Task<TState>> =>
+  task$: TaskObservable,
+): Observable<Task> =>
   task$
-    .accept<RequestTask<TState>>('@FETCHER/REQUEST')
+    .accept<RequestTask>(KIND_REQUEST)
     .withLatestFrom(configuration$)
     .flatMap(([task, configuration]) => {
-      const { name = '', tags = [], triggers = {}, ...parameters } = task.request;
+      const { name = '', tags = [], ...parameters } = task.payload;
       const request = createAjaxRequest(name, tags, parameters, configuration);
       const lifeCycleParameters = {
         name,
         tags,
         request,
-        triggers,
       };
 
       /* istanbul ignore next */
@@ -116,42 +80,32 @@ export const accept = <TState extends State>(
         request.createXHR = () => new XHR2();
       }
 
-      const before$ = createLifeCycleObservable({
-        ...lifeCycleParameters,
-        kind: '@FETCHER/BEFORE',
-        trigger: 'before',
-      });
-
-      const after$ = createLifeCycleObservable({
-        ...lifeCycleParameters,
-        kind: '@FETCHER/AFTER',
-        trigger: 'after',
-      });
+      const before$ = Observable.of(before(lifeCycleParameters));
+      const after$ = Observable.of(after(lifeCycleParameters));
 
       const abort$ = task$
-        .accept<AbortTask<TState>>('@FETCHER/ABORT')
-        .filter(abortTask => abortTask.name === name);
+        .accept<AbortTask>(KIND_ABORT)
+        .filter(abortTask => abortTask.payload === name);
 
       const ajax$ = Observable.ajax(request).concatMap(response =>
-        createLifeCycleObservable({
-          ...lifeCycleParameters,
-          kind: '@FETCHER/SUCCESS',
-          response,
-          trigger: 'success',
-        }),
+        Observable.of(
+          success({
+            ...lifeCycleParameters,
+            response,
+          }),
+        ),
       );
 
       return Observable.concat(
-        Observable.concat(before$, ajax$)
-          .takeUntil(abort$)
-          .catch<any, any>(error =>
-            createLifeCycleObservable({
+        before$,
+        ajax$.takeUntil(abort$).catch<any, any>(error =>
+          Observable.of(
+            failure({
               ...lifeCycleParameters,
-              kind: '@FETCHER/FAILURE',
-              trigger: 'failure',
               error,
             }),
           ),
+        ),
         after$,
       );
     });

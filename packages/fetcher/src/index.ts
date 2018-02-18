@@ -10,25 +10,12 @@ import {
   AbortTask,
   LifeCycleTask,
   LifeCycleTaskKind,
-  Trigger,
-  TriggerParameters,
-  TriggerMap,
 } from './request';
 
-export {
-  request,
-  abort,
-  Request,
-  RequestTask,
-  AbortTask,
-  LifeCycleTask,
-  LifeCycleTaskKind,
-  Trigger,
-  TriggerParameters,
-  TriggerMap,
-};
+export { request, abort, Request, RequestTask, AbortTask, LifeCycleTask, LifeCycleTaskKind };
 
 export default <TState extends State>(
+  /* istanbul ignore next */
   configuration: Partial<Configuration> = {},
 ): Worker<TState> => task$ => {
   const configuration$ = new BehaviorSubject<ConfigurationState>(
