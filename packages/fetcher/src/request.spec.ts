@@ -1,5 +1,5 @@
 import { run, FetcherState } from './test/utils';
-import { KIND_BEFORE, KIND_SUCCESS, KIND_FAILURE, KIND_AFTER, KIND_ABORT } from './request';
+import { KIND_BEFORE, KIND_SUCCESS, KIND_FAILURE, KIND_AFTER } from './request';
 
 const request = {
   url: 'http://api.foo.com/get/123',
