@@ -24,6 +24,22 @@ export interface TaskCreator5<TKind extends string, TPayload, T1, T2, T3, T4, T5
   (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5): Task<TKind, TPayload>;
 }
 
+export type TaskCreator<
+  TKind extends string = string,
+  TPayload = any,
+  T1 = any,
+  T2 = any,
+  T3 = any,
+  T4 = any,
+  T5 = any
+> =
+  | TaskCreator0<TKind, TPayload>
+  | TaskCreator1<TKind, TPayload, T1>
+  | TaskCreator2<TKind, TPayload, T1, T2>
+  | TaskCreator3<TKind, TPayload, T1, T2, T3>
+  | TaskCreator4<TKind, TPayload, T1, T2, T3, T4>
+  | TaskCreator5<TKind, TPayload, T1, T2, T3, T4, T5>;
+
 export function createTask<TKind extends string>(kind: TKind): TaskCreator0<TKind, any>;
 
 export function createTask<TPayload, TKind extends string>(
