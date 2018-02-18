@@ -5,6 +5,10 @@ import {
   accept as requestAccept,
   request,
   abort,
+  before,
+  after,
+  success,
+  failure,
   Request,
   RequestTask,
   AbortTask,
@@ -12,7 +16,19 @@ import {
   LifeCycleTaskKind,
 } from './request';
 
-export { request, abort, Request, RequestTask, AbortTask, LifeCycleTask, LifeCycleTaskKind };
+export {
+  request,
+  abort,
+  before,
+  success,
+  failure,
+  after,
+  Request,
+  RequestTask,
+  AbortTask,
+  LifeCycleTask,
+  LifeCycleTaskKind,
+};
 
 export default <TState extends State>(
   /* istanbul ignore next */

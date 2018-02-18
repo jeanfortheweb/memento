@@ -44,10 +44,18 @@ export const request: TaskCreator1<
   Partial<Request>
 > = createTask(KIND_REQUEST, (request: Partial<Request>) => request);
 
-const before = createTask(KIND_BEFORE, (payload: Partial<LifeCycleTaskPayload>) => payload);
-const success = createTask(KIND_SUCCESS, (payload: Partial<LifeCycleTaskPayload>) => payload);
-const failure = createTask(KIND_FAILURE, (payload: Partial<LifeCycleTaskPayload>) => payload);
-const after = createTask(KIND_AFTER, (payload: Partial<LifeCycleTaskPayload>) => payload);
+export const before = createTask(KIND_BEFORE, (payload: Partial<LifeCycleTaskPayload>) => payload);
+export const success = createTask(
+  KIND_SUCCESS,
+  (payload: Partial<LifeCycleTaskPayload>) => payload,
+);
+
+export const failure = createTask(
+  KIND_FAILURE,
+  (payload: Partial<LifeCycleTaskPayload>) => payload,
+);
+
+export const after = createTask(KIND_AFTER, (payload: Partial<LifeCycleTaskPayload>) => payload);
 
 const createAjaxRequest = (
   name: string | undefined,
