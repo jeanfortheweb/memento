@@ -1,20 +1,20 @@
-import { State, Task, TaskObservable } from '@memento/store';
+import { Task, TaskObservable } from '@memento/store';
 import { Observable } from '@reactivex/rxjs';
 
-// temporary fix for the observable shadowing.
-export let observable: Observable<any>;
+export const KIND = '@SEQUENCER/SEQUENCE';
 
-export interface SequenceTask<TState extends State> extends Task<TState> {
-  kind: '@SEQUENCE_WORKER/SEQUENCE';
-  tasks: Task<TState>[];
-}
+export type SequenceTask = Task<typeof KIND, Task[]>;
 
-export const accept = <TState extends State>(task$: TaskObservable<TState>) =>
+export const accept = (task$: TaskObservable & Observable<Task>) =>
   task$
-    .accept<SequenceTask<TState>>('@SEQUENCE_WORKER/SEQUENCE')
-    .flatMap<SequenceTask<TState>, Task<TState>>(task => Observable.from(task.tasks));
+    .accept<SequenceTask>(KIND)
+    .flatMap<SequenceTask, Task>(task => Observable.from(task.payload));
 
-export default <TState extends State>(...tasks: Task<TState>[]): SequenceTask<TState> => ({
-  kind: '@SEQUENCE_WORKER/SEQUENCE',
-  tasks,
+const sequence = (...tasks: Task[]): SequenceTask => ({
+  kind: KIND,
+  payload: tasks,
 });
+
+sequence.toString = () => KIND;
+
+export default sequence;
