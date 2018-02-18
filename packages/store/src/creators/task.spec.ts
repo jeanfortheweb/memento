@@ -15,8 +15,10 @@ test('does create a task creator as expected', () => {
   expect(creator1.toString()).toEqual('@TEST/TASK_B');
   expect(creator1()).toMatchObject({
     kind: '@TEST/TASK_B',
-    parameterA: 0,
-    parameterB: 0,
+    payload: {
+      parameterA: 0,
+      parameterB: 0,
+    },
   });
 
   const creator2 = createTask('@TEST/TASK_A', (parameterA: string, parameterB: string) => ({
@@ -28,7 +30,9 @@ test('does create a task creator as expected', () => {
   expect(creator2.toString()).toEqual('@TEST/TASK_A');
   expect(creator2('foo', 'bar')).toMatchObject({
     kind: '@TEST/TASK_A',
-    parameterA: 'foo',
-    parameterB: 'bar',
+    payload: {
+      parameterA: 'foo',
+      parameterB: 'bar',
+    },
   });
 });
