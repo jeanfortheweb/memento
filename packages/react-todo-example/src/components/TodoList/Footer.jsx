@@ -1,7 +1,13 @@
 import React from 'react';
-import { Grid, Button, Input, Checkbox } from 'semantic-ui-react';
+import { Divider, Grid, Button, Input, Checkbox } from 'semantic-ui-react';
 import { View, Trigger } from '@memento/react';
-import todoStore, { addTodo, setTodoText, getTodoText } from '../../stores/todo';
+import todoStore, {
+  addTodo,
+  setTodoText,
+  getTodoText,
+  getTodos,
+  saveTodos,
+} from '../../stores/todo';
 import settingsStore, { getFilter, setFilter } from '../../stores/settings';
 
 const FilterCheckbox = ({ value }) => (
@@ -31,13 +37,7 @@ const renderTodoTextInput = ({ text }) => (
         onChange={onChange}
         placeholder="Enter todo text..."
         action={
-          <Button
-            color="teal"
-            icon="add"
-            content="Add Todo"
-            onClick={onAddClick}
-            disabled={text.length === 0}
-          />
+          <Button color="teal" icon="add" onClick={onAddClick} disabled={text.length === 0} />
         }
       />
     )}
@@ -49,6 +49,36 @@ const Footer = () => (
     <Grid.Row>
       <Grid.Column width={16}>
         <View store={todoStore} text={getTodoText} render={renderTodoTextInput} />
+        <Divider />
+        <View
+          store={todoStore}
+          isLoading={state => state.isSaving}
+          todos={getTodos}
+          link={state => (state.jsonbinID ? `http://api.jsonbin.io/b/${state.jsonbinID}` : '')}
+          id={state => state.jsonbinID}
+        >
+          {({ link, isLoading, todos }) => (
+            <Input
+              readOnly
+              fluid
+              onClick={event => event.target.select()}
+              value={link}
+              action={
+                <Trigger store={todoStore} onClick={saveTodos(todos)}>
+                  {({ onClick }) => (
+                    <Button
+                      color="teal"
+                      disabled={isLoading}
+                      loading={isLoading}
+                      icon="save"
+                      onClick={onClick}
+                    />
+                  )}
+                </Trigger>
+              }
+            />
+          )}
+        </View>
       </Grid.Column>
     </Grid.Row>
   </Grid>

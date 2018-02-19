@@ -5,7 +5,7 @@ import { Store } from '@memento/store';
 import createSequencer, { sequence } from '@memento/sequencer';
 import createMade, { push, merge, update, set } from '@memento/made';
 import createSnitch, { listen, unlisten } from '@memento/snitch';
-import createFetcher, { request, success } from '@memento/fetcher';
+import createFetcher, { request, success, after, before } from '@memento/fetcher';
 
 // state.
 export class Todo extends Record({
@@ -19,6 +19,7 @@ export class State extends Record({
   todos: List(),
   text: '',
   jsonbinID: '',
+  isSaving: false,
 }) {}
 
 // task creators.
@@ -42,13 +43,25 @@ export const saveTodos = todos => () => {
     },
   });
 
+  const listenForBefore = listen.once(
+    before,
+    ({ name }) => name === 'jsonbin',
+    () => set('isSaving', true),
+  );
+
   const listenForSuccess = listen.once(
     success,
     ({ name }) => name === 'jsonbin',
     ({ response }) => set('jsonbinID', response.response.id),
   );
 
-  return sequence(makeRequest, listenForSuccess);
+  const listenForAfter = listen.once(
+    after,
+    ({ name }) => name === 'jsonbin',
+    () => set('isSaving', false),
+  );
+
+  return sequence(listenForBefore, listenForSuccess, listenForAfter, makeRequest);
 };
 
 // selectors.

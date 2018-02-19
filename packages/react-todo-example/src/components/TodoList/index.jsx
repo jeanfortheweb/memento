@@ -1,5 +1,5 @@
 import React from 'react';
-import { Segment, Button, List } from 'semantic-ui-react';
+import { Divider, Segment, Button, List } from 'semantic-ui-react';
 import { View, Trigger } from '@memento/react';
 import todoStore, { getTodos, saveTodos } from '../../stores/todo';
 import settingsStore, { getFilter } from '../../stores/settings';
@@ -37,16 +37,6 @@ const TodoList = () => (
     </Segment>
     <Segment secondary>
       <Footer />
-      <View store={todoStore} todos={getTodos}>
-        {({ todos }) => (
-          <Trigger store={todoStore} onClick={saveTodos(todos)}>
-            {({ onClick }) => <Button icon="save" content="Save" onClick={onClick} />}
-          </Trigger>
-        )}
-      </View>
-      <View store={todoStore} id={state => state.jsonbinID}>
-        {({ id }) => id && `Gespeichert unter ${id}`}
-      </View>
     </Segment>
   </Segment.Group>
 );
