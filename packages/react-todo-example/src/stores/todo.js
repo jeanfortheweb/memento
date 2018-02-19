@@ -32,9 +32,9 @@ export const addTodo = text => () => {
   return sequence(pushTodo, clearText);
 };
 
-export const saveTodos = todos => () => {
-  const makeRequest = request({
-    name: 'jsonbin',
+export const saveTodos = todos => () =>
+  request({
+    tags: ['save'],
     url: 'https://api.jsonbin.io/b',
     method: 'POST',
     body: JSON.stringify(todos.toJS()),
@@ -43,25 +43,26 @@ export const saveTodos = todos => () => {
     },
   });
 
-  const listenForBefore = listen.once(
+export const setupSaveListeners = () => {
+  const listenForBefore = listen(
     before,
-    ({ name }) => name === 'jsonbin',
+    ({ tags }) => tags.includes('save'),
     () => set('isSaving', true),
   );
 
-  const listenForSuccess = listen.once(
+  const listenForSuccess = listen(
     success,
-    ({ name }) => name === 'jsonbin',
+    ({ tags }) => tags.includes('save'),
     ({ response }) => set('jsonbinID', response.response.id),
   );
 
-  const listenForAfter = listen.once(
+  const listenForAfter = listen(
     after,
-    ({ name }) => name === 'jsonbin',
+    ({ tags }) => tags.includes('save'),
     () => set('isSaving', false),
   );
 
-  return sequence(listenForBefore, listenForSuccess, listenForAfter, makeRequest);
+  return sequence(listenForBefore, listenForSuccess, listenForAfter);
 };
 
 // selectors.
@@ -85,6 +86,9 @@ const store = new Store(new State(), [
 // add some default todos.
 store.assign(addTodo('Add more features')());
 store.assign(addTodo('Update documentation')());
+
+// add request listeners.
+store.assign(setupSaveListeners());
 
 // explore the latest state in the console.
 //store.listen((prev, next) => console.log(next.toJS()));
