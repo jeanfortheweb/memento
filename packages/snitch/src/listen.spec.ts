@@ -1,5 +1,5 @@
 import { TaskSubject } from '@memento/store';
-import { listen, accept, KIND_LISTEN, unlisten, KIND_UNLISTEN } from './listen';
+import { listen, accept, KIND_LISTEN, unlisten, KIND_UNLISTEN, KIND_LISTEN_ONCE } from './listen';
 
 const KIND_A = '@TEST/KIND_A';
 
@@ -33,6 +33,16 @@ test('creates the expected task objects', () => {
   });
 
   expect(listen.toString()).toEqual(KIND_LISTEN);
+
+  expect(listen.once(KIND_A, assign)).toMatchObject({
+    kind: KIND_LISTEN_ONCE,
+    payload: {
+      kind: KIND_A,
+      assign,
+    },
+  });
+
+  expect(listen.once.toString()).toEqual(KIND_LISTEN_ONCE);
 
   expect(unlisten('foo')).toMatchObject({
     kind: KIND_UNLISTEN,
@@ -87,6 +97,29 @@ test('does stop listening when unlisten is emitted', () => {
   expect(assign1).toHaveBeenCalledTimes(1);
   expect(assign2).toHaveBeenCalledTimes(2);
   expect(assign3).toHaveBeenCalledTimes(1);
+});
+
+test('does stop listening with once', () => {
+  const task$ = new TaskSubject();
+  const assign1 = jest.fn();
+  const assign2 = jest.fn();
+  const task = {
+    kind: KIND_A,
+    payload: {
+      a: true,
+      b: 'foo',
+    },
+  };
+
+  accept(task$).subscribe();
+
+  task$.next(listen.once(KIND_A, assign1));
+  task$.next(listen.once(KIND_A, payload => payload.a, assign2));
+  task$.next(task);
+  task$.next(task);
+
+  expect(assign1).toHaveBeenCalledTimes(1);
+  expect(assign2).toHaveBeenCalledTimes(1);
 });
 
 test('throws with invalid arguments', () => {
