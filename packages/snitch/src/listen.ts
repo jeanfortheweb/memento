@@ -9,7 +9,7 @@ export type ListenTask = Task<
   {
     name?: string;
     kind: string;
-    predicate?: (task: Task) => boolean;
+    predicate?: PredicateFunction<any>;
     assign: AssignFunction<any>;
   }
 >;
@@ -17,14 +17,11 @@ export type ListenTask = Task<
 export type UnListenTask = Task<typeof KIND_UNLISTEN, string>;
 
 export interface AssignFunction<TTask extends Task> {
-  (task: TTask): Task;
+  (payload: TTask['payload']): Task;
 }
 
-export interface Target<TPayload> {
-  name?: string;
-  kind: Function | string;
-  payload?: Partial<TPayload>;
-  predicate?: (payload: TPayload) => boolean;
+export interface PredicateFunction<TTask extends Task> {
+  (payload: TTask['payload']): boolean;
 }
 
 const noFilter = () => true;
@@ -34,7 +31,7 @@ export const accept = (task$: TaskObservable & Observable<Task>): Observable<Tas
     task$
       .accept(kind)
       .filter(task => (predicate ? predicate(task.payload) : noFilter()))
-      .map(task => assign(task))
+      .map(task => assign(task.payload))
       .takeUntil(
         task$
           .accept<UnListenTask>(KIND_UNLISTEN)
@@ -59,21 +56,21 @@ export function listen<TTask extends Task>(
 
 export function listen<TTask extends Task>(
   kind: string,
-  predicate: (payload: TTask['payload']) => boolean,
+  predicate: PredicateFunction<TTask>,
   assign: AssignFunction<TTask>,
 ): ListenTask;
 
 export function listen<TTask extends Task>(
   name: string,
   kind: string,
-  predicate: (payload: TTask['payload']) => boolean,
+  predicate: PredicateFunction<TTask>,
   assign: AssignFunction<TTask>,
 ): ListenTask;
 
 export function listen(a?, b?, c?, d?) {
   return {
     kind: KIND_LISTEN,
-    payload: match(a.toString(), b, c, d, {
+    payload: match(a, b, c, d, {
       'string|function': (kind, assign) => ({
         kind,
         assign,

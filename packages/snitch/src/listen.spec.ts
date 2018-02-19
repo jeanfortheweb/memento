@@ -50,7 +50,7 @@ test('does invoke assign function on function targets', () => {
   const taskCreator = () => ({});
   taskCreator.toString = () => KIND_A;
 
-  expect(run(taskCreator)).toHaveBeenCalledTimes(1);
+  expect(run(taskCreator.toString())).toHaveBeenCalledTimes(1);
 });
 
 test('does invoke assign with payload filter function returning true', () => {
