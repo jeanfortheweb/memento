@@ -25,6 +25,7 @@
     "@memento/made": "^0.0.1",
     "@memento/react": "^0.0.1",
     "@memento/sequencer": "^0.0.1",
+    "@memento/snitch": "^0.0.1",
     "@memento/store": "^0.0.1",
     "@reactivex/rxjs": "^5.5.6",
     "immutable": "4.0.0-rc.9",

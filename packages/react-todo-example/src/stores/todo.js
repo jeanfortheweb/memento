@@ -4,8 +4,10 @@ import shortid from 'shortid';
 import { Store } from '@memento/store';
 import createSequencer, { sequence } from '@memento/sequencer';
 import createMade, { push, merge, update, set } from '@memento/made';
-import createFetcher, { request } from '@memento/fetcher';
+import createSnitch, { listen, unlisten } from '@memento/snitch';
+import createFetcher, { request, success } from '@memento/fetcher';
 
+// state.
 export class Todo extends Record({
   id: null,
   date: Date.now(),
@@ -16,9 +18,12 @@ export class Todo extends Record({
 export class State extends Record({
   todos: List(),
   text: '',
+  jsonbinID: '',
 }) {}
 
 // task creators.
+export const toggleTodo = todo => () => update('todos', todo, todo.set('done', !todo.done));
+export const setTodoText = event => set('text', event.target.value);
 export const addTodo = text => () => {
   const pushTodo = push('todos', new Todo({ id: shortid.generate(), text }));
   const clearText = set('text', '');
@@ -26,27 +31,34 @@ export const addTodo = text => () => {
   return sequence(pushTodo, clearText);
 };
 
-export const toggleTodo = todo => () => update('todos', todo, todo.set('done', !todo.done));
-
-export const setTodoText = event => set('text', event.target.value);
-
-export const saveTodos = todos => () =>
-  request({
+export const saveTodos = todos => () => {
+  const makeRequest = request({
+    name: 'jsonbin',
     url: 'https://api.jsonbin.io/b',
     method: 'POST',
+    body: JSON.stringify(todos.toJS()),
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(todos.toJS()),
   });
 
-// selectors
+  const listenForSuccess = listen.once(
+    success,
+    ({ name }) => name === 'jsonbin',
+    ({ response }) => set('jsonbinID', response.response.id),
+  );
+
+  return sequence(makeRequest, listenForSuccess);
+};
+
+// selectors.
 export const getState = state => state;
 export const getTodos = state => state.todos;
-
 export const getTodoText = state => state.text;
 
+// create the store with required workers.
 const store = new Store(new State(), [
+  createSnitch(),
   createMade(),
   createSequencer(),
   createFetcher({
@@ -54,10 +66,14 @@ const store = new Store(new State(), [
       'Content-Type': 'text/html',
     },
   }),
+  task$ => task$.do(t => console.log(t)).mapTo(state => state),
 ]);
 
-// add some default todos
+// add some default todos.
 store.assign(addTodo('Add more features')());
 store.assign(addTodo('Update documentation')());
+
+// explore the latest state in the console.
+//store.listen((prev, next) => console.log(next.toJS()));
 
 export default store;

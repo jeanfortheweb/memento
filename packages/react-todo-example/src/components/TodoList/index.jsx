@@ -44,6 +44,9 @@ const TodoList = () => (
           </Trigger>
         )}
       </View>
+      <View store={todoStore} id={state => state.jsonbinID}>
+        {({ id }) => id && `Gespeichert unter ${id}`}
+      </View>
     </Segment>
   </Segment.Group>
 );
