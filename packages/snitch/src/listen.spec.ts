@@ -1,19 +1,15 @@
 import { TaskSubject } from '@memento/store';
-import { listen, accept, KIND_LISTEN, Target, unlisten, KIND_UNLISTEN } from './listen';
+import { listen, accept, KIND_LISTEN, unlisten, KIND_UNLISTEN } from './listen';
 
 const KIND_A = '@TEST/KIND_A';
 
-const run = (target: Function | string | Partial<Target<any>>) => {
+const run = (...args: any[]) => {
   const task$ = new TaskSubject();
   const assign = jest.fn();
 
   accept(task$).subscribe();
 
-  if (typeof target === 'object') {
-    target.kind = KIND_A;
-  }
-
-  task$.next(listen(target as any, assign));
+  task$.next(listen.apply(null, [...args, assign]));
   task$.next({
     kind: KIND_A,
     payload: {
@@ -31,7 +27,7 @@ test('creates the expected task objects', () => {
   expect(listen(KIND_A, assign)).toMatchObject({
     kind: KIND_LISTEN,
     payload: {
-      target: KIND_A,
+      kind: KIND_A,
       assign,
     },
   });
@@ -57,46 +53,19 @@ test('does invoke assign function on function targets', () => {
   expect(run(taskCreator)).toHaveBeenCalledTimes(1);
 });
 
-test('does invoke assign with payload filter object matching', () => {
-  expect(
-    run({
-      payload: {
-        b: 'foo',
-      },
-    }),
-  ).toHaveBeenCalledTimes(1);
-});
-
-test('does not invoke assign with payload filter object not matching', () => {
-  expect(
-    run({
-      payload: {
-        b: 'bar',
-      },
-    }),
-  ).toHaveBeenCalledTimes(0);
-});
-
 test('does invoke assign with payload filter function returning true', () => {
-  expect(
-    run({
-      predicate: payload => payload.a === true,
-    }),
-  ).toHaveBeenCalledTimes(1);
+  expect(run(KIND_A, payload => payload.a === true)).toHaveBeenCalledTimes(1);
 });
 
 test('does not invoke assign with payload filter function returning false', () => {
-  expect(
-    run({
-      predicate: payload => payload.b === 'bar',
-    }),
-  ).toHaveBeenCalledTimes(0);
+  expect(run(KIND_A, payload => payload.b === 'bar')).toHaveBeenCalledTimes(0);
 });
 
 test('does stop listening when unlisten is emitted', () => {
   const task$ = new TaskSubject();
   const assign1 = jest.fn();
   const assign2 = jest.fn();
+  const assign3 = jest.fn();
   const task = {
     kind: KIND_A,
     payload: {
@@ -107,17 +76,9 @@ test('does stop listening when unlisten is emitted', () => {
 
   accept(task$).subscribe();
 
-  task$.next(
-    listen(
-      {
-        name: 'foo',
-        kind: KIND_A,
-      },
-      assign1,
-    ),
-  );
-
+  task$.next(listen('foo', KIND_A, assign1));
   task$.next(listen(KIND_A, assign2));
+  task$.next(listen('foo', KIND_A, payload => payload.a, assign3));
 
   task$.next(task);
   task$.next(unlisten('foo'));
@@ -125,4 +86,9 @@ test('does stop listening when unlisten is emitted', () => {
 
   expect(assign1).toHaveBeenCalledTimes(1);
   expect(assign2).toHaveBeenCalledTimes(2);
+  expect(assign3).toHaveBeenCalledTimes(1);
+});
+
+test('throws with invalid arguments', () => {
+  expect(() => run(KIND_A, true, false, false)).toThrow();
 });

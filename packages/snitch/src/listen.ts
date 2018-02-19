@@ -7,7 +7,9 @@ export const KIND_UNLISTEN = '@SNITCH/UNLISTEN';
 export type ListenTask = Task<
   typeof KIND_LISTEN,
   {
-    target: Function | string | Target<any>;
+    name?: string;
+    kind: string;
+    predicate?: (task: Task) => boolean;
     assign: AssignFunction<any>;
   }
 >;
@@ -25,48 +27,18 @@ export interface Target<TPayload> {
   predicate?: (payload: TPayload) => boolean;
 }
 
-const getKind = (target: Function | string | Target<any>) => {
-  if (typeof target === 'function' || typeof target === 'string') {
-    return target.toString();
-  }
-
-  return target.kind.toString();
-};
-
-const getFilter = (target: Function | string | Target<any>) =>
-  getPredicateFilter(target) || getPayloadFilter(target) || (() => true);
-
-const getPredicateFilter = (target: Function | string | Target<any>) =>
-  typeof target === 'object' &&
-  typeof target.predicate === 'function' &&
-  (task => (target.predicate as any)(task.payload));
-
-const getPayloadFilter = (target: Function | string | Target<any>) =>
-  typeof target === 'object' &&
-  target.payload !== undefined &&
-  (task =>
-    Object.keys(target.payload as any).every(
-      prop => task.payload[prop] === (target.payload as any)[prop],
-    ));
-
-const getName = (target: Function | string | Target<any>) => {
-  if (typeof target !== 'function' && typeof target !== 'string') {
-    return target.name;
-  }
-
-  return '';
-};
+const noFilter = () => true;
 
 export const accept = (task$: TaskObservable & Observable<Task>): Observable<Task> =>
-  task$.accept<ListenTask>(KIND_LISTEN).flatMap(({ payload: { target, assign } }) =>
+  task$.accept<ListenTask>(KIND_LISTEN).flatMap(({ payload: { name, kind, predicate, assign } }) =>
     task$
-      .accept(getKind(target))
-      .filter(getFilter(target))
-      .map(targetTask => assign(targetTask))
+      .accept(kind)
+      .filter(task => (predicate ? predicate(task.payload) : noFilter()))
+      .map(task => assign(task))
       .takeUntil(
         task$
           .accept<UnListenTask>(KIND_UNLISTEN)
-          .filter(unlistenTask => unlistenTask.payload === getName(target)),
+          .filter(unlistenTask => unlistenTask.payload === name),
       ),
   );
 
@@ -77,15 +49,67 @@ export const unlisten = (name: string): UnListenTask => ({
 
 unlisten.toString = () => KIND_UNLISTEN;
 
-export const listen = <TTask extends Task>(
-  target: Function | string | Target<TTask['payload']>,
+export function listen<TTask extends Task>(kind: string, assign: AssignFunction<TTask>): ListenTask;
+
+export function listen<TTask extends Task>(
+  name: string,
+  kind: string,
   assign: AssignFunction<TTask>,
-): ListenTask => ({
-  kind: KIND_LISTEN,
-  payload: {
-    target,
-    assign,
-  },
-});
+): ListenTask;
+
+export function listen<TTask extends Task>(
+  kind: string,
+  predicate: (payload: TTask['payload']) => boolean,
+  assign: AssignFunction<TTask>,
+): ListenTask;
+
+export function listen<TTask extends Task>(
+  name: string,
+  kind: string,
+  predicate: (payload: TTask['payload']) => boolean,
+  assign: AssignFunction<TTask>,
+): ListenTask;
+
+export function listen(a?, b?, c?, d?) {
+  return {
+    kind: KIND_LISTEN,
+    payload: match(a.toString(), b, c, d, {
+      'string|function': (kind, assign) => ({
+        kind,
+        assign,
+      }),
+      'string|string|function': (name, kind, assign) => ({
+        name,
+        kind,
+        assign,
+      }),
+      'string|function|function': (kind, predicate, assign) => ({
+        kind,
+        predicate,
+        assign,
+      }),
+      'string|string|function|function': (name, kind, predicate, assign) => ({
+        name,
+        kind,
+        predicate,
+        assign,
+      }),
+    }),
+  };
+}
+
+const match = (...args: any[]) => {
+  const map = args.pop();
+  const pattern = args
+    .map(arg => typeof arg)
+    .filter(arg => arg !== 'undefined')
+    .join('|');
+
+  if (map[pattern] !== undefined) {
+    return map[pattern].apply(null, args);
+  }
+
+  throw new Error(`Invalid arguments, expected one of: ${Object.keys(map).join(', ')}`);
+};
 
 listen.toString = () => KIND_LISTEN;
