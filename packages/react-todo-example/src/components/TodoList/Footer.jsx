@@ -28,7 +28,7 @@ const FilterCheckbox = ({ value }) => (
   </View>
 );
 
-const renderTodoTextInput = ({ text }) => (
+const TodoTextInput = ({ text }) => (
   <Trigger store={todoStore} onAddClick={addTodo(text)} onChange={setTodoText}>
     {({ onChange, onAddClick }) => (
       <Input
@@ -48,14 +48,13 @@ const Footer = () => (
   <Grid>
     <Grid.Row>
       <Grid.Column width={16}>
-        <View store={todoStore} text={getTodoText} render={renderTodoTextInput} />
+        <View store={todoStore} text={getTodoText} render={TodoTextInput} />
         <Divider />
         <View
           store={todoStore}
           isLoading={state => state.isSaving}
           todos={getTodos}
           link={state => (state.jsonbinID ? `http://api.jsonbin.io/b/${state.jsonbinID}` : '')}
-          id={state => state.jsonbinID}
         >
           {({ link, isLoading, todos }) => (
             <Input
