@@ -10,6 +10,9 @@
     },
     "bootstrap": {
       "ignore": "@memento/---"
+    },
+    "run": {
+      "ignore": "@memento/---"
     }
   }
 }
