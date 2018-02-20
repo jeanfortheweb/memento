@@ -12,7 +12,7 @@ cache:
 
 install:
   - yarn install
-  - yarn global add lerna codecov
+  - yarn global add lerna
   - lerna bootstrap
 
 services: mongodb
