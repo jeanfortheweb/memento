@@ -1,71 +1,54 @@
-import { List } from 'immutable';
-import * as faker from 'faker';
-import { Task, Worker } from '@memento/store';
-import ProbeState from './ProbeState';
+import { Task, Worker, State } from '@memento/store';
+import { random } from 'faker';
 import ProbeStore from './ProbeStore';
 import Expectation from './Expectation';
 
 /**
- * Creates an array of a random length where each element is created by the
- * provided factory function.
- *
- * @param min Minimum array length.
- * @param max Maximum array length.
- * @param factory Factory for creating elements.
+ * Represents a value generator.
  */
-const randomArray = <T>(min: number, max: number, factory: () => T): T[] => {
-  const array: T[] = [];
-  const length = faker.random.number({ min, max });
+export interface Generator<T> {
+  (): T;
+  (min: number, max: number): T[];
+}
 
-  for (let i = 0; i < length; i++) {
-    array.push(factory());
+function* counter(count: number) {
+  let i = 0;
+
+  while (i < count) {
+    yield ++i;
   }
-
-  return array;
-};
+}
 
 /**
- * Generates a new `ProbeState` instance with an optional seed.
+ * Creates a value genereator based on a given factory.
  *
- * @param seed The seed to use
+ * @param factory The factory for generated values.
  */
-export const generate = (seed?: number) => {
-  if (seed) {
-    faker.seed(seed);
+export const generator = <T>(factory: () => T): Generator<T> => (
+  min?: number,
+  max?: number,
+): any => {
+  const values: T[] = [];
+  const count = random.number({ min: min || 1, max: max || min || 1 });
+  const iterator = counter(count);
+
+  while (iterator.next().done === false) {
+    values.push(factory());
   }
 
-  return new ProbeState({
-    host: faker.internet.ip(),
-    port: faker.random.number({ min: 1000, max: 9999 }),
+  if (min === undefined && max === undefined) {
+    return values.pop() as T;
+  }
 
-    addresses: List(
-      randomArray(
-        1,
-        10,
-        () =>
-          new ProbeState.Address({
-            street: faker.address.streetAddress(),
-            postalCode: faker.address.zipCode(),
-            country: faker.address.country(),
-            state: faker.address.state(),
-          }),
-      ),
-    ),
-  });
+  return values;
 };
-
-/**
- * A default `ProbeState` instance with a fixed seed.
- */
-export const defaultState = generate(180293);
 
 /**
  * Creates a curried setup chain which leads to a `run` on a `ProbeStore`.
- * This utility works only the `ProbeState` implementation.
  *
  * @param initialState The initial state for the store.
  */
-export const setup = (initialState = defaultState) => (worker: Worker<ProbeState>) => (
+export const setup = <TState extends State>(initialState) => (worker: Worker<TState>) => (
   task: Task,
-  ...expectations: Expectation<ProbeState>[]
+  ...expectations: Expectation<TState>[]
 ) => new ProbeStore(initialState, worker).run(task, ...expectations);

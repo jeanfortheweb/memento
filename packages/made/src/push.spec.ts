@@ -1,7 +1,8 @@
-import { setup, defaultState, Expectation, ProbeState } from '@memento/probe';
+import { setup, Expectation, ProbeState } from '@memento/probe';
 import push, { accept, KIND, PushTask } from './push';
 
-const run = setup(defaultState)(accept);
+const defaultState = ProbeState.defaultState;
+const run = setup<ProbeState>(defaultState)(accept);
 
 test('toString() ouputs the kind as string', () => {
   expect(push.toString()).toEqual(KIND);

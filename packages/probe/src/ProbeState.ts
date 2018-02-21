@@ -1,5 +1,6 @@
 import { List, Record } from 'immutable';
 import * as faker from 'faker';
+import { generator, Generator } from './utils';
 
 /**
  * Defines the properties of the `ProbeState`-Record.
@@ -42,14 +43,28 @@ namespace ProbeState {
   }) {}
 
   export namespace Address {
-    export const generate = () =>
-      new Address({
-        street: faker.address.streetAddress(),
-        postalCode: faker.address.zipCode(),
-        country: faker.address.country(),
-        state: faker.address.state(),
-      });
+    export const generate: Generator<Address> = generator(
+      () =>
+        new Address({
+          street: faker.address.streetAddress(),
+          postalCode: faker.address.zipCode(),
+          country: faker.address.country(),
+          state: faker.address.state(),
+        }),
+    );
   }
+
+  export const generate: Generator<ProbeState> = generator(
+    () =>
+      new ProbeState({
+        addresses: List(Address.generate(5, 10)),
+      }),
+  );
+
+  /**
+   * A default `ProbeState` instance with a fixed seed.
+   */
+  export const defaultState = generate();
 }
 
 export default ProbeState;

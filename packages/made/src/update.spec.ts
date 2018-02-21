@@ -1,7 +1,8 @@
-import { setup, defaultState, Expectation, ProbeState } from '@memento/probe';
+import { setup, Expectation, ProbeState } from '@memento/probe';
 import update, { accept, KIND, UpdateTask } from './update';
 
-const run = setup(defaultState)(accept);
+const defaultState = ProbeState.defaultState;
+const run = setup<ProbeState>(defaultState)(accept);
 
 test('toString() ouputs the kind as string', () => {
   expect(update.toString()).toEqual(KIND);
@@ -9,7 +10,7 @@ test('toString() ouputs the kind as string', () => {
 
 test('produces the expected output state', async () => {
   const element = defaultState.addresses.last() as ProbeState.Address;
-  const data = element.set('street', 'Foostr. 55');
+  const data = ProbeState.Address.generate();
 
   await run(
     update<ProbeState.Address>('addresses', element, data),

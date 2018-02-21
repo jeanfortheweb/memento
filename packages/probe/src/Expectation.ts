@@ -55,7 +55,7 @@ namespace Expectation {
     /**
      * @inheritDoc
      */
-    public assert(history: History<TState>) {
+    public assert(history: History<TState>): void {
       const initialState = history.state.pop().last();
       const updatedState = history.state.last();
 
@@ -72,7 +72,9 @@ namespace Expectation {
   /**
    * Expects a given `Task` to be assigned to the store.
    */
-  export class TaskAssignment<TTask extends Task> extends Expectation<any> {
+  export class TaskAssignment<TState extends State, TTask extends Task> extends Expectation<
+    TState
+  > {
     private _task: TTask;
 
     /**
@@ -84,7 +86,7 @@ namespace Expectation {
       this._task = task;
     }
 
-    public assert(history: History<any>) {
+    public assert(history: History<TState>): void {
       const task = history.task.last();
 
       expect(task).toBeDefined();
@@ -119,10 +121,10 @@ namespace Expectation {
     /**
      * @inheritDoc
      */
-    public assert(history: History<TState>) {
+    public assert(history: History<TState>): void {
       new Expectation.Group(
-        new Expectation.TaskAssignment<TTask>(this._assignedTask),
-        new Expectation.StateChange(this._initialState, this._updatedState),
+        new Expectation.TaskAssignment<TState, TTask>(this._assignedTask),
+        new Expectation.StateChange<TState>(this._initialState, this._updatedState),
       ).assert(history);
     }
   }

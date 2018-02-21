@@ -1,8 +1,9 @@
 import { List } from 'immutable';
-import { setup, defaultState, Expectation, ProbeState } from '@memento/probe';
+import { setup, Expectation, ProbeState } from '@memento/probe';
 import remove, { accept, KIND, RemoveTask } from './remove';
 
-const run = setup(defaultState)(accept);
+const defaultState = ProbeState.defaultState;
+const run = setup<ProbeState>(defaultState)(accept);
 
 test('toString() ouputs the kind as string', () => {
   expect(remove.toString()).toEqual(KIND);
