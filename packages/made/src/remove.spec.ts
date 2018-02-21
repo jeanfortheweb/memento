@@ -1,37 +1,28 @@
-import { TestState, InnerTestProps, wire } from './test/helpers';
 import { List } from 'immutable';
-import remove, { accept, KIND } from './remove';
+import { setup, defaultState, Expectation, ProbeState } from '@memento/probe';
+import remove, { accept, KIND, RemoveTask } from './remove';
 
-const item1 = { a: 0, b: 0 };
-const item2 = { a: 1, b: 1 };
+const run = setup(defaultState)(accept);
 
-test('creates the expected task object', () => {
-  expect(remove<InnerTestProps>('list', item1)).toMatchObject({
-    kind: KIND,
-    payload: {
-      path: 'list',
-      data: [item1],
-    },
-  });
-
+test('toString() ouputs the kind as string', () => {
   expect(remove.toString()).toEqual(KIND);
 });
 
 test('produces the expected output state', async () => {
-  const run = wire<TestState>(
-    accept,
-    new TestState({
-      list: List([item1, item2, { a: 2, b: 2 }]),
-    }),
-  );
+  const data = defaultState.addresses.toArray();
 
   await run(
-    remove<InnerTestProps>('list', item1, item2),
-    {
-      list: [{ a: 0, b: 0 }, { a: 1, b: 1 }, { a: 2, b: 2 }],
-    },
-    {
-      list: [{ a: 2, b: 2 }],
-    },
+    remove<ProbeState.Address>('addresses', ...data),
+    new Expectation.StateChangeTask<ProbeState, RemoveTask<ProbeState.Address>>(
+      {
+        kind: KIND,
+        payload: {
+          path: 'addresses',
+          data,
+        },
+      },
+      defaultState,
+      defaultState.update('addresses', addresses => List()),
+    ),
   );
 });

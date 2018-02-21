@@ -1,36 +1,27 @@
-import { TestState, InnerTestProps, wire } from './test/helpers';
-import set, { accept, KIND } from './set';
+import { setup, defaultState, Expectation, ProbeState } from '@memento/probe';
+import set, { accept, KIND, SetTask } from './set';
 
-test('creates the expected task object', () => {
-  expect(
-    set<InnerTestProps>('a.child', {
-      a: 2,
-      b: 3,
-    }),
-  ).toMatchObject({
-    kind: KIND,
-    payload: {
-      path: 'a.child',
-      data: {
-        a: 2,
-        b: 3,
-      },
-    },
-  });
+const run = setup(defaultState)(accept);
 
+test('toString() ouputs the kind as string', () => {
   expect(set.toString()).toEqual(KIND);
 });
 
 test('produces the expected output state', async () => {
-  const run = wire<TestState>(accept, new TestState());
+  const data = 'Foostr. 23';
 
   await run(
-    set<string>('a', 'foo'),
-    {
-      a: '',
-    },
-    {
-      a: 'foo',
-    },
+    set<string>('addresses.0.street', data),
+    new Expectation.StateChangeTask<ProbeState, SetTask<string>>(
+      {
+        kind: KIND,
+        payload: {
+          path: 'addresses.0.street',
+          data,
+        },
+      },
+      defaultState,
+      defaultState.update('addresses', addresses => addresses.setIn([0, 'street'], data)),
+    ),
   );
 });

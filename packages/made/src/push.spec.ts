@@ -1,48 +1,28 @@
-import { TestState, InnerTestProps, wire } from './test/helpers';
-import push, { accept, KIND } from './push';
+import { setup, defaultState, Expectation, ProbeState } from '@memento/probe';
+import push, { accept, KIND, PushTask } from './push';
 
-test('creates the expected task object', () => {
-  expect(
-    push<InnerTestProps>('list', {
-      a: 2,
-      b: 3,
-    }),
-  ).toMatchObject({
-    kind: KIND,
-    payload: {
-      path: 'list',
-      data: [
-        {
-          a: 2,
-          b: 3,
-        },
-      ],
-    },
-  });
+const run = setup(defaultState)(accept);
 
+test('toString() ouputs the kind as string', () => {
   expect(push.toString()).toEqual(KIND);
 });
 
 test('produces the expected output state', async () => {
-  const run = wire<TestState>(accept, new TestState());
+  const data1 = ProbeState.Address.generate();
+  const data2 = ProbeState.Address.generate();
 
   await run(
-    push<InnerTestProps>(
-      'list',
+    push<ProbeState.Address>('addresses', data1, data2),
+    new Expectation.StateChangeTask<ProbeState, PushTask<ProbeState.Address>>(
       {
-        a: 1,
-        b: 2,
+        kind: KIND,
+        payload: {
+          path: 'addresses',
+          data: [data1, data2],
+        },
       },
-      {
-        a: 3,
-        b: 4,
-      },
+      defaultState,
+      defaultState.update('addresses', addresses => addresses.push(data1, data2)),
     ),
-    {
-      list: [{ a: 0, b: 0 }],
-    },
-    {
-      list: [{ a: 0, b: 0 }, { a: 1, b: 2 }, { a: 3, b: 4 }],
-    },
   );
 });
