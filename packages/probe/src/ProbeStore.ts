@@ -18,8 +18,6 @@ export default class ProbeStore<TState extends State> {
   private _worker: Worker<TState>;
 
   /**
-   * Creates a new `ProbeStore` instance.
-   *
    * @param initialState The initial state.
    * @param worker The worker to use.
    */

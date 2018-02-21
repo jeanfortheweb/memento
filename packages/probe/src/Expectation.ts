@@ -1,4 +1,4 @@
-import { State } from '@memento/store';
+import { State, Task } from '@memento/store';
 import { History } from './History';
 
 /**
@@ -13,15 +13,35 @@ abstract class Expectation<TState extends State> {
  */
 namespace Expectation {
   /**
-   * Expects a given `initialState` and a resulting `updatedState` after one `Store`-Cycle.
+   * Allows to make a group of expectations on a single emission cycle of the store.
+   */
+  export class Group<TState extends State> extends Expectation<TState> {
+    private _expectations: Expectation<TState>[];
+
+    /**
+     * @param expectations The expectations to make.
+     */
+    constructor(...expectations: Expectation<TState>[]) {
+      super();
+
+      this._expectations = expectations;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    assert(history: History<TState>) {
+      this._expectations.map(expectation => expectation.assert(history));
+    }
+  }
+  /**
+   * Expects a given `initialState` and a resulting `updatedState`.
    */
   export class StateChange<TState extends State> extends Expectation<TState> {
     private _initialState: TState;
     private _updatedState: TState;
 
     /**
-     * Creates a new `StateChange`-Expectation.
-     *
      * @param initialState The initial state (or previous/current) state to expect.
      * @param updatedState The updated state to expect.
      */
@@ -32,7 +52,10 @@ namespace Expectation {
       this._updatedState = updatedState;
     }
 
-    assert(history: History<TState>) {
+    /**
+     * @inheritDoc
+     */
+    public assert(history: History<TState>) {
       const initialState = history.state.pop().last();
       const updatedState = history.state.last();
 
@@ -43,6 +66,64 @@ namespace Expectation {
         expect(initialState.toJS()).toMatchObject(this._initialState.toJS());
         expect(updatedState.toJS()).toMatchObject(this._updatedState.toJS());
       }
+    }
+  }
+
+  /**
+   * Expects a given `Task` to be assigned to the store.
+   */
+  export class TaskAssignment<TTask extends Task> extends Expectation<any> {
+    private _task: TTask;
+
+    /**
+     * @param task The task to expect.
+     */
+    constructor(task: TTask) {
+      super();
+
+      this._task = task;
+    }
+
+    public assert(history: History<any>) {
+      const task = history.task.last();
+
+      expect(task).toBeDefined();
+      expect(task).toMatchObject(this._task);
+    }
+  }
+
+  /**
+   * Combines a `TaskAssignment`-Expecation with a `StateChange`-Expectation.
+   */
+  export class StateChangeTask<TState extends State, TTask extends Task> extends Expectation<
+    TState
+  > {
+    private _initialState: TState;
+    private _updatedState: TState;
+    private _assignedTask: TTask;
+
+    /**
+     *
+     * @param assignedTask The task that is expected to be assigned.
+     * @param initialState The initial state to expect.
+     * @param updatedState The updated state to expect.
+     */
+    constructor(assignedTask: TTask, initialState: TState, updatedState: TState) {
+      super();
+
+      this._assignedTask = assignedTask;
+      this._initialState = initialState;
+      this._updatedState = updatedState;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public assert(history: History<TState>) {
+      new Expectation.Group(
+        new Expectation.TaskAssignment<TTask>(this._assignedTask),
+        new Expectation.StateChange(this._initialState, this._updatedState),
+      ).assert(history);
     }
   }
 }

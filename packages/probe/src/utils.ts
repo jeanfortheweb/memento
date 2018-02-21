@@ -39,12 +39,17 @@ export const generate = (seed?: number) => {
     port: faker.random.number({ min: 1000, max: 9999 }),
 
     addresses: List(
-      randomArray(1, 10, () => ({
-        street: faker.address.streetAddress(),
-        postalCode: faker.address.zipCode(),
-        country: faker.address.country(),
-        state: faker.address.state(),
-      })),
+      randomArray(
+        1,
+        10,
+        () =>
+          new ProbeState.Address({
+            street: faker.address.streetAddress(),
+            postalCode: faker.address.zipCode(),
+            country: faker.address.country(),
+            state: faker.address.state(),
+          }),
+      ),
     ),
   });
 };
