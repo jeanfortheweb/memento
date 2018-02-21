@@ -1,11 +1,11 @@
 import { State, Task } from '@memento/store';
-import { History } from './History';
+import { ProbeHistory } from './ProbeHistory';
 
 /**
  * Expectation.
  */
 abstract class Expectation<TState extends State> {
-  public abstract assert(history: History<TState>);
+  public abstract assert(history: ProbeHistory<TState>);
 }
 
 /**
@@ -30,7 +30,7 @@ namespace Expectation {
     /**
      * @inheritDoc
      */
-    assert(history: History<TState>) {
+    assert(history: ProbeHistory<TState>) {
       this._expectations.map(expectation => expectation.assert(history));
     }
   }
@@ -55,7 +55,7 @@ namespace Expectation {
     /**
      * @inheritDoc
      */
-    public assert(history: History<TState>): void {
+    public assert(history: ProbeHistory<TState>): void {
       const initialState = history.state.pop().last();
       const updatedState = history.state.last();
 
@@ -86,7 +86,7 @@ namespace Expectation {
       this._task = task;
     }
 
-    public assert(history: History<TState>): void {
+    public assert(history: ProbeHistory<TState>): void {
       const task = history.task.last();
 
       expect(task).toBeDefined();
@@ -121,7 +121,7 @@ namespace Expectation {
     /**
      * @inheritDoc
      */
-    public assert(history: History<TState>): void {
+    public assert(history: ProbeHistory<TState>): void {
       new Expectation.Group(
         new Expectation.TaskAssignment<TState, TTask>(this._assignedTask),
         new Expectation.StateChange<TState>(this._initialState, this._updatedState),
