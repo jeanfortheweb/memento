@@ -9,9 +9,12 @@ import History from './History';
  *
  * @param initialState The initial state for the store.
  */
-export const setup = <TState extends StoreState>(initialState) => (worker: Worker<TState>) => (
-  task: Task,
-  ...expectations: Expect<TState>[]
-) => new Store(initialState, worker).run(task, ...expectations);
+export const setup = <TState extends StoreState>(initialState) => (
+  worker: Worker<TState>,
+) => async (task: Task, ...expectations: Expect<TState>[]) => {
+  const store = new Store(initialState, worker);
+  await store.run(task, ...expectations);
+  store.reset();
+};
 
 export { Store, State, Expect, History };

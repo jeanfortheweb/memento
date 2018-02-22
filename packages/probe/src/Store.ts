@@ -16,6 +16,8 @@ export default class Store<TState extends State> {
   private _initialState: TState;
   private _state: TState;
   private _worker: Worker<TState>;
+  private _expectations: Expectation<TState>[];
+  private _expectation?: Expectation<TState>;
 
   /**
    * @param initialState The initial state.
@@ -29,7 +31,7 @@ export default class Store<TState extends State> {
     this._initialState = initialState;
     this._state = initialState;
     this._worker = worker;
-
+    this._expectations = [];
     this.reset();
   }
 
@@ -41,15 +43,26 @@ export default class Store<TState extends State> {
     this._state$ = new StateSubject<TState>(this._initialState);
     this._output$ = new Subject<Task | Updater<TState>>();
     this._history = new HistoryState();
+    this._expectations = [];
+    this._expectation = undefined;
+
     this._state = this._initialState;
 
     this._state$.subscribe(value => {
       this._history = this._history.update('state', state => state.push(value));
       this._state = value;
+
+      if (this._expectation) {
+        this._expectation.assert(this._history);
+      }
     });
 
     this._task$.subscribe(value => {
       this._history = this._history.update('task', task => task.push(value));
+
+      if (this._expectation) {
+        this._expectation.assert(this._history);
+      }
     });
 
     this._worker(this._task$, this._state$).subscribe(this._output$);
@@ -70,30 +83,31 @@ export default class Store<TState extends State> {
    * @param expectations The expectations to make.
    */
   public run(task: Task, ...expectations: Expectation<TState>[]) {
+    this._expectations = expectations;
+    this._expectation = this._expectations.shift();
+
     return new Promise(resolve => {
-      const subscription = this._output$.subscribe(value => {
-        this._history = this._history.update('output', output => output.push(value));
+      if (this._expectations.length > 0) {
+        const subscription = this._output$.subscribe(value => {
+          this._expectation = this._expectations.shift();
 
-        if (typeof value === 'function') {
-          this._state$.next(value(this._state));
-        } else {
-          this._task$.next(value);
-        }
+          if (typeof value === 'function') {
+            this._state$.next(value(this._state));
+          } else {
+            this._task$.next(value);
+          }
 
-        const expectation = expectations.shift();
+          if (this._expectations.length === 0) {
+            subscription.unsubscribe();
+            resolve();
+          }
+        });
 
-        if (expectation) {
-          expectation.assert(this.history);
-        }
-
-        if (expectations.length === 0) {
-          subscription.unsubscribe();
-          this.reset();
-          resolve();
-        }
-      });
-
-      this._task$.next(task);
+        this._task$.next(task);
+      } else {
+        this._task$.next(task);
+        resolve();
+      }
     });
   }
 }

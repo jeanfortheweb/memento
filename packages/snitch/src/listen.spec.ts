@@ -1,127 +1,102 @@
-import { TaskSubject } from '@memento/store';
+import { Task, createTask } from '@memento/store';
+import { Store, State, Expect } from '@memento/probe';
 import { listen, accept, KIND_LISTEN, unlisten, KIND_UNLISTEN, KIND_LISTEN_ONCE } from './listen';
 
 const KIND_A = '@TEST/KIND_A';
+const KIND_B = '@TEST/KIND_B';
 
-const run = (...args: any[]) => {
-  const task$ = new TaskSubject();
-  const assign = jest.fn();
+type TaskA = Task<typeof KIND_A, { propertyA: string; propertyB: string }>;
+type TaskB = Task<typeof KIND_B, { propertyA: string }>;
 
-  accept(task$).subscribe();
+const taskA = createTask(KIND_A, (propertyA: string, propertyB: string) => ({
+  propertyA,
+  propertyB,
+}));
 
-  task$.next(listen.apply(null, [...args, assign]));
-  task$.next({
-    kind: KIND_A,
-    payload: {
-      a: true,
-      b: 'foo',
-    },
-  });
+const taskB = createTask(KIND_B, (propertyA: string) => ({
+  propertyA,
+}));
 
-  return assign;
+const state = State.defaultState;
+const store = new Store(state, accept);
+const assign = jest.fn((payload: TaskA['payload']) => taskB(payload.propertyA));
+
+const expectTaskToBeAssigned = async (task: Task) => {
+  await store.run(task, new Expect.TaskAssignment<State, Task>(task));
 };
 
-test('creates the expected task objects', () => {
-  const assign = jest.fn();
+const expectAssignmentFromListener = async (task: Task) => {
+  await store.run(
+    task,
+    new Expect.TaskAssignment<State, Task>(task),
+    new Expect.TaskAssignment<State, TaskB>({
+      kind: KIND_B,
+      payload: {
+        propertyA: 'propertyA',
+      },
+    }),
+  );
+};
 
-  expect(listen(KIND_A, assign)).toMatchObject({
-    kind: KIND_LISTEN,
-    payload: {
-      kind: KIND_A,
-      assign,
-    },
-  });
+beforeEach(() => {
+  store.reset();
+  assign.mockClear();
+});
 
+test('toString() ouputs the kind as string', () => {
   expect(listen.toString()).toEqual(KIND_LISTEN);
-
-  expect(listen.once(KIND_A, assign)).toMatchObject({
-    kind: KIND_LISTEN_ONCE,
-    payload: {
-      kind: KIND_A,
-      assign,
-    },
-  });
-
   expect(listen.once.toString()).toEqual(KIND_LISTEN_ONCE);
-
-  expect(unlisten('foo')).toMatchObject({
-    kind: KIND_UNLISTEN,
-    payload: 'foo',
-  });
-
   expect(unlisten.toString()).toEqual(KIND_UNLISTEN);
 });
 
-test('does invoke assign function on string targets', () => {
-  expect(run(KIND_A)).toHaveBeenCalledTimes(1);
+test('does invoke assign function on string targets', async () => {
+  await expectTaskToBeAssigned(listen(KIND_A, assign));
+  await expectAssignmentFromListener(taskA('propertyA', 'propertyB'));
+
+  expect(assign).toHaveBeenCalledTimes(1);
 });
 
-test('does invoke assign function on function targets', () => {
-  const taskCreator = () => ({});
-  taskCreator.toString = () => KIND_A;
+test('does invoke assign with payload filter function returning true', async () => {
+  const predicate = jest.fn(payload => payload.propertyA === 'propertyA');
+  const task = taskA('propertyA', 'propertyB');
 
-  expect(run(taskCreator.toString())).toHaveBeenCalledTimes(1);
+  await expectTaskToBeAssigned(listen(KIND_A, predicate, assign));
+  await expectAssignmentFromListener(taskA('propertyA', 'propertyB'));
+
+  expect(assign).toHaveBeenCalledTimes(1);
+  expect(predicate).toHaveBeenCalledWith(task.payload);
 });
 
-test('does invoke assign with payload filter function returning true', () => {
-  expect(run(KIND_A, payload => payload.a === true)).toHaveBeenCalledTimes(1);
+test('does not invoke assign with payload filter function returning false', async () => {
+  const predicate = jest.fn(payload => payload.propertyA !== 'propertyA');
+  const task = taskA('propertyA', 'propertyB');
+
+  await expectTaskToBeAssigned(listen(KIND_A, predicate, assign));
+  await expectTaskToBeAssigned(task);
+
+  expect(assign).toHaveBeenCalledTimes(0);
+  expect(predicate).toHaveBeenCalledWith(task.payload);
 });
 
-test('does not invoke assign with payload filter function returning false', () => {
-  expect(run(KIND_A, payload => payload.b === 'bar')).toHaveBeenCalledTimes(0);
+test('does stop listening when unlisten is emitted', async () => {
+  await expectTaskToBeAssigned(listen('foo', KIND_A, () => true, assign));
+  await expectTaskToBeAssigned(listen('bar', KIND_A, assign));
+  await expectAssignmentFromListener(taskA('propertyA', 'propertyB'));
+  await expectTaskToBeAssigned(unlisten('foo'));
+  await expectTaskToBeAssigned(taskA('propertyA', 'propertyB'));
+
+  expect(assign).toHaveBeenCalledTimes(3);
 });
 
-test('does stop listening when unlisten is emitted', () => {
-  const task$ = new TaskSubject();
-  const assign1 = jest.fn();
-  const assign2 = jest.fn();
-  const assign3 = jest.fn();
-  const task = {
-    kind: KIND_A,
-    payload: {
-      a: true,
-      b: 'foo',
-    },
-  };
+test('does stop listening with once', async () => {
+  await expectTaskToBeAssigned(listen.once(KIND_A, assign));
+  await expectTaskToBeAssigned(listen.once(KIND_A, () => false, assign));
+  await expectAssignmentFromListener(taskA('propertyA', 'propertyB'));
+  await expectTaskToBeAssigned(taskA('propertyA', 'propertyB'));
 
-  accept(task$).subscribe();
-
-  task$.next(listen('foo', KIND_A, assign1));
-  task$.next(listen(KIND_A, assign2));
-  task$.next(listen('foo', KIND_A, payload => payload.a, assign3));
-
-  task$.next(task);
-  task$.next(unlisten('foo'));
-  task$.next(task);
-
-  expect(assign1).toHaveBeenCalledTimes(1);
-  expect(assign2).toHaveBeenCalledTimes(2);
-  expect(assign3).toHaveBeenCalledTimes(1);
-});
-
-test('does stop listening with once', () => {
-  const task$ = new TaskSubject();
-  const assign1 = jest.fn();
-  const assign2 = jest.fn();
-  const task = {
-    kind: KIND_A,
-    payload: {
-      a: true,
-      b: 'foo',
-    },
-  };
-
-  accept(task$).subscribe();
-
-  task$.next(listen.once(KIND_A, assign1));
-  task$.next(listen.once(KIND_A, payload => payload.a, assign2));
-  task$.next(task);
-  task$.next(task);
-
-  expect(assign1).toHaveBeenCalledTimes(1);
-  expect(assign2).toHaveBeenCalledTimes(1);
+  expect(assign).toHaveBeenCalledTimes(1);
 });
 
 test('throws with invalid arguments', () => {
-  expect(() => run(KIND_A, true, false, false)).toThrow();
+  expect(() => (listen as any)(KIND_A, true, false, false)).toThrow();
 });

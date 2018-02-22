@@ -29,6 +29,7 @@ namespace Expectation {
       this._expectations.map(expectation => expectation.assert(history));
     }
   }
+
   /**
    * Expects a given `initialState` and a resulting `updatedState`.
    */
