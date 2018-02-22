@@ -1,31 +1,22 @@
+import { setup, State, Expect } from '@memento/probe';
 import sequence, { accept, KIND } from './sequence';
-import { TaskSubject, Task, Updater } from '@memento/store';
-import { Subject } from '@reactivex/rxjs';
-import { Record } from 'immutable';
+import { Task } from '@memento/store';
 
-class State extends Record({}) {}
-const tasks = [{ kind: 'A', payload: null }, { kind: 'B', payload: null }];
+const run = setup<State>(State.defaultState)(accept);
+const tasks: Task[] = [{ kind: 'A', payload: null }, { kind: 'B', payload: null }];
 
-test('creates the expected task object', () => {
-  expect(sequence(...tasks)).toMatchObject({
-    kind: KIND,
-    payload: tasks,
-  });
-
+test('toString() ouputs the kind as string', () => {
   expect(sequence.toString()).toEqual(KIND);
 });
 
-test('does forward all given tasks', () => {
-  const taskSubject = new TaskSubject();
-  const updaterSubject = new Subject<Updater<State> | Task>();
-  const subscriber = jest.fn();
-
-  accept(taskSubject).subscribe(updaterSubject);
-
-  updaterSubject.subscribe(subscriber);
-
-  taskSubject.next(sequence(...tasks));
-
-  expect(subscriber).toHaveBeenCalledTimes(2);
-  expect(subscriber.mock.calls).toMatchObject([[tasks[0]], [tasks[1]]]);
+test('does forward all given tasks', async () => {
+  await run(
+    sequence(...tasks),
+    new Expect.TaskAssignment({
+      kind: KIND,
+      payload: tasks,
+    }),
+    new Expect.TaskAssignment(tasks[0]),
+    new Expect.TaskAssignment(tasks[1]),
+  );
 });
