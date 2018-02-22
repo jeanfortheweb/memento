@@ -14,14 +14,14 @@ test('produces the expected output state', async () => {
 
   await run(
     remove<State.Address>('addresses', ...data),
-    new Expect.StateChangeTask<State, RemoveTask<State.Address>>(
-      {
-        kind: KIND,
-        payload: {
-          path: 'addresses',
-          data,
-        },
+    new Expect.TaskAssignment<State, RemoveTask<State.Address>>({
+      kind: KIND,
+      payload: {
+        path: 'addresses',
+        data,
       },
+    }),
+    new Expect.StateChange<State>(
       defaultState,
       defaultState.update('addresses', addresses => List()),
     ),

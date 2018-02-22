@@ -13,14 +13,14 @@ test('produces the expected output state', async () => {
 
   await run(
     set<string>('addresses.0.street', data),
-    new Expect.StateChangeTask<State, SetTask<string>>(
-      {
-        kind: KIND,
-        payload: {
-          path: 'addresses.0.street',
-          data,
-        },
+    new Expect.TaskAssignment<State, SetTask<string>>({
+      kind: KIND,
+      payload: {
+        path: 'addresses.0.street',
+        data,
       },
+    }),
+    new Expect.StateChange<State>(
       defaultState,
       defaultState.update('addresses', addresses => addresses.setIn([0, 'street'], data)),
     ),

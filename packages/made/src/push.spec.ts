@@ -14,14 +14,14 @@ test('produces the expected output state', async () => {
 
   await run(
     push<State.Address>('addresses', data1, data2),
-    new Expect.StateChangeTask<State, PushTask<State.Address>>(
-      {
-        kind: KIND,
-        payload: {
-          path: 'addresses',
-          data: [data1, data2],
-        },
+    new Expect.TaskAssignment<State, PushTask<State.Address>>({
+      kind: KIND,
+      payload: {
+        path: 'addresses',
+        data: [data1, data2],
       },
+    }),
+    new Expect.StateChange<State>(
       defaultState,
       defaultState.update('addresses', addresses => addresses.push(data1, data2)),
     ),

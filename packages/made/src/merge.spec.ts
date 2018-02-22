@@ -13,15 +13,12 @@ test('produces the expected output state', async () => {
     merge({
       host: 'github.com',
     }),
-    new Expect.StateChangeTask<State, MergeTask<State>>(
-      {
-        kind: KIND,
-        payload: {
-          host: 'github.com',
-        },
+    new Expect.TaskAssignment<State, MergeTask<State>>({
+      kind: KIND,
+      payload: {
+        host: 'github.com',
       },
-      defaultState,
-      defaultState.set('host', 'github.com'),
-    ),
+    }),
+    new Expect.StateChange<State>(defaultState, defaultState.set('host', 'github.com')),
   );
 });
