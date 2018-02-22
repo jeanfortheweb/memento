@@ -1,8 +1,8 @@
-import { setup, Expectation, ProbeState } from '@memento/probe';
+import { setup, Expect, State } from '@memento/probe';
 import set, { accept, KIND, SetTask } from './set';
 
-const defaultState = ProbeState.defaultState;
-const run = setup<ProbeState>(defaultState)(accept);
+const defaultState = State.defaultState;
+const run = setup<State>(defaultState)(accept);
 
 test('toString() ouputs the kind as string', () => {
   expect(set.toString()).toEqual(KIND);
@@ -13,7 +13,7 @@ test('produces the expected output state', async () => {
 
   await run(
     set<string>('addresses.0.street', data),
-    new Expectation.StateChangeTask<ProbeState, SetTask<string>>(
+    new Expect.StateChangeTask<State, SetTask<string>>(
       {
         kind: KIND,
         payload: {

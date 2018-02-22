@@ -1,43 +1,38 @@
 import { State, Task } from '@memento/store';
-import { ProbeHistory } from './ProbeHistory';
+import History from './History';
 
 /**
  * Expectation.
  */
-abstract class Expectation<TState extends State> {
-  public abstract assert(history: ProbeHistory<TState>);
+interface Expectation<TState extends State> {
+  assert(history: History<TState>);
 }
 
-/**
- * Contains several common expectations to make.
- */
 namespace Expectation {
   /**
    * Allows to make a group of expectations on a single emission cycle of the store.
    */
-  export class Group<TState extends State> extends Expectation<TState> {
+  export class Group<TState extends State> implements Expectation<TState> {
     private _expectations: Expectation<TState>[];
 
     /**
      * @param expectations The expectations to make.
      */
     constructor(...expectations: Expectation<TState>[]) {
-      super();
-
       this._expectations = expectations;
     }
 
     /**
      * @inheritDoc
      */
-    assert(history: ProbeHistory<TState>) {
+    assert(history: History<TState>) {
       this._expectations.map(expectation => expectation.assert(history));
     }
   }
   /**
    * Expects a given `initialState` and a resulting `updatedState`.
    */
-  export class StateChange<TState extends State> extends Expectation<TState> {
+  export class StateChange<TState extends State> implements Expectation<TState> {
     private _initialState: TState;
     private _updatedState: TState;
 
@@ -46,8 +41,6 @@ namespace Expectation {
      * @param updatedState The updated state to expect.
      */
     constructor(initialState: TState, updatedState: TState) {
-      super();
-
       this._initialState = initialState;
       this._updatedState = updatedState;
     }
@@ -55,7 +48,7 @@ namespace Expectation {
     /**
      * @inheritDoc
      */
-    public assert(history: ProbeHistory<TState>): void {
+    public assert(history: History<TState>): void {
       const initialState = history.state.pop().last();
       const updatedState = history.state.last();
 
@@ -72,21 +65,18 @@ namespace Expectation {
   /**
    * Expects a given `Task` to be assigned to the store.
    */
-  export class TaskAssignment<TState extends State, TTask extends Task> extends Expectation<
-    TState
-  > {
+  export class TaskAssignment<TState extends State, TTask extends Task>
+    implements Expectation<TState> {
     private _task: TTask;
 
     /**
      * @param task The task to expect.
      */
     constructor(task: TTask) {
-      super();
-
       this._task = task;
     }
 
-    public assert(history: ProbeHistory<TState>): void {
+    public assert(history: History<TState>): void {
       const task = history.task.last();
 
       expect(task).toBeDefined();
@@ -97,9 +87,8 @@ namespace Expectation {
   /**
    * Combines a `TaskAssignment`-Expecation with a `StateChange`-Expectation.
    */
-  export class StateChangeTask<TState extends State, TTask extends Task> extends Expectation<
-    TState
-  > {
+  export class StateChangeTask<TState extends State, TTask extends Task>
+    implements Expectation<TState> {
     private _initialState: TState;
     private _updatedState: TState;
     private _assignedTask: TTask;
@@ -111,8 +100,6 @@ namespace Expectation {
      * @param updatedState The updated state to expect.
      */
     constructor(assignedTask: TTask, initialState: TState, updatedState: TState) {
-      super();
-
       this._assignedTask = assignedTask;
       this._initialState = initialState;
       this._updatedState = updatedState;
@@ -121,10 +108,10 @@ namespace Expectation {
     /**
      * @inheritDoc
      */
-    public assert(history: ProbeHistory<TState>): void {
-      new Expectation.Group(
-        new Expectation.TaskAssignment<TState, TTask>(this._assignedTask),
-        new Expectation.StateChange<TState>(this._initialState, this._updatedState),
+    public assert(history: History<TState>): void {
+      new Group(
+        new TaskAssignment<TState, TTask>(this._assignedTask),
+        new StateChange<TState>(this._initialState, this._updatedState),
       ).assert(history);
     }
   }

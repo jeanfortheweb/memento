@@ -1,20 +1,20 @@
-import { setup, Expectation, ProbeState } from '@memento/probe';
+import { setup, Expect, State } from '@memento/probe';
 import push, { accept, KIND, PushTask } from './push';
 
-const defaultState = ProbeState.defaultState;
-const run = setup<ProbeState>(defaultState)(accept);
+const defaultState = State.defaultState;
+const run = setup<State>(defaultState)(accept);
 
 test('toString() ouputs the kind as string', () => {
   expect(push.toString()).toEqual(KIND);
 });
 
 test('produces the expected output state', async () => {
-  const data1 = ProbeState.Address.generate();
-  const data2 = ProbeState.Address.generate();
+  const data1 = State.Address.generate();
+  const data2 = State.Address.generate();
 
   await run(
-    push<ProbeState.Address>('addresses', data1, data2),
-    new Expectation.StateChangeTask<ProbeState, PushTask<ProbeState.Address>>(
+    push<State.Address>('addresses', data1, data2),
+    new Expect.StateChangeTask<State, PushTask<State.Address>>(
       {
         kind: KIND,
         payload: {

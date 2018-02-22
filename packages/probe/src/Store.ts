@@ -1,14 +1,14 @@
 import { Subject } from '@reactivex/rxjs';
 import { Updater, State, Task, TaskSubject, StateSubject, Worker } from '@memento/store';
-import HistoryState, { ProbeHistory } from './ProbeHistory';
-import ProbeExpectation from './ProbeExpectation';
+import Expectation from './Expectation';
+import History, { State as HistoryState } from './History';
 
 /**
- * `ProbeStore` implements a pattern that mimics the observable flow of an actual `Store`.
+ * Implements a pattern that mimics the observable flow of an actual `Store`.
  * Each emission of its observables is stored in a history which can be used by `Expecation` implementations
  * to make assertions.
  */
-export default class ProbeStore<TState extends State> {
+export default class Store<TState extends State> {
   private _task$: TaskSubject;
   private _state$: StateSubject<TState>;
   private _output$: Subject<Task | Updater<TState>>;
@@ -58,7 +58,7 @@ export default class ProbeStore<TState extends State> {
   /**
    * Gets the current history.
    */
-  public get history(): ProbeHistory<TState> {
+  public get history(): History<TState> {
     return this._history;
   }
 
@@ -69,7 +69,7 @@ export default class ProbeStore<TState extends State> {
    * @param task The task to run.
    * @param expectations The expectations to make.
    */
-  public run(task: Task, ...expectations: ProbeExpectation<TState>[]) {
+  public run(task: Task, ...expectations: Expectation<TState>[]) {
     return new Promise(resolve => {
       const subscription = this._output$.subscribe(value => {
         this._history = this._history.update('output', output => output.push(value));
