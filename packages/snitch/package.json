@@ -12,19 +12,16 @@
   "publishConfig": {
     "access": "public"
   },
-  "keywords": [
-    "flux",
-    "state management"
-  ],
+  "keywords": ["flux", "state management"],
   "author": "jeanfortheweb",
   "devDependencies": {
+    "@memento/probe": "^0.0.1",
     "@types/jest": "^22.1.1",
     "jest": "^22.1.4",
     "ts-jest": "^22.0.2",
     "typescript": "^2.7.1"
   },
   "dependencies": {
-    "@memento/probe": "^0.0.1",
     "@memento/store": "^0.0.1",
     "@reactivex/rxjs": "^5.5.6",
     "immutable": "4.0.0-rc.9"
@@ -34,10 +31,7 @@
     "transform": {
       "^.+\\.ts$": "ts-jest"
     },
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
     "testRegex": "\\.spec\\.ts$",
     "mapCoverage": true
   }
