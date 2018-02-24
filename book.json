@@ -19,7 +19,7 @@
       "label": "Edit This Page"
     },
     "theme-api": {
-      "split": false,
+      "split": true,
       "theme": "dark",
       "family": "sans",
       "size": 3,
