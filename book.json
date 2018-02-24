@@ -1,0 +1,39 @@
+{
+  "root": "./docs",
+  "title": "Memento Documentation",
+  "plugins": ["theme-api", "github", "anchorjs", "edit-link"],
+  "pluginsConfig": {
+    "github": {
+      "url": "https://github.com/jeanfortheweb/memento"
+    },
+    "sharing": {
+      "facebook": false,
+      "twitter": false,
+      "google": false,
+      "weibo": false,
+      "instapaper": false,
+      "vk": false
+    },
+    "edit-link": {
+      "base": "https://github.com/jeanfortheweb/memento/tree/master",
+      "label": "Edit This Page"
+    },
+    "theme-api": {
+      "split": false,
+      "theme": "dark",
+      "family": "sans",
+      "size": 3,
+      "languages": [
+        {
+          "lang": "redux",
+          "name": "Redux",
+          "default": true
+        },
+        {
+          "lang": "memento",
+          "name": "Memento"
+        }
+      ]
+    }
+  }
+}

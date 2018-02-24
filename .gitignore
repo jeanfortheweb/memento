@@ -8,3 +8,4 @@ npm-debug.log
 .cache/
 dist/
 /packages/react-example
+_book
