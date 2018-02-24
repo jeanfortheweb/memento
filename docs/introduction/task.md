@@ -36,7 +36,7 @@ addTodo.toString();
 {% sample lang="ts" %}
 
 ```ts
-// stores/todo.js
+// stores/todo.ts
 import { createTask } from '@memento/store';
 
 // (text) => ({ kind: 'ADD_TODO', payload: { text: '...', date: 24235464543 } })
