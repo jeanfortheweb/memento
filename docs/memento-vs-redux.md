@@ -1,4 +1,4 @@
-# Memento Explained
+# Memento vs Redux
 
 The easiest way to explain how Memento works is to compare it to the most popular state management library most of us should know: Redux.
 
