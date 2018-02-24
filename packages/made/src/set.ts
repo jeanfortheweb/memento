@@ -7,7 +7,7 @@ export const KIND = '@MADE/SET';
 export type SetTask<TData> = Task<typeof KIND, { path: string; data: Partial<TData> }>;
 
 export const accept = <TState extends State>(task$: TaskObservable & Observable<Task>) =>
-  task$.accept<SetTask<any>>(KIND).map<SetTask<any>, Updater<TState>>(task => state => {
+  task$.accept(set).map<SetTask<any>, Updater<TState>>(task => state => {
     return state.setIn(pathToArray(task.payload.path), task.payload.data);
   });
 

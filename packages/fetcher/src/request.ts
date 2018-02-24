@@ -1,5 +1,14 @@
-import { Task, TaskObservable, createTask, TaskCreator1 } from '@memento/store';
-import { Observable, AjaxRequest, AjaxResponse } from '@reactivex/rxjs';
+import {
+  Task,
+  TaskObservable,
+  createTask,
+  TaskCreator1,
+} from '@memento/store';
+import {
+  Observable,
+  AjaxRequest,
+  AjaxResponse,
+} from '@reactivex/rxjs';
 import { ConfigurationState } from './configuration';
 
 export const KIND_REQUEST = '@FETCHER/REQUEST';
@@ -28,23 +37,36 @@ export interface LifeCycleTaskPayload {
   error?: Error;
 }
 
-export type LifeCycleTask = Task<LifeCycleTaskKind, LifeCycleTaskPayload>;
+export type LifeCycleTask = Task<
+  LifeCycleTaskKind,
+  LifeCycleTaskPayload
+>;
 
-export type RequestTask = Task<typeof KIND_REQUEST, Partial<Request>>;
+export type RequestTask = Task<
+  typeof KIND_REQUEST,
+  Partial<Request>
+>;
 export type AbortTask = Task<typeof KIND_ABORT, string>;
 
-export const abort: TaskCreator1<typeof KIND_ABORT, string, string> = createTask(
-  KIND_ABORT,
-  (name: string) => name,
-);
+export const abort: TaskCreator1<
+  typeof KIND_ABORT,
+  string,
+  string
+> = createTask(KIND_ABORT, (name: string) => name);
 
 export const request: TaskCreator1<
   typeof KIND_REQUEST,
   Partial<Request>,
   Partial<Request>
-> = createTask(KIND_REQUEST, (request: Partial<Request>) => request);
+> = createTask(
+  KIND_REQUEST,
+  (request: Partial<Request>) => request,
+);
 
-export const before = createTask(KIND_BEFORE, (payload: Partial<LifeCycleTaskPayload>) => payload);
+export const before = createTask(
+  KIND_BEFORE,
+  (payload: Partial<LifeCycleTaskPayload>) => payload,
+);
 export const success = createTask(
   KIND_SUCCESS,
   (payload: Partial<LifeCycleTaskPayload>) => payload,
@@ -55,7 +77,10 @@ export const failure = createTask(
   (payload: Partial<LifeCycleTaskPayload>) => payload,
 );
 
-export const after = createTask(KIND_AFTER, (payload: Partial<LifeCycleTaskPayload>) => payload);
+export const after = createTask(
+  KIND_AFTER,
+  (payload: Partial<LifeCycleTaskPayload>) => payload,
+);
 
 const createAjaxRequest = (
   name: string | undefined,
@@ -71,11 +96,20 @@ export const accept = (
   task$: TaskObservable,
 ): Observable<Task> =>
   task$
-    .accept<RequestTask>(KIND_REQUEST)
+    .accept(request)
     .withLatestFrom(configuration$)
     .flatMap(([task, configuration]) => {
-      const { name = '', tags = [], ...parameters } = task.payload;
-      const request = createAjaxRequest(name, tags, parameters, configuration);
+      const {
+        name = '',
+        tags = [],
+        ...parameters
+      } = task.payload;
+      const request = createAjaxRequest(
+        name,
+        tags,
+        parameters,
+        configuration,
+      );
       const lifeCycleParameters = {
         name,
         tags,
@@ -88,20 +122,25 @@ export const accept = (
         request.createXHR = () => new XHR2();
       }
 
-      const before$ = Observable.of(before(lifeCycleParameters));
-      const after$ = Observable.of(after(lifeCycleParameters));
+      const before$ = Observable.of(
+        before(lifeCycleParameters),
+      );
+      const after$ = Observable.of(
+        after(lifeCycleParameters),
+      );
 
       const abort$ = task$
-        .accept<AbortTask>(KIND_ABORT)
+        .accept(abort)
         .filter(abortTask => abortTask.payload === name);
 
-      const ajax$ = Observable.ajax(request).concatMap(response =>
-        Observable.of(
-          success({
-            ...lifeCycleParameters,
-            response,
-          }),
-        ),
+      const ajax$ = Observable.ajax(request).concatMap(
+        response =>
+          Observable.of(
+            success({
+              ...lifeCycleParameters,
+              response,
+            }),
+          ),
       );
 
       return Observable.concat(

@@ -16,7 +16,11 @@ export interface ListenOnce {
 }
 
 export interface Listen extends ListenOnce {
-  <TTask extends Task>(name: string, kind: string, assign: AssignFunction<TTask>): ListenTask;
+  <TTask extends Task>(
+    name: string,
+    kind: string,
+    assign: AssignFunction<TTask>,
+  ): ListenTask;
 
   <TTask extends Task>(
     name: string,
@@ -71,17 +75,15 @@ const mapToAssign = (
 export const accept = (task$: TaskObservable & Observable<Task>): Observable<Task> =>
   Observable.merge(
     task$
-      .accept<ListenTask>(KIND_LISTEN)
+      .accept(listen)
       .flatMap(task =>
         mapToAssign(task$, task).takeUntil(
           task$
-            .accept<UnListenTask>(KIND_UNLISTEN)
+            .accept(unlisten)
             .filter(unlistenTask => unlistenTask.payload === task.payload.name),
         ),
       ),
-    task$
-      .accept<ListenOnceTask>(KIND_LISTEN_ONCE)
-      .flatMap(task => mapToAssign(task$, task).take(1)),
+    task$.accept(listen.once).flatMap(task => mapToAssign(task$, task).take(1)),
   );
 
 export const unlisten = (name: string): UnListenTask => ({

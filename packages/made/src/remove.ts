@@ -8,7 +8,7 @@ export const KIND = '@MADE/REMOVE';
 export type RemoveTask<TData> = Task<typeof KIND, { path: string; data: TData[] }>;
 
 export const accept = <TState extends State>(task$: TaskObservable & Observable<Task>) =>
-  task$.accept<RemoveTask<any>>(KIND).map<RemoveTask<any>, Updater<TState>>(task => state => {
+  task$.accept(remove).map<RemoveTask<any>, Updater<TState>>(task => state => {
     return state.updateIn(pathToArray(task.payload.path), (target: List<any>) =>
       task.payload.data.reduce<List<any>>(
         (newTarget, item) => newTarget.remove(newTarget.indexOf(item)),

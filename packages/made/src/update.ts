@@ -12,7 +12,7 @@ export type UpdateTask<TData> = Task<
 
 export const accept = <TState extends State>(task$: TaskObservable & Observable<Task>) =>
   task$
-    .accept<UpdateTask<any>>(KIND)
+    .accept(update)
     .map<UpdateTask<any>, Updater<TState>>(task => state =>
       state.updateIn(pathToArray(task.payload.path), (target: List<any>) =>
         target.update(target.indexOf(task.payload.element), element =>

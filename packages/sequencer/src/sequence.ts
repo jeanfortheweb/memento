@@ -5,10 +5,12 @@ export const KIND = '@SEQUENCER/SEQUENCE';
 
 export type SequenceTask = Task<typeof KIND, Task[]>;
 
-export const accept = (task$: TaskObservable & Observable<Task>) =>
+export const accept = (
+  task$: TaskObservable & Observable<Task>,
+) =>
   task$
-    .accept<SequenceTask>(KIND)
-    .flatMap<SequenceTask, Task>(task => Observable.from(task.payload));
+    .accept(sequence)
+    .flatMap(task => Observable.from(task.payload));
 
 const sequence = (...tasks: Task[]): SequenceTask => ({
   kind: KIND,
