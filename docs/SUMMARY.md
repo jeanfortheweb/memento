@@ -9,3 +9,11 @@
 * [The Store](pillars-of-glory/store.md)
 * [The Task](pillars-of-glory/task.md)
 * [The Worker](pillars-of-glory/worker.md)
+
+### Memento Guide (Coming soon..)
+
+* Defining the State
+* Defining tasks
+* Defining workers
+* Creating the store
+* Summary
