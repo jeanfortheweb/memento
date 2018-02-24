@@ -29,11 +29,9 @@ export interface Task<
 }
 
 export interface TaskObservable extends Observable<Task> {
-  accept<TTask extends Task>(
-    kind:
-      | TTask['kind']
-      | TaskCreator<TTask['kind'], TTask['payload']>,
-  ): Observable<TTask>;
+  accept<TKind extends string = string, TPayload = any>(
+    kind: TKind | TaskCreator<TKind, TPayload>,
+  ): Observable<Task<TKind, TPayload>>;
 }
 
 export interface StateObservable<TState extends State>

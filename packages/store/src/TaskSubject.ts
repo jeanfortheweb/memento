@@ -4,13 +4,13 @@ import { TaskCreator } from '.';
 
 class TaskSubject extends Subject<Task>
   implements TaskObservable, Observable<Task> {
-  public accept<TTask extends Task>(
-    kind:
-      | TTask['kind']
-      | TaskCreator<TTask['kind'], TTask['payload']>,
-  ) {
-    return this.filter<Task, TTask>(
-      (task): task is TTask => task.kind === kind,
+  public accept<
+    TKind extends string = string,
+    TPayload = any
+  >(kind: TKind | TaskCreator<TKind, TPayload>) {
+    return this.filter<Task, Task<TKind, TPayload>>(
+      (task): task is Task<TKind, TPayload> =>
+        task.kind === kind.toString(),
     );
   }
 }
