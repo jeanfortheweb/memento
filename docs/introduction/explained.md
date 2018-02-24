@@ -17,7 +17,11 @@ When creating a Redux store, you usually provide a `reducer` - which may provide
 {% sample lang="js" %}
 
 ```js
-import { createStore, combineReducers, applyMiddleware } from 'redux';
+import {
+  createStore,
+  combineReducers,
+  applyMiddleware,
+} from 'redux';
 
 let todoApp = combineReducers(reducers);
 let store = createStore(
@@ -56,14 +60,21 @@ Redux gives you the `dispatch` function to dispatch actions on the store, the `g
 {% sample lang="js" %}
 
 ```js
-import { addTodo, toggleTodo, setVisibilityFilter, VisibilityFilters } from './actions';
+import {
+  addTodo,
+  toggleTodo,
+  setVisibilityFilter,
+  VisibilityFilters,
+} from './actions';
 
 // Log the initial state
 console.log(store.getState());
 
 // Every time the state changes, log it
 // Note that subscribe() returns a function for unregistering the listener
-const unsubscribe = store.subscribe(() => console.log(store.getState()));
+const unsubscribe = store.subscribe(() =>
+  console.log(store.getState()),
+);
 
 // Dispatch some actions
 store.dispatch(addTodo('Learn about actions'));
@@ -71,7 +82,9 @@ store.dispatch(addTodo('Learn about reducers'));
 store.dispatch(addTodo('Learn about store'));
 store.dispatch(toggleTodo(0));
 store.dispatch(toggleTodo(1));
-store.dispatch(setVisibilityFilter(VisibilityFilters.SHOW_COMPLETED));
+store.dispatch(
+  setVisibilityFilter(VisibilityFilters.SHOW_COMPLETED),
+);
 
 // Stop listening to state updates
 unsubscribe();

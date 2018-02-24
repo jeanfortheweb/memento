@@ -4,11 +4,9 @@
     "docs:prepare": "gitbook install",
     "docs:build": "yarn docs:prepare && gitbook build -g jeanfortheweb/memento",
     "docs:watch": "gitbook serve",
-    "docs:publish":
-      "yarn docs:clean && yarn docs:build && cp CNAME _book && cd _book && git init && git commit --allow-empty -m 'Update book' && git checkout -b gh-pages && touch .nojekyll && git add . && git commit -am 'Update book' && git push git@github.com:jeanfortheweb/memento gh-pages --force"
+    "docs:publish": "yarn docs:clean && yarn docs:build && cp CNAME _book && cd _book && git init && git commit --allow-empty -m 'Update book' && git checkout -b gh-pages && touch .nojekyll && git add . && git commit -am 'Update book' && git push git@github.com:jeanfortheweb/memento gh-pages --force"
   },
   "devDependencies": {
-    "gitbook-cli": "^2.3.2",
     "lerna": "^2.8.0",
     "rimraf": "^2.6.2"
   }
