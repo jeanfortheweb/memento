@@ -1,0 +1,302 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Introduction · Memento Documentation</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-theme-api/theme-api.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="introduction/explained.html" />
+    
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        <li class="header">README</li>
+        
+        
+    
+        <li class="chapter active" data-level="1.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="header">Introduction</li>
+        
+        
+    
+        <li class="chapter " data-level="2.1" data-path="introduction/explained.html">
+            
+                <a href="introduction/explained.html">
+            
+                    
+                    Memento Explained
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="." >Introduction</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="memento---state-management-evolved">Memento - State Management evolved</h1>
+<p><a href="https://travis-ci.org/jeanfortheweb/memento" target="_blank"><img src="https://travis-ci.org/jeanfortheweb/memento.svg?branch=master" alt="Build Status"></a> <a href="https://codeclimate.com/github/jeanfortheweb/memento/maintainability" target="_blank"><img src="https://api.codeclimate.com/v1/badges/5494041ca69fd977cae6/maintainability" alt="Maintainability"></a> <a href="https://codeclimate.com/github/jeanfortheweb/memento/test_coverage" target="_blank"><img src="https://api.codeclimate.com/v1/badges/5494041ca69fd977cae6/test_coverage" alt="Test Coverage"></a></p>
+<p>Memento is a state management library which is mainly aims to be used with react. It has four main goals in mind:</p>
+<ul>
+<li><strong>DRY</strong> Other popular libraries tend to produce heavy boilerplate, even for the simplest things. Memento avoids that with several techniques but also with standard tools which let you express most of the common and also more advanced needs without any real boilerplate. On the other hand, custom solutions and tools share the same aspects: easy to write, none to almost no boilerplate.</li>
+<li><strong>Declarative</strong> Libraries these days tend to split business logic into alls kinds of separations and often end in so called &quot;Higher Order Components&quot; which tend to hide and complicate things. They are often hard to follow when stacked and can even create conflicts. Memento does not use or need a single &quot;Higher Order Component&quot;, but it still lets you express any variety of views or actions, just in place. It is always easy to reason about where values come from and where they go. Conflicts are basically impossible.</li>
+<li><strong>Modular</strong> Unlike others, Memento embraces the idea of multiple stores. Whenever it makes sense to isolate data into a separate store you can and should do so. This makes it incredible easy to write isolated application parts which really work without any external dependency. Even the standard tools coming with Memento are clever isolated so that you only include what you need and nothing more (or less!).</li>
+<li><strong>Efficient</strong> Memento makes it somewhat hard to mess up your props or selectors in a way that your component render performance goes down. This comes from it simple patterns, glued together in an intelligent way, taking away the computation logic spread over files and lets you focus on the actual problems.</li>
+</ul>
+<h2 id="examples">Examples</h2>
+<p>The only &quot;full powered&quot; example at this point is the <a href="https://github.com/jeanfortheweb/memento/tree/master/packages/react-todo-example" target="_blank">react-todo-example</a>, but to give you a minimal glimpse:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">import</span> { Store } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;@memento/store&apos;</span>;
+<span class="hljs-keyword">import</span> { View } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;@memento/react&apos;</span>;
+<span class="hljs-keyword">import</span> { Record } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;immutable&apos;</span>;
+<span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;react&apos;</span>;
+<span class="hljs-keyword">import</span> ReactDOM <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;react-dom&apos;</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">State</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Record</span>(</span>{
+  message: <span class="hljs-string">&apos;Hello World&apos;</span>,
+}) {}
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> Store(<span class="hljs-keyword">new</span> State(), []);
+
+<span class="hljs-keyword">const</span> App = () =&gt; (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">View</span>
+    <span class="hljs-attr">store</span>=<span class="hljs-string">{store}</span>
+    <span class="hljs-attr">message</span>=<span class="hljs-string">{state</span> =&gt;</span> state.message}
+    compute={props =&gt; props.message.toUpperCase()}
+  &gt;
+    {yelledMessage =&gt; <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{yelledMessage}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>}
+  <span class="hljs-tag">&lt;/<span class="hljs-name">View</span>&gt;</span></span>
+);
+
+ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">App</span> /&gt;</span>, document.getElementById(&apos;#app&apos;));
+</span></code></pre>
+<h2 id="installation">Installation</h2>
+<p>To use Memento with react, you&apos;ll need to install:</p>
+<pre><code class="lang-sh">yarn install @memento/store @memento/react react react-dom immutable
+</code></pre>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Introduction","level":"1.1","depth":1,"next":{"title":"Memento Explained","level":"2.1","depth":1,"path":"introduction/explained.md","ref":"introduction/explained.md","articles":[]},"dir":"ltr"},"config":{"plugins":["theme-api","github","anchorjs","edit-link"],"root":"./docs","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"github":{"url":"https://github.com/jeanfortheweb/memento"},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"highlight":{},"theme-api":{"languages":[{"lang":"redux","name":"Redux","default":true},{"lang":"memento","name":"Memento"}],"split":false,"theme":"dark","family":"sans","size":3},"sharing":{"facebook":false,"twitter":false,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"edit-link":{"label":"Edit This Page","base":"https://github.com/jeanfortheweb/memento/tree/master"},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"anchorjs":{}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Memento Documentation","gitbook":"*"},"file":{"path":"README.md","mtime":"2018-02-24T11:47:52.357Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-02-24T12:33:09.135Z"},"basePath":".","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="gitbook/gitbook.js"></script>
+    <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/3.1.1/anchor.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-anchorjs/anchor-style.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-edit-link/plugin.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+        
+        <script src="gitbook/gitbook-plugin-theme-api/theme-api.js"></script>
+        
+    
+
+    </body>
+</html>
+

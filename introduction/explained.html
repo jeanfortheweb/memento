@@ -1,0 +1,435 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Memento Explained · Memento Documentation</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-theme-api/theme-api.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    
+    <link rel="prev" href="../" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        <li class="header">README</li>
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="header">Introduction</li>
+        
+        
+    
+        <li class="chapter active" data-level="2.1" data-path="explained.html">
+            
+                <a href="explained.html">
+            
+                    
+                    Memento Explained
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Memento Explained</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="memento-explained">Memento Explained</h1>
+<p>The easiest way to explain how Memento works is to compare it to the most popular state management library most of us should know: Redux.</p>
+<p>While the conceptual ideas of Redux and Memento are pretty similar, their implementations are not. So lets go through the differences step by step.</p>
+<h2 id="the-store">The Store</h2>
+<p>Both libraries are building onto a store to hold and manage its data. While Redux gives you the <code>createStore</code> factory, Memento provides you with a <code>Store</code> class.</p>
+<div class="api-method"><div class="api-method-definition"><h5 id="creating-a-store-in-redux">Creating a Store in Redux</h5>
+<p>When creating a Redux store, you usually provide a <code>reducer</code> - which may provide an initial state - and probably some <code>middlewares</code> to fill the gaps.</p>
+</div><div class="api-method-code"><div class="api-method-sample" data-lang="js" data-name="JavaScript"><pre><code class="lang-js"><span class="hljs-keyword">import</span> { createStore, combineReducers, applyMiddleware } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;redux&apos;</span>;
+
+<span class="hljs-keyword">let</span> todoApp = combineReducers(reducers);
+<span class="hljs-keyword">let</span> store = createStore(
+  todoApp,
+  <span class="hljs-comment">// applyMiddleware() tells createStore() how to handle middleware</span>
+  applyMiddleware(logger, crashReporter),
+);
+</code></pre>
+</div></div></div>
+
+<div class="api-method"><div class="api-method-definition"><h5 id="creating-a-store-in-memento">Creating a store in Memento</h5>
+<p>In Memento there are no <code>reducers</code> and no <code>middlewares</code>, but <code>workers</code>. <code>Workers</code> explained in later chapters, but let me say that they fulfill all requirements you may have when we talk about <code>reducers</code> or <code>middlewares</code>.</p>
+</div><div class="api-method-code"><div class="api-method-sample" data-lang="js" data-name="JavaScript"><pre><code class="lang-js"><span class="hljs-keyword">import</span> { Store } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;@memento/store&apos;</span>;
+<span class="hljs-keyword">import</span> State <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;./state&apos;</span>;
+<span class="hljs-keyword">import</span> worker <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;./worker&apos;</span>;
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> Store(<span class="hljs-keyword">new</span> State(), [someWorker]);
+</code></pre>
+</div></div></div>
+
+<div class="api-method"><div class="api-method-definition"><h5 id="the-redux-store-api">The Redux store API</h5>
+<p>Redux gives you the <code>dispatch</code> function to dispatch actions on the store, the <code>getState</code> function to access the current state and the <code>subscribe</code> function to participate in state changes when they happen:</p>
+</div><div class="api-method-code"><div class="api-method-sample" data-lang="js" data-name="JavaScript"><pre><code class="lang-js"><span class="hljs-keyword">import</span> { addTodo, toggleTodo, setVisibilityFilter, VisibilityFilters } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;./actions&apos;</span>;
+
+<span class="hljs-comment">// Log the initial state</span>
+<span class="hljs-built_in">console</span>.log(store.getState());
+
+<span class="hljs-comment">// Every time the state changes, log it</span>
+<span class="hljs-comment">// Note that subscribe() returns a function for unregistering the listener</span>
+<span class="hljs-keyword">const</span> unsubscribe = store.subscribe(() =&gt; <span class="hljs-built_in">console</span>.log(store.getState()));
+
+<span class="hljs-comment">// Dispatch some actions</span>
+store.dispatch(addTodo(<span class="hljs-string">&apos;Learn about actions&apos;</span>));
+store.dispatch(addTodo(<span class="hljs-string">&apos;Learn about reducers&apos;</span>));
+store.dispatch(addTodo(<span class="hljs-string">&apos;Learn about store&apos;</span>));
+store.dispatch(toggleTodo(<span class="hljs-number">0</span>));
+store.dispatch(toggleTodo(<span class="hljs-number">1</span>));
+store.dispatch(setVisibilityFilter(VisibilityFilters.SHOW_COMPLETED));
+
+<span class="hljs-comment">// Stop listening to state updates</span>
+unsubscribe();
+</code></pre>
+</div></div></div>
+
+<div class="api-method"><div class="api-method-definition"><h5 id="the-memento-store-api">The Memento store API</h5>
+<p>Again, Memento is very similar here. It gives you the <code>assign</code> function to assign tasks (tasks are the actions of redux), the <code>listen</code> function to listen for state changes and the <code>select</code> function to make a selection on the current state:</p>
+</div><div class="api-method-code"><div class="api-method-sample" data-lang="js" data-name="JavaScript"><pre><code class="lang-js"><span class="hljs-keyword">import</span> {
+  store,
+  addTodo,
+  toggleTodo,
+  setVisibilityFilter,
+  VisibilityFilters
+} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;./store&apos;</span>;
+
+<span class="hljs-comment">// Log the initial state</span>
+<span class="hljs-built_in">console</span>.log(store.select(state =&gt; state));
+
+<span class="hljs-comment">// Every time the state changes, log it</span>
+<span class="hljs-comment">// Note that subscribe() returns a function for unregistering the listener</span>
+<span class="hljs-keyword">const</span> unlisten = store.listen((prevState, nextState) =&gt;
+  <span class="hljs-built_in">console</span>.log(nextState.toJS()
+);
+
+<span class="hljs-comment">// Dispatch some actions</span>
+store.assign(addTodo(<span class="hljs-string">&apos;Learn about tasks&apos;</span>);
+store.assign(addTodo(<span class="hljs-string">&apos;Learn about workers&apos;</span>);
+store.assign(addTodo(<span class="hljs-string">&apos;Learn about store&apos;</span>);
+store.assign(toggleTodo(<span class="hljs-number">0</span>));
+store.assign(toggleTodo(<span class="hljs-number">1</span>));
+store.assign(setVisibilityFilter(VisibilityFilters.SHOW_COMPLETED));
+
+<span class="hljs-comment">// Stop listening to state updates</span>
+unlisten();
+</code></pre>
+</div></div></div>
+
+<h2 id="actions-vs-tasks">Actions vs Tasks</h2>
+<p>While Redux gives you <code>actions</code> to trigger changes, Memento calls them <code>tasks</code> and they are again very similar.</p>
+<div class="api-method"><div class="api-method-definition"><h5 id="actions-in-redux">Actions in Redux</h5>
+<p>A Redux <code>action</code> needs a <code>type</code> property and optional any other property you want to pass. Normally you don&apos;t use or create these objects by hand, instead, you will use a so called <code>action creator</code> which will produce these actions for you.</p>
+</div><div class="api-method-code"><div class="api-method-sample" data-lang="js" data-name="JavaScript"><pre><code class="lang-js"><span class="hljs-keyword">const</span> ADD_TODO = <span class="hljs-string">&apos;ADD_TODO&apos;</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addTodo</span>(<span class="hljs-params">text</span>) </span>{
+  <span class="hljs-keyword">return</span> {
+    type: ADD_TODO,
+    text,
+  };
+}
+</code></pre>
+</div></div></div>
+
+<div class="api-method"><div class="api-method-definition"><h5 id="tasks-in-memento">Tasks in Memento</h5>
+<p>In essence, Memento does the same but calls the type <code>kind</code>. On top, <code>tasks</code> already have a normalized structure very similiar to <code>Flux Standard Actions</code>:</p>
+</div><div class="api-method-code"><div class="api-method-sample" data-lang="js" data-name="JavaScript"><pre><code class="lang-js"><span class="hljs-keyword">const</span> task = {
+  type: <span class="hljs-string">&apos;ADD_TODO&apos;</span>,
+  payload: <span class="hljs-string">&apos;Build my first Memento app&apos;</span>,
+};
+</code></pre>
+</div></div></div>
+
+<div class="api-method"><div class="api-method-definition"><p>As in Redux, you usually put those into functions, called <code>task creators</code>, but you will use an utility for this which comes with Memento. It&apos;s very similar to <code>createAction</code> from <code>redux-actions</code>. Here you don&apos;t need an extra constant for the <code>kind</code>, since the creator is also the <code>kind</code> when casted as string.</p>
+</div><div class="api-method-code"><div class="api-method-sample" data-lang="js" data-name="JavaScript"><pre><code class="lang-js"><span class="hljs-keyword">import</span> { createTask } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;@memento/store&apos;</span>;
+
+<span class="hljs-keyword">const</span> addTodo = createTask(<span class="hljs-string">&apos;ADD_TODO&apos;</span>, text =&gt; text);
+
+<span class="hljs-comment">// { kind: &apos;ADD_TODO&apos;, payload: &apos;Explain Memento&apos; }</span>
+<span class="hljs-built_in">console</span>.log(addTodo(<span class="hljs-string">&apos;Explain Memento&apos;</span>));
+
+<span class="hljs-comment">// ADD_TODO</span>
+<span class="hljs-built_in">console</span>.log(addTodo.toString());
+</code></pre>
+</div></div></div>
+
+<h2 id="reducers-vs-workers">Reducers vs Workers</h2>
+<p>Finally we hit a difference. Maybe a big one. You can&apos;t really compare <code>reducers</code> from Redux with <code>workers</code> from Memento. <code>Workers</code> can do what <code>reducers</code> can but not the other way around. But both of them are, when done right, are pure.</p>
+<div class="api-method"><div class="api-method-definition"><h5 id="define-a-state-to-work-with">Define a state to work with</h5>
+<p>In any case, we will need a <code>state</code> when we want to modify anything. I&apos;ll use a <code>state</code> that would be required by Memento but is also compatible with Redux. Memento requires you to use <code>Records</code> from <code>immutable</code>.</p>
+<p>Don&apos;t feel forced, it&apos;s a design decision with reasons and it will pay off.</p>
+</div><div class="api-method-code"><div class="api-method-sample" data-lang="js" data-name="JavaScript"><pre><code class="lang-js"><span class="hljs-keyword">import</span> { Record, List } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;immutable&apos;</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Record</span>(</span>{
+  text: <span class="hljs-string">&apos;Enter todo text...&apos;</span>,
+  completed: <span class="hljs-literal">false</span>,
+}) {}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">State</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Record</span>(</span>{
+  visibilityFilter: <span class="hljs-string">&apos;SHOW_ALL&apos;</span>,
+  todos: List(),
+}) {}
+</code></pre>
+</div><div class="api-method-example"><p>Actually, at this point, only the top most level of the state would be required to be a <code>Record</code>, but in the end it pays off to use it any time you&apos;re creating a sub-state.</p>
+</div></div></div>
+
+<div class="api-method"><div class="api-method-definition"><h5 id="the-reducer-in-redux">The reducer in Redux</h5>
+<p>Now some action. If you want to react to the <code>setVisibilityFilter</code> action in Redux, you would write a <code>reducer</code> for it, wouldn&apos;t you?</p>
+</div><div class="api-method-code"><div class="api-method-sample" data-lang="js" data-name="JavaScript"><pre><code class="lang-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">todoApp</span>(<span class="hljs-params">state = initialState, action</span>) </span>{
+  <span class="hljs-keyword">switch</span> (action.type) {
+    <span class="hljs-keyword">case</span> SET_VISIBILITY_FILTER:
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.assign({}, state, {
+        visibilityFilter: action.filter,
+      });
+    <span class="hljs-keyword">default</span>:
+      <span class="hljs-keyword">return</span> state;
+  }
+}
+</code></pre>
+</div></div></div>
+
+<div class="api-method"><div class="api-method-definition"><h5 id="the-worker-in-memento">The worker in Memento</h5>
+<p>In Memento, you would write a <code>worker</code>. A <code>worker</code> is a function that takes a <code>task</code> and a <code>state</code> <code>observable</code> and returns a new <code>observable</code> that can emit either <code>updaters</code> or just more <code>tasks</code>. <code>Updaters</code> are the <code>reducers</code> from Redux. Both input <code>observables</code> are suffixed with a dollar sign. This is just a convention to let you know that these are <code>observables</code>.</p>
+</div><div class="api-method-code"><div class="api-method-sample" data-lang="js" data-name="JavaScript"><pre><code class="lang-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">todoWorker</span>(<span class="hljs-params">task$, state$</span>) </span>{
+  <span class="hljs-keyword">return</span> task$.accept(setVisibilityFilter).map(task =&gt;
+    state =&gt; state.set(<span class="hljs-string">&apos;visibilityFilter&apos;</span>, task.payload
+  )
+}
+</code></pre>
+</div></div></div>
+
+<p><br></p>
+<p>The result is the same as the <code>reducer</code> from Redux. It takes the <code>task$</code> observable which initially contains all incoming tasks. Then it only accepts the <code>setVisibilityFilter</code> tasks by calling <code>accept</code>. We are passing the <code>task creator</code> here, since its <code>toString()</code> gives us the <code>kind</code> of the task we want to accept and the <code>accept</code> function knows that. This results in a new observable we can chain on. This new observable will only emit tasks matching the kind of <code>setVisibilityFilter</code>. We map those task to an updater function which is more or less a <code>reducer</code>. It takes the current state and returns a new one. The store knows that and will run the updater against the current state.</p>
+<p>Actually, for those simple tasks you would normally not even write a custom worker, since Memento has already tools for that, but it&apos;s still a good example to show off the difference. It&apos;s readable and requires less code around while doing the same.</p>
+<h2 id="summary">Summary</h2>
+<p>Now we know the differences in setting up Redux against setting up Memento. We just scratched the surface, of course. In the next chapters you will learn especially about the Memento standard tools which will give you the power to do more while writing less.</p>
+<p><br></p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Memento Explained","level":"2.1","depth":1,"previous":{"title":"Introduction","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"plugins":["theme-api","github","anchorjs","edit-link"],"root":"./docs","styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"github":{"url":"https://github.com/jeanfortheweb/memento"},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"highlight":{},"theme-api":{"languages":[{"lang":"redux","name":"Redux","default":true},{"lang":"memento","name":"Memento"}],"split":false,"theme":"dark","family":"sans","size":3},"sharing":{"facebook":false,"twitter":false,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"edit-link":{"label":"Edit This Page","base":"https://github.com/jeanfortheweb/memento/tree/master"},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"anchorjs":{}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Memento Documentation","gitbook":"*"},"file":{"path":"introduction/explained.md","mtime":"2018-02-24T12:32:30.034Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-02-24T12:33:09.135Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/3.1.1/anchor.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-anchorjs/anchor-style.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-edit-link/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-theme-api/theme-api.js"></script>
+        
+    
+
+    </body>
+</html>
+
