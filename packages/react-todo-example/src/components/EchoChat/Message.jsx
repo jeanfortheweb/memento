@@ -1,12 +1,13 @@
 import React from 'react';
 import { Comment } from 'semantic-ui-react';
+import moment from 'moment';
 
 const Message = ({ message: { date, username, text } }) => (
   <Comment>
     <Comment.Content>
       <Comment.Author as="a">{username}</Comment.Author>
       <Comment.Metadata>
-        <div>18:03 AM</div>
+        <div>{moment(date).format('LT')}</div>
       </Comment.Metadata>
       <Comment.Text>{text}</Comment.Text>
     </Comment.Content>
