@@ -13,9 +13,7 @@ const Messages = () => (
             <Divider hidden />
             <Icon name="info" />
             No Messages
-            <Header.Subheader>
-              No messages found. Connect and write some!
-            </Header.Subheader>
+            <Header.Subheader>Connect and write some!</Header.Subheader>
           </Header>
         )}
         <Comment.Group>
