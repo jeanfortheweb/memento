@@ -23,7 +23,8 @@ export class State extends Record({
 }) {}
 
 // task creators.
-export const toggleTodo = todo => () => update('todos', todo, todo.set('done', !todo.done));
+export const toggleTodo = todo => () =>
+  update('todos', todo, todo.set('done', !todo.done));
 export const setTodoText = event => set('text', event.target.value);
 export const addTodo = text => () => {
   const pushTodo = push('todos', new Todo({ id: shortid.generate(), text }));
@@ -80,7 +81,6 @@ const store = new Store(new State(), [
       'Content-Type': 'text/html',
     },
   }),
-  task$ => task$.do(t => console.log(t)).mapTo(state => state),
 ]);
 
 // add some default todos.
