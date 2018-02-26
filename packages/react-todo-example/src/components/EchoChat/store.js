@@ -32,13 +32,11 @@ export const setText = event => set('text', event.target.value);
 export const getText = state => state.text;
 
 export const sendChatMessage = (username, text) => () => {
-  const sendMessage = send(
-    new Message({
-      username,
-      text,
-      date: Date.now(),
-    }).toJS(),
-  );
+  const sendMessage = send({
+    username,
+    text,
+    date: Date.now(),
+  });
 
   const clearText = set('text', '');
 
