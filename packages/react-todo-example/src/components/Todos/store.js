@@ -23,7 +23,10 @@ export class State extends Record({
 // task creators.
 export const toggleTodo = todo => () =>
   update('todos', todo, todo.set('done', !todo.done));
+
 export const setTodoText = event => set('text', event.target.value);
+export const setFilter = value => () => set('filter', value.toUpperCase());
+
 export const addTodo = text => () => {
   const pushTodo = push('todos', new Todo({ id: shortid.generate(), text }));
   const clearText = set('text', '');
@@ -32,13 +35,8 @@ export const addTodo = text => () => {
 };
 
 // selectors.
-export const getState = state => state;
 export const getTodos = state => state.todos;
 export const getTodoText = state => state.text;
-// task creators
-export const setFilter = value => () => set('filter', value.toUpperCase());
-
-// selectors
 export const getFilter = state => state.filter;
 
 // create the store with required workers.
