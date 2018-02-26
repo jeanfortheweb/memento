@@ -12,7 +12,7 @@ Memento is a state management library which is mainly aims to be used with react
 ## Documentation
 
 You can find the memento documentation at [memento.js.org](http://memento.js.org).
-Currently, this documentation is incomplete but already covers some fundamentals of memento. In the meantime, don't forget to checkout our example for more information.
+Currently, it's incomplete but already covers some fundamentals of memento. In the meantime, don't forget to checkout our examples for more information.
 
 ## Examples
 
