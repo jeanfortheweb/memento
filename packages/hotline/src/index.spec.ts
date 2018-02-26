@@ -9,7 +9,7 @@ import createHotline, {
   DisconnectTask,
   LifeCycleTask,
   SendTask,
-  ReceivedTask,
+  ReceiveTask,
   KIND_CONNECT,
   KIND_OPEN,
   KIND_RECEIVED,
@@ -17,7 +17,7 @@ import createHotline, {
   KIND_CLOSE,
   KIND_SEND,
   open,
-  received,
+  receive,
 } from './';
 
 const store = new Store(State.defaultState, createHotline());
@@ -28,7 +28,7 @@ test('toString() ouputs the kind as string', () => {
   expect(connect.toString()).toEqual(KIND_CONNECT);
   expect(open.toString()).toEqual(KIND_OPEN);
   expect(send.toString()).toEqual(KIND_SEND);
-  expect(received.toString()).toEqual(KIND_RECEIVED);
+  expect(receive.toString()).toEqual(KIND_RECEIVED);
   expect(close.toString()).toEqual(KIND_CLOSE);
   expect(disconnect.toString()).toEqual(KIND_DISCONNECT);
 });
@@ -66,7 +66,7 @@ test('triggers the message task on incoming messages', async () => {
         },
       },
     }),
-    new Expect.TaskAssignment<State, ReceivedTask>({
+    new Expect.TaskAssignment<State, ReceiveTask>({
       kind: KIND_RECEIVED,
       payload: {
         name: 'default',
@@ -148,7 +148,7 @@ test('works with multiple connections', async () => {
         },
       },
     }),
-    new Expect.TaskAssignment<State, ReceivedTask>({
+    new Expect.TaskAssignment<State, ReceiveTask>({
       kind: KIND_RECEIVED,
       payload: {
         name: 'default',
@@ -171,7 +171,7 @@ test('works with multiple connections', async () => {
         },
       },
     }),
-    new Expect.TaskAssignment<State, ReceivedTask>({
+    new Expect.TaskAssignment<State, ReceiveTask>({
       kind: KIND_RECEIVED,
       payload: {
         name: 'socket2',

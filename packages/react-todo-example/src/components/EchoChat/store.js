@@ -9,7 +9,7 @@ import createHotline, {
   close,
   open,
   send,
-  received,
+  receive,
 } from '@memento/hotline';
 
 class Message extends Record({
@@ -50,7 +50,7 @@ export const disconnectFromChat = () => disconnect();
 
 const registerListeners = () => {
   const onConnect = listen(open, () => set('isConnected', true));
-  const onReceive = listen(received, ({ data }) => push('messages', new Message(data)));
+  const onReceive = listen(receive, ({ data }) => push('messages', new Message(data)));
   const onClose = listen(close, () =>
     sequence(set('isConnected', false), set('messages', List())),
   );

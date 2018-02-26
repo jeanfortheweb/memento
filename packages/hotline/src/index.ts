@@ -27,7 +27,7 @@ export interface SendPayload {
   message: any;
 }
 
-export interface ReceivedPayload<T = any> {
+export interface ReceivePayload<T = any> {
   name: string;
   tags: string[];
   data: T;
@@ -54,7 +54,7 @@ export type Disconnect = TaskCreator0<typeof KIND_DISCONNECT, string> &
 export type ConnectTask = Task<typeof KIND_CONNECT, ConnectPayload>;
 export type OpenTask = Task<typeof KIND_OPEN, LifeCyclePayload>;
 export type SendTask = Task<typeof KIND_SEND, SendPayload>;
-export type ReceivedTask<T = any> = Task<typeof KIND_RECEIVED, ReceivedPayload<T>>;
+export type ReceiveTask<T = any> = Task<typeof KIND_RECEIVED, ReceivePayload<T>>;
 export type DisconnectTask = Task<typeof KIND_DISCONNECT, string | undefined>;
 export type LifeCycleTask = Task<typeof KIND_OPEN | typeof KIND_CLOSE, LifeCyclePayload>;
 
@@ -87,12 +87,12 @@ export const disconnect: Disconnect = createTask(
   (name?: string) => name || 'default',
 );
 
-export const received = <T = any>(payload: ReceivedPayload): ReceivedTask<T> => ({
+export const receive = <T = any>(payload: ReceivePayload): ReceiveTask<T> => ({
   kind: KIND_RECEIVED,
   payload,
 });
 
-received.toString = () => KIND_RECEIVED;
+receive.toString = () => KIND_RECEIVED;
 
 export const send: Send = createTask(KIND_SEND, (name: string, message?: string) => ({
   name: message ? name : 'default',
@@ -128,7 +128,7 @@ export default () => (
 
     const open$ = openObserver$.mapTo(open({ name, tags }));
     const close$ = closeObserver$.mapTo(close({ name, tags }));
-    const message$ = connection$.map(data => received({ name, tags, data }));
+    const message$ = connection$.map(data => receive({ name, tags, data }));
 
     return Observable.merge(open$, close$, message$);
   });
