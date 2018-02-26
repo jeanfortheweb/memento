@@ -46,8 +46,8 @@ ReactDOM.render(<App />, document.getElementById('#app'));
 
 ## Installation
 
-To use Memento with react, you'll need to install at least:
+To use Memento with react, you'll need to install at least (not including react itself):
 
 ```sh
-yarn install @memento/store @memento/react react react-dom immutable
+yarn install @memento/store @memento/react immutable
 ```
