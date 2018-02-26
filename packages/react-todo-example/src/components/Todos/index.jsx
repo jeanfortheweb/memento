@@ -6,7 +6,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Item from './Item';
 
-const TodoList = () => (
+const Todos = () => (
   <Segment.Group>
     <Segment secondary>
       <Header />
@@ -40,4 +40,4 @@ const TodoList = () => (
   </Segment.Group>
 );
 
-export default TodoList;
+export default Todos;
