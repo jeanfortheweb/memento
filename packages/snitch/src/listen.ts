@@ -1,32 +1,35 @@
 import { Observable } from '@reactivex/rxjs';
-import { TaskObservable, Task } from '@memento/store';
+import { TaskObservable, Task, TaskCreator } from '@memento/store';
 
 export const KIND_LISTEN = '@SNITCH/LISTEN';
 export const KIND_LISTEN_ONCE = '@SNITCH/LISTEN/ONCE';
 export const KIND_UNLISTEN = '@SNITCH/UNLISTEN';
 
 export interface ListenOnce {
-  <TTask extends Task>(kind: string, assign: AssignFunction<TTask>): ListenTask;
+  <TKind extends string = string, TPayload = any>(
+    kind: TKind | TaskCreator<TKind, TPayload>,
+    creator: CreatorFunction<TPayload>,
+  ): ListenTask;
 
-  <TTask extends Task>(
-    kind: string,
-    predicate: PredicateFunction<TTask>,
-    assign: AssignFunction<TTask>,
+  <TKind extends string = string, TPayload = any>(
+    kind: TKind | TaskCreator<TKind, TPayload>,
+    predicate: PredicateFunction<TPayload>,
+    creator: CreatorFunction<TPayload>,
   ): ListenTask;
 }
 
 export interface Listen extends ListenOnce {
-  <TTask extends Task>(
+  <TKind extends string = string, TPayload = any>(
     name: string,
-    kind: string,
-    assign: AssignFunction<TTask>,
+    kind: TKind | TaskCreator<TKind, TPayload>,
+    creator: CreatorFunction<TPayload>,
   ): ListenTask;
 
-  <TTask extends Task>(
+  <TKind extends string = string, TPayload = any>(
     name: string,
-    kind: string,
-    predicate: PredicateFunction<TTask>,
-    assign: AssignFunction<TTask>,
+    kind: TKind | TaskCreator<TKind, TPayload>,
+    predicate: PredicateFunction<TPayload>,
+    creator: CreatorFunction<TPayload>,
   ): ListenTask;
 
   once: ListenOnce;
@@ -38,7 +41,7 @@ export type ListenTask = Task<
     name?: string;
     kind: string;
     predicate?: PredicateFunction<any>;
-    assign: AssignFunction<any>;
+    assign: CreatorFunction<any>;
   }
 >;
 
@@ -47,18 +50,18 @@ export type ListenOnceTask = Task<
   {
     kind: string;
     predicate?: PredicateFunction<any>;
-    assign: AssignFunction<any>;
+    assign: CreatorFunction<any>;
   }
 >;
 
 export type UnListenTask = Task<typeof KIND_UNLISTEN, string>;
 
-export interface AssignFunction<TTask extends Task> {
-  (payload: TTask['payload']): Task;
+export interface CreatorFunction<TPayload> {
+  (payload: TPayload): Task;
 }
 
-export interface PredicateFunction<TTask extends Task> {
-  (payload: TTask['payload']): boolean;
+export interface PredicateFunction<TPayload> {
+  (payload: TPayload): boolean;
 }
 
 const noFilter = () => true;
