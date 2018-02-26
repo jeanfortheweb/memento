@@ -5,7 +5,6 @@ import { Store } from '@memento/store';
 import createSequencer, { sequence } from '@memento/sequencer';
 import createMade, { push, merge, update, set } from '@memento/made';
 import createSnitch, { listen, unlisten } from '@memento/snitch';
-import createFetcher, { request, success, after, before } from '@memento/fetcher';
 
 // state.
 export class Todo extends Record({
@@ -18,8 +17,7 @@ export class Todo extends Record({
 export class State extends Record({
   todos: List(),
   text: '',
-  jsonbinID: '',
-  isSaving: false,
+  filter: 'ALL',
 }) {}
 
 // task creators.
@@ -33,64 +31,21 @@ export const addTodo = text => () => {
   return sequence(pushTodo, clearText);
 };
 
-export const saveTodos = todos => () =>
-  request({
-    tags: ['save'],
-    url: 'https://api.jsonbin.io/b',
-    method: 'POST',
-    body: JSON.stringify(todos.toJS()),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-export const setupSaveListeners = () => {
-  const listenForBefore = listen(
-    before,
-    ({ tags }) => tags.includes('save'),
-    () => set('isSaving', true),
-  );
-
-  const listenForSuccess = listen(
-    success,
-    ({ tags }) => tags.includes('save'),
-    ({ response }) => set('jsonbinID', response.response.id),
-  );
-
-  const listenForAfter = listen(
-    after,
-    ({ tags }) => tags.includes('save'),
-    () => set('isSaving', false),
-  );
-
-  return sequence(listenForBefore, listenForSuccess, listenForAfter);
-};
-
 // selectors.
 export const getState = state => state;
 export const getTodos = state => state.todos;
 export const getTodoText = state => state.text;
+// task creators
+export const setFilter = value => () => set('filter', value.toUpperCase());
+
+// selectors
+export const getFilter = state => state.filter;
 
 // create the store with required workers.
-const store = new Store(new State(), [
-  createSnitch(),
-  createMade(),
-  createSequencer(),
-  createFetcher({
-    headers: {
-      'Content-Type': 'text/html',
-    },
-  }),
-]);
+const store = new Store(new State(), [createSnitch(), createMade(), createSequencer()]);
 
 // add some default todos.
 store.assign(addTodo('Add more features')());
 store.assign(addTodo('Update documentation')());
-
-// add request listeners.
-store.assign(setupSaveListeners());
-
-// explore the latest state in the console.
-//store.listen((prev, next) => console.log(next.toJS()));
 
 export default store;

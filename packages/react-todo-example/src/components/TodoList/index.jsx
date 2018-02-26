@@ -1,8 +1,7 @@
 import React from 'react';
 import { Divider, Segment, Button, List } from 'semantic-ui-react';
 import { View, Trigger } from '@memento/react';
-import todoStore, { getTodos, saveTodos } from '../../stores/todo';
-import settingsStore, { getFilter } from '../../stores/settings';
+import store, { getTodos, saveTodos, getFilter } from './store';
 import Header from './Header';
 import Footer from './Footer';
 import Item from './Item';
@@ -14,10 +13,10 @@ const TodoList = () => (
     </Segment>
     <Segment>
       <List divided color="teal" relaxed="very" selection>
-        <View store={settingsStore} filter={state => state.filter}>
+        <View store={store} filter={state => state.filter}>
           {({ filter }) => (
             <View
-              store={todoStore}
+              store={store}
               filter={filter}
               todos={state => state.todos}
               compute={props =>

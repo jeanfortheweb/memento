@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, Trigger } from '@memento/react';
 import { Grid, Label, Header as SemanticHeader } from 'semantic-ui-react';
-import todoStore from '../../stores/todo';
-import settingsStore, { setFilter } from '../../stores/settings';
+import store, { setFilter } from './store';
 
 const StatLabel = ({ name, value }) => (
-  <Trigger store={settingsStore} onClick={setFilter(name)}>
+  <Trigger store={store} onClick={setFilter(name)}>
     {({ onClick }) => (
       <Label as="a" color="teal" onClick={onClick}>
         {name}
@@ -17,7 +16,7 @@ const StatLabel = ({ name, value }) => (
 
 const Header = () => (
   <View
-    store={todoStore}
+    store={store}
     todos={state => state.todos}
     compute={({ todos }) => ({
       all: todos.size,

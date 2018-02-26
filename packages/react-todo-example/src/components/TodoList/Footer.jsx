@@ -1,17 +1,18 @@
 import React from 'react';
 import { Divider, Grid, Button, Input, Checkbox } from 'semantic-ui-react';
 import { View, Trigger } from '@memento/react';
-import todoStore, {
+import store, {
   addTodo,
   setTodoText,
   getTodoText,
   getTodos,
   saveTodos,
-} from '../../stores/todo';
-import settingsStore, { getFilter, setFilter } from '../../stores/settings';
+  getFilter,
+  setFilter,
+} from './store';
 
 const FilterCheckbox = ({ value }) => (
-  <View store={settingsStore} filter={getFilter}>
+  <View store={store} filter={getFilter}>
     {({ filter }) => (
       <div>
         <Trigger store={settingsStore} onClick={setFilter}>
@@ -29,7 +30,7 @@ const FilterCheckbox = ({ value }) => (
 );
 
 const TodoTextInput = ({ text }) => (
-  <Trigger store={todoStore} onAddClick={addTodo(text)} onChange={setTodoText}>
+  <Trigger store={store} onAddClick={addTodo(text)} onChange={setTodoText}>
     {({ onChange, onAddClick }) => (
       <Input
         fluid
@@ -37,7 +38,12 @@ const TodoTextInput = ({ text }) => (
         onChange={onChange}
         placeholder="Enter todo text..."
         action={
-          <Button color="teal" icon="add" onClick={onAddClick} disabled={text.length === 0} />
+          <Button
+            color="teal"
+            icon="add"
+            onClick={onAddClick}
+            disabled={text.length === 0}
+          />
         }
       />
     )}
@@ -48,36 +54,7 @@ const Footer = () => (
   <Grid>
     <Grid.Row>
       <Grid.Column width={16}>
-        <View store={todoStore} text={getTodoText} render={TodoTextInput} />
-        <Divider />
-        <View
-          store={todoStore}
-          isLoading={state => state.isSaving}
-          todos={getTodos}
-          link={state => (state.jsonbinID ? `http://api.jsonbin.io/b/${state.jsonbinID}` : '')}
-        >
-          {({ link, isLoading, todos }) => (
-            <Input
-              readOnly
-              fluid
-              onClick={event => event.target.select()}
-              value={link}
-              action={
-                <Trigger store={todoStore} onClick={saveTodos(todos)}>
-                  {({ onClick }) => (
-                    <Button
-                      color="teal"
-                      disabled={isLoading}
-                      loading={isLoading}
-                      icon="save"
-                      onClick={onClick}
-                    />
-                  )}
-                </Trigger>
-              }
-            />
-          )}
-        </View>
+        <View store={store} text={getTodoText} render={TodoTextInput} />
       </Grid.Column>
     </Grid.Row>
   </Grid>

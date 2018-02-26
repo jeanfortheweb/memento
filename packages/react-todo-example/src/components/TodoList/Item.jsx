@@ -2,7 +2,7 @@ import React from 'react';
 import { List, Checkbox } from 'semantic-ui-react';
 import moment from 'moment';
 import { Trigger } from '@memento/react';
-import todoStore, { toggleTodo } from '../../stores/todo';
+import todoStore, { toggleTodo } from './store';
 
 const Item = ({ data }) => (
   <Trigger store={todoStore} onClick={toggleTodo(data)}>
