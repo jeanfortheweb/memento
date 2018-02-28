@@ -10,6 +10,10 @@
 * [The Task](pillars-of-glory/task.md)
 * [The Worker](pillars-of-glory/worker.md)
 
+### Memento with React
+
+* [The View](react/view.md)
+
 ### Memento Guide (Coming soon..)
 
 * Defining the State
