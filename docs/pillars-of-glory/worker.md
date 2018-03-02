@@ -25,31 +25,8 @@ const logTasksWorker = task$ => task$.do(task => console.log(task)).mapTo(state 
 
 ```js
 // stores/todo.ts
-const logTasksWorker = task$ => task$.do(task => console.log(task)).mapTo(state => state);
-```
-
-{% endmethod %}
-
-{% method %}
-
-##### The most basic state worker
-
-Since a worker also gets the `state$` observable, we could also create workers that only react on state changes instead of tasks. We could call that a `passive worker` since we do not trigger his behavior with active tasks. This one here would pretty much mimic the `listen` API of the store.
-
-{% sample lang="js" %}
-
-```js
-// stores/todo.js
-const logStateWorker = (task$, state$) =>
-  state$.do(state => console.log(state.toJS())).mapTo(state => state);
-```
-
-{% sample lang="ts" %}
-
-```js
-// stores/todo.ts
-const logStateWorker = (task$, state$) =>
-  state$.do(state => console.log(state.toJS())).mapTo(state => state);
+const logTasksWorker: Worker<State> = task$ =>
+  task$.do(task => console.log(task)).mapTo(state => state);
 ```
 
 {% endmethod %}
@@ -77,7 +54,7 @@ const logTodosStateWorker = (task$, state$) =>
 
 ```js
 // stores/todo.ts
-const logTodosStateWorker = (task$, state$) =>
+const logTodosStateWorker: Worker<State> = (task$, state$) =>
   state$
     .select(state => state.todos)
     .do(todos => console.log(todos.toJS()))
@@ -117,7 +94,7 @@ type AddTodoTask = Task<'ADD_TODO', string>;
 type ToggleTodoTask = Task<'TOGGLE_TODO', number>;
 
 // stores/todo.js
-const addTodoWorker = task$ =>
+const addTodoWorker: Worker<State> = task$ =>
   task$
     .accept<AddTodoTask>('ADD_TODO')
     .do(task => console.log('Adding todo:', task.payload))
@@ -159,7 +136,7 @@ const updateTodoStats = (task$, state$) =>
 
 ```js
 // stores/todo.js
-const updateTodoStats = (task$, state$) =>
+const updateTodoStats: Worker<State> = (task$, state$) =>
   task$
     .accept('UPDATE_TODO_STATS')
     .combineLatest(state$.select(state => state.todos))
