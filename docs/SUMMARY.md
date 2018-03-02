@@ -13,6 +13,7 @@
 ### Memento with React
 
 * [The View](react/view.md)
+* [The Trigger](react/trigger.md)
 
 ### Memento Guide (Coming soon..)
 
