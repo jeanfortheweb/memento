@@ -29,7 +29,7 @@ class State extends Record({
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // stores/todo.ts
 import { Record, List } from 'immutable';
 
@@ -70,7 +70,7 @@ const store = new Store(new State(), []);
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // stores/todo.ts
 import { Store } from '@memento/store';
 
@@ -98,7 +98,7 @@ console.log(currentTodos.toJS()); // []
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // stores/todo.ts
 const currentTodos = store.select(state => state.todos);
 
@@ -127,7 +127,7 @@ unlisten(); // stops the listener
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // stores/todo.js
 const unlisten = store.listen((prevState, nextState) =>
   console.log(prevState.toJS(), nextState.toJS()),

@@ -52,7 +52,7 @@ export default Input;
 
 {% sample lang="ts" %}
 
-```ts
+```js
 import React from 'react';
 
 export interface State = {

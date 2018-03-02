@@ -50,7 +50,7 @@ export default store;
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // stores/todo.ts
 import { Record, List } from 'immutable';
 
@@ -105,7 +105,7 @@ export default Todos;
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // components/Todos.ts
 const Todos: React.SFC = () => (
   <ul>
@@ -176,7 +176,7 @@ export default Todos;
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // components/Todos.ts
 import React from 'react';
 import { View } from '@memento/react';
@@ -256,7 +256,7 @@ export default Todos;
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // components/Todos.ts
 import React from 'react';
 import { View } from '@memento/react';

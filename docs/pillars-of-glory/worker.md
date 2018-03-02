@@ -18,16 +18,14 @@ The most basic worker you could write is one that just logs the incoming tasks t
 
 ```js
 // stores/todo.js
-const logTasksWorker = task$ =>
-  task$.do(task => console.log(task)).mapTo(state => state);
+const logTasksWorker = task$ => task$.do(task => console.log(task)).mapTo(state => state);
 ```
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // stores/todo.ts
-const logTasksWorker = task$ =>
-  task$.do(task => console.log(task)).mapTo(state => state);
+const logTasksWorker = task$ => task$.do(task => console.log(task)).mapTo(state => state);
 ```
 
 {% endmethod %}
@@ -43,19 +41,15 @@ Since a worker also gets the `state$` observable, we could also create workers t
 ```js
 // stores/todo.js
 const logStateWorker = (task$, state$) =>
-  state$
-    .do(state => console.log(state.toJS()))
-    .mapTo(state => state);
+  state$.do(state => console.log(state.toJS())).mapTo(state => state);
 ```
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // stores/todo.ts
 const logStateWorker = (task$, state$) =>
-  state$
-    .do(state => console.log(state.toJS()))
-    .mapTo(state => state);
+  state$.do(state => console.log(state.toJS())).mapTo(state => state);
 ```
 
 {% endmethod %}
@@ -81,7 +75,7 @@ const logTodosStateWorker = (task$, state$) =>
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // stores/todo.ts
 const logTodosStateWorker = (task$, state$) =>
   state$
@@ -118,7 +112,7 @@ store.assign({
 
 {% sample lang="ts" %}
 
-```ts
+```js
 type AddTodoTask = Task<'ADD_TODO', string>;
 type ToggleTodoTask = Task<'TOGGLE_TODO', number>;
 
@@ -163,7 +157,7 @@ const updateTodoStats = (task$, state$) =>
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // stores/todo.js
 const updateTodoStats = (task$, state$) =>
   task$

@@ -21,10 +21,7 @@ export const addTodo = createTask('ADD_TODO', text => ({
 }));
 
 // (todo) => ({ kind: 'REMOVE_TODO', payload: <todo object> })
-export const removeTodo = createTask(
-  'REMOVE_TODO',
-  todo => todo,
-);
+export const removeTodo = createTask('REMOVE_TODO', todo => todo);
 
 // { kind: 'ADD_TODO', payload: { text: 'Explain Memento', date: 24235464543 } }
 addTodo('Explain Memento');
@@ -35,7 +32,7 @@ addTodo.toString();
 
 {% sample lang="ts" %}
 
-```ts
+```js
 // stores/todo.ts
 import { createTask } from '@memento/store';
 
@@ -46,10 +43,7 @@ export const addTodo = createTask('ADD_TODO', text => ({
 }));
 
 // (todo) => ({ kind: 'REMOVE_TODO', payload: <todo object> })
-export const removeTodo = createTask(
-  'REMOVE_TODO',
-  todo => todo,
-);
+export const removeTodo = createTask('REMOVE_TODO', todo => todo);
 
 // { kind: 'ADD_TODO', payload: { text: 'Explain Memento', date: 24235464543 } }
 addTodo('Explain Memento');
