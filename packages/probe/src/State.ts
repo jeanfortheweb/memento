@@ -57,6 +57,8 @@ namespace State {
   export const generate: Generator<State> = generator(
     () =>
       new State({
+        host: faker.internet.domainName(),
+        port: faker.random.number({ min: 1111, max: 9999 }),
         addresses: List(State.Address.generate(5, 10)),
       }),
   );
