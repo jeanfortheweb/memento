@@ -15,7 +15,7 @@ test('toString() ouputs the kind as string', () => {
 
 test('assigns task after specified duration', async () => {
   const duration = 1000;
-  const creator = jest.fn((): Task => ({ kind: 'DEBOUNCED', payload: null }));
+  const creator = jest.fn((): Task => ({ kind: 'THROTTLED', payload: null }));
 
   await store.run(
     throttle(duration, creator),
@@ -27,7 +27,7 @@ test('assigns task after specified duration', async () => {
       },
     }),
     new Expect.TaskAssignment({
-      kind: 'DEBOUNCED',
+      kind: 'THROTTLED',
       payload: null,
     }),
   );
