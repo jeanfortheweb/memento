@@ -1,5 +1,3 @@
-// timer
-
 import { Worker, State } from '@memento/store';
 import { Observable } from '@reactivex/rxjs';
 import { when, WhenTask, accept as whenAccept } from './when';
