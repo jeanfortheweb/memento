@@ -13,7 +13,7 @@ cache:
 install:
   - yarn 
   - yarn global add lerna
-  - lerna bootstrap
+  - lerna run prepublish
 
 services: mongodb
 
