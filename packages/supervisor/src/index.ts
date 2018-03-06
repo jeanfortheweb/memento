@@ -1,5 +1,4 @@
 // timer
-// delay
 
 import { Worker, State } from '@memento/store';
 import { Observable } from '@reactivex/rxjs';
@@ -8,12 +7,14 @@ import { unless, UnlessTask, accept as unlessAccept } from './unless';
 import { from, FromTask, accept as fromAccept } from './from';
 import { throttle, ThrottleTask, accept as throttleAccept } from './throttle';
 import { debounce, DebounceTask, accept as debounceAccept } from './debounce';
+import { delay, DelayTask, accept as delayAccept } from './delay';
 
 export { WhenTask, when };
 export { UnlessTask, unless };
 export { FromTask, from };
 export { ThrottleTask, throttle };
 export { DebounceTask, debounce };
+export { DelayTask, delay };
 
 export default <TState extends State<TStateProps>, TStateProps extends Object>(): Worker<
   TState
@@ -24,4 +25,5 @@ export default <TState extends State<TStateProps>, TStateProps extends Object>()
     fromAccept<TState>(task$, state$),
     throttleAccept<TState>(task$, state$),
     debounceAccept<TState>(task$, state$),
+    delayAccept<TState>(task$, state$),
   );
