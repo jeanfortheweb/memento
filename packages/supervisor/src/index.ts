@@ -8,6 +8,13 @@ import { from, FromTask, accept as fromAccept } from './from';
 import { throttle, ThrottleTask, accept as throttleAccept } from './throttle';
 import { debounce, DebounceTask, accept as debounceAccept } from './debounce';
 import { delay, DelayTask, accept as delayAccept } from './delay';
+import {
+  start,
+  stop,
+  StartTimerTask,
+  StopTimerTask,
+  accept as timerAccept,
+} from './timer';
 
 export { WhenTask, when };
 export { UnlessTask, unless };
@@ -15,6 +22,13 @@ export { FromTask, from };
 export { ThrottleTask, throttle };
 export { DebounceTask, debounce };
 export { DelayTask, delay };
+
+const timer = {
+  start,
+  stop,
+};
+
+export { timer, StartTimerTask, StopTimerTask };
 
 export default <TState extends State<TStateProps>, TStateProps extends Object>(): Worker<
   TState
@@ -26,4 +40,5 @@ export default <TState extends State<TStateProps>, TStateProps extends Object>()
     throttleAccept<TState>(task$, state$),
     debounceAccept<TState>(task$, state$),
     delayAccept<TState>(task$, state$),
+    timerAccept<TState>(task$, state$),
   );
