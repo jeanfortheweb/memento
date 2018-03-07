@@ -2,7 +2,7 @@ import { Record, List } from 'immutable';
 import { Store } from '@memento/store';
 import createMade, { set, push } from '@memento/made';
 import createSnitch, { listen } from '@memento/snitch';
-import createSequencer, { sequence } from '@memento/sequencer';
+import createSupervisor, { sequence } from '@memento/supervisor';
 import createHotline, {
   connect,
   disconnect,
@@ -62,7 +62,7 @@ const store = new Store(new State(), [
   createMade(),
   createHotline(),
   createSnitch(),
-  createSequencer(),
+  createSupervisor(),
 ]);
 
 store.assign(registerListeners());

@@ -16,6 +16,36 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
+"@memento/sequencer@^0.0.1":
+  version "0.1.0-pre.38391161"
+  resolved "https://registry.yarnpkg.com/@memento/sequencer/-/sequencer-0.1.0-pre.38391161.tgz#098cba58aaef03e28d0b63f64b8ebc04e3602c2f"
+  dependencies:
+    "@memento/store" "^0.1.0-pre.38391161"
+    "@reactivex/rxjs" "^5.5.6"
+    immutable "4.0.0-rc.9"
+
+"@memento/store@^0.1.0-pre.38391161":
+  version "0.1.0-pre.1d3db6e4"
+  resolved "https://registry.yarnpkg.com/@memento/store/-/store-0.1.0-pre.1d3db6e4.tgz#8c898e7d740d38a5a90f02f9d7366d362400a9b0"
+  dependencies:
+    "@reactivex/rxjs" "^5.5.6"
+    immutable "4.0.0-rc.9"
+
+"@memento/store@^0.1.0-pre.e631c577":
+  version "0.1.0-pre.f2af840d"
+  resolved "https://registry.yarnpkg.com/@memento/store/-/store-0.1.0-pre.f2af840d.tgz#cd54d8056c934acf1d89c1608b231d1efddb9ee5"
+  dependencies:
+    "@reactivex/rxjs" "^5.5.6"
+    immutable "4.0.0-rc.9"
+
+"@memento/supervisor@^0.1.0-pre.e631c577":
+  version "0.1.0-pre.e631c577"
+  resolved "https://registry.yarnpkg.com/@memento/supervisor/-/supervisor-0.1.0-pre.e631c577.tgz#a488b6e48225f67010d5a4f303de7f501d1acbda"
+  dependencies:
+    "@memento/store" "^0.1.0-pre.e631c577"
+    "@reactivex/rxjs" "^5.5.6"
+    immutable "4.0.0-rc.9"
+
 "@reactivex/rxjs@^5.5.6":
   version "5.5.6"
   resolved "https://registry.yarnpkg.com/@reactivex/rxjs/-/rxjs-5.5.6.tgz#6baf5dfd4f388d506dfe11902ea669e02f651c5f"
