@@ -5,36 +5,6 @@ export const KIND_LISTEN = '@SNITCH/LISTEN';
 export const KIND_LISTEN_ONCE = '@SNITCH/LISTEN/ONCE';
 export const KIND_UNLISTEN = '@SNITCH/UNLISTEN';
 
-export interface ListenOnce {
-  <TKind extends string = string, TPayload = any>(
-    kind: TKind | TaskCreator<TKind, TPayload>,
-    creator: CreatorFunction<TPayload>,
-  ): ListenTask;
-
-  <TKind extends string = string, TPayload = any>(
-    kind: TKind | TaskCreator<TKind, TPayload>,
-    predicate: PredicateFunction<TPayload>,
-    creator: CreatorFunction<TPayload>,
-  ): ListenTask;
-}
-
-export interface Listen extends ListenOnce {
-  <TKind extends string = string, TPayload = any>(
-    name: string,
-    kind: TKind | TaskCreator<TKind, TPayload>,
-    creator: CreatorFunction<TPayload>,
-  ): ListenTask;
-
-  <TKind extends string = string, TPayload = any>(
-    name: string,
-    kind: TKind | TaskCreator<TKind, TPayload>,
-    predicate: PredicateFunction<TPayload>,
-    creator: CreatorFunction<TPayload>,
-  ): ListenTask;
-
-  once: ListenOnce;
-}
-
 export type ListenTask = Task<
   typeof KIND_LISTEN,
   {
@@ -96,7 +66,20 @@ export const unlisten = (name: string): UnListenTask => ({
 
 unlisten.toString = () => KIND_UNLISTEN;
 
-const listenCreator: any = (a?, b?, c?, d?): ListenTask => {
+export function listen<TKind extends string = string, TPayload = any>(
+  name: string,
+  kind: TKind | TaskCreator<TKind, TPayload>,
+  creator: CreatorFunction<TPayload>,
+): ListenTask;
+
+export function listen<TKind extends string = string, TPayload = any>(
+  name: string,
+  kind: TKind | TaskCreator<TKind, TPayload>,
+  predicate: PredicateFunction<TPayload>,
+  creator: CreatorFunction<TPayload>,
+): ListenTask;
+
+export function listen(a?, b?, c?, d?): ListenTask {
   return {
     kind: KIND_LISTEN,
     payload: match(a.toString(), b, c, d, {
@@ -122,31 +105,42 @@ const listenCreator: any = (a?, b?, c?, d?): ListenTask => {
       }),
     }),
   };
-};
-
-function once(a?, b?, c?): ListenOnceTask {
-  return {
-    kind: KIND_LISTEN_ONCE,
-    payload: match(a.toString(), b, c, {
-      'string|function': (kind, assign) => ({
-        kind,
-        assign,
-      }),
-      'string|function|function': (kind, predicate, assign) => ({
-        kind,
-        predicate,
-        assign,
-      }),
-    }),
-  };
 }
 
-once.toString = () => KIND_LISTEN_ONCE;
+listen.toString = () => KIND_LISTEN;
 
-listenCreator.once = once;
-listenCreator.toString = () => KIND_LISTEN;
+// istanbul ignore next
+export namespace listen {
+  export function once<TKind extends string = string, TPayload = any>(
+    kind: TKind | TaskCreator<TKind, TPayload>,
+    creator: CreatorFunction<TPayload>,
+  ): ListenOnceTask;
 
-export const listen: Listen = listenCreator;
+  export function once<TKind extends string = string, TPayload = any>(
+    kind: TKind | TaskCreator<TKind, TPayload>,
+    predicate: PredicateFunction<TPayload>,
+    creator: CreatorFunction<TPayload>,
+  ): ListenOnceTask;
+
+  export function once(a?, b?, c?): ListenOnceTask {
+    return {
+      kind: KIND_LISTEN_ONCE,
+      payload: match(a.toString(), b, c, {
+        'string|function': (kind, assign) => ({
+          kind,
+          assign,
+        }),
+        'string|function|function': (kind, predicate, assign) => ({
+          kind,
+          predicate,
+          assign,
+        }),
+      }),
+    };
+  }
+
+  once.toString = () => KIND_LISTEN_ONCE;
+}
 
 const match = (...args: any[]) => {
   const map = args.pop();
