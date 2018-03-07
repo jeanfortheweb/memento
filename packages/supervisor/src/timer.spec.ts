@@ -1,13 +1,5 @@
 import { State, Expect, Store } from '@memento/probe';
-import {
-  accept,
-  start,
-  stop,
-  KIND_START,
-  KIND_STOP,
-  StartTimerTask,
-  StopTimerTask,
-} from './timer';
+import { accept, start, stop, KIND_START, KIND_STOP, StartTimerTask } from './timer';
 import { Task } from '@memento/store';
 
 const defaultState = State.defaultState;
