@@ -1,4 +1,3 @@
-import { Task, createTask } from '@memento/store';
 import { Store, State, Expect } from '@memento/probe';
 import {
   accept,
@@ -8,8 +7,8 @@ import {
   KIND_UNWATCH,
   KIND_WATCH_ONCE,
   WatchTask,
+  WatchOnceTask,
 } from './watch';
-import {} from '../es5/watch';
 
 const state = State.defaultState;
 const store = new Store(state, accept);
@@ -95,9 +94,6 @@ test('calls creator on selector changes', async () => {
 });
 
 test('stops calling creator after unwatch', async () => {
-  const nextState1 = state.set('host', 'foo');
-  const nextState2 = state.set('host', 'bar');
-
   await store.assign(
     watch(name, selector, creator),
     new Expect.TaskAssignment<State, WatchTask<State, string>>({
@@ -115,6 +111,26 @@ test('stops calling creator after unwatch', async () => {
 
   await store.assign(unwatch(name));
   await store.update(state => state.set('host', 'foo'));
+
+  expect(selector).toHaveBeenCalledTimes(1);
+  expect(creator).toHaveBeenCalledTimes(1);
+});
+
+test('calls creator once', async () => {
+  await store.assign(
+    watch.once(selector, creator),
+    new Expect.TaskAssignment<State, WatchOnceTask<State, string>>({
+      kind: KIND_WATCH_ONCE,
+      payload: {
+        selector,
+        creator,
+      },
+    }),
+    new Expect.TaskAssignment({
+      kind: 'WATCHED',
+      payload: state.host,
+    }),
+  );
 
   expect(selector).toHaveBeenCalledTimes(1);
   expect(creator).toHaveBeenCalledTimes(1);
