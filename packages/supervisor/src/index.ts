@@ -6,6 +6,7 @@ import { from, FromTask, accept as fromAccept } from './from';
 import { throttle, ThrottleTask, accept as throttleAccept } from './throttle';
 import { debounce, DebounceTask, accept as debounceAccept } from './debounce';
 import { delay, DelayTask, accept as delayAccept } from './delay';
+import { sequence, SequenceTask, accept as sequenceAccept } from './sequence';
 import {
   start,
   stop,
