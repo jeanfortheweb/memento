@@ -9,7 +9,7 @@ beforeEach(() => {
   store.reset();
 });
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(from.toString()).toEqual(KIND);
 });
 
@@ -20,7 +20,7 @@ test('injects the selected value into the creator', async () => {
     payload: host,
   }));
 
-  await store.run(
+  await store.assign(
     from<State, string>(selector, creator),
     new Expect.TaskAssignment<State, FromTask<State, string>>({
       kind: KIND,

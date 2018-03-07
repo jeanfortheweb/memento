@@ -1,6 +1,13 @@
 import { Task, createTask } from '@memento/store';
 import { Store, State, Expect } from '@memento/probe';
-import { listen, accept, KIND_LISTEN, unlisten, KIND_UNLISTEN, KIND_LISTEN_ONCE } from './listen';
+import {
+  accept,
+  unlisten,
+  listen,
+  KIND_LISTEN,
+  KIND_UNLISTEN,
+  KIND_LISTEN_ONCE,
+} from './listen';
 
 const KIND_A = '@TEST/KIND_A';
 const KIND_B = '@TEST/KIND_B';
@@ -22,11 +29,11 @@ const store = new Store(state, accept);
 const assign = jest.fn((payload: TaskA['payload']) => taskB(payload.propertyA));
 
 const expectTaskToBeAssigned = async (task: Task) => {
-  await store.run(task, new Expect.TaskAssignment<State, Task>(task));
+  await store.assign(task, new Expect.TaskAssignment<State, Task>(task));
 };
 
 const expectAssignmentFromListener = async (task: Task) => {
-  await store.run(
+  await store.assign(
     task,
     new Expect.TaskAssignment<State, Task>(task),
     new Expect.TaskAssignment<State, TaskB>({
@@ -43,20 +50,20 @@ beforeEach(() => {
   assign.mockClear();
 });
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(listen.toString()).toEqual(KIND_LISTEN);
   expect(listen.once.toString()).toEqual(KIND_LISTEN_ONCE);
   expect(unlisten.toString()).toEqual(KIND_UNLISTEN);
 });
 
-test('does invoke assign function on string targets', async () => {
+test('does invoke creator function on string targets', async () => {
   await expectTaskToBeAssigned(listen(KIND_A, assign));
   await expectAssignmentFromListener(taskA('propertyA', 'propertyB'));
 
   expect(assign).toHaveBeenCalledTimes(1);
 });
 
-test('does invoke assign with payload filter function returning true', async () => {
+test('does invoke creator with payload filter function returning true', async () => {
   const predicate = jest.fn(payload => payload.propertyA === 'propertyA');
   const task = taskA('propertyA', 'propertyB');
 
@@ -67,7 +74,7 @@ test('does invoke assign with payload filter function returning true', async () 
   expect(predicate).toHaveBeenCalledWith(task.payload);
 });
 
-test('does not invoke assign with payload filter function returning false', async () => {
+test('does not invoke creator with payload filter function returning false', async () => {
   const predicate = jest.fn(payload => payload.propertyA !== 'propertyA');
   const task = taskA('propertyA', 'propertyB');
 

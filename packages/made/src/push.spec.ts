@@ -2,9 +2,9 @@ import { setup, Expect, State } from '@memento/probe';
 import push, { accept, KIND, PushTask } from './push';
 
 const defaultState = State.defaultState;
-const run = setup<State>(defaultState)(accept);
+const assign = setup<State>(defaultState)(accept);
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(push.toString()).toEqual(KIND);
 });
 
@@ -12,7 +12,7 @@ test('produces the expected output state', async () => {
   const data1 = State.Address.generate();
   const data2 = State.Address.generate();
 
-  await run(
+  await assign(
     push<State.Address>('addresses', data1, data2),
     new Expect.TaskAssignment<State, PushTask<State.Address>>({
       kind: KIND,

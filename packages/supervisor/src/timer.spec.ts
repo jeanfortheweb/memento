@@ -1,13 +1,5 @@
 import { State, Expect, Store } from '@memento/probe';
-import {
-  accept,
-  start,
-  stop,
-  KIND_START,
-  KIND_STOP,
-  StartTimerTask,
-  StopTimerTask,
-} from './timer';
+import { accept, start, stop, KIND_START, KIND_STOP, StartTimerTask } from './timer';
 import { Task } from '@memento/store';
 
 const defaultState = State.defaultState;
@@ -17,7 +9,7 @@ beforeEach(() => {
   store.reset();
 });
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(start.toString()).toEqual(KIND_START);
   expect(stop.toString()).toEqual(KIND_STOP);
 });
@@ -30,7 +22,7 @@ test('assigns task in specified periods', async () => {
     payload: { tick, period, total },
   }));
 
-  await store.run(
+  await store.assign(
     start(name, period, creator),
     new Expect.TaskAssignment<State, StartTimerTask>({
       kind: KIND_START,
@@ -67,7 +59,7 @@ test('assigns task in specified periods', async () => {
     }),
   );
 
-  store.run(stop(name));
+  store.assign(stop(name));
 
   expect(creator).toHaveBeenCalledTimes(3);
   expect(store.history.task.size).toEqual(5);
@@ -82,7 +74,7 @@ test('assigns task in specified periods after initial delay', async () => {
     payload: { tick, period, total },
   }));
 
-  await store.run(
+  await store.assign(
     start(name, initialDelay, period, creator),
     new Expect.TaskAssignment<State, StartTimerTask>({
       kind: KIND_START,
@@ -119,7 +111,7 @@ test('assigns task in specified periods after initial delay', async () => {
     }),
   );
 
-  store.run(stop(name));
+  store.assign(stop(name));
 
   expect(creator).toHaveBeenCalledTimes(3);
   expect(store.history.task.size).toEqual(5);

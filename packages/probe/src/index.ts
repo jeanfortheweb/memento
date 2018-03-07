@@ -13,7 +13,7 @@ export const setup = <TState extends StoreState>(initialState) => (
   worker: Worker<TState>,
 ) => async (task: Task, ...expectations: Expect<TState>[]) => {
   const store = new Store(initialState, worker);
-  await store.run(task, ...expectations);
+  await store.assign(task, ...expectations);
   store.reset();
 };
 

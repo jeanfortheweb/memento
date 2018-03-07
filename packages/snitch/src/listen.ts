@@ -1,5 +1,6 @@
 import { Observable } from '@reactivex/rxjs';
 import { TaskObservable, Task, TaskCreator } from '@memento/store';
+import { match } from './utils';
 
 export const KIND_LISTEN = '@SNITCH/LISTEN';
 export const KIND_LISTEN_ONCE = '@SNITCH/LISTEN/ONCE';
@@ -65,6 +66,11 @@ export const unlisten = (name: string): UnListenTask => ({
 });
 
 unlisten.toString = () => KIND_UNLISTEN;
+
+export function listen<TKind extends string = string, TPayload = any>(
+  kind: TKind | TaskCreator<TKind, TPayload>,
+  creator: CreatorFunction<TPayload>,
+): ListenTask;
 
 export function listen<TKind extends string = string, TPayload = any>(
   name: string,
@@ -141,17 +147,3 @@ export namespace listen {
 
   once.toString = () => KIND_LISTEN_ONCE;
 }
-
-const match = (...args: any[]) => {
-  const map = args.pop();
-  const pattern = args
-    .map(arg => typeof arg)
-    .filter(arg => arg !== 'undefined')
-    .join('|');
-
-  if (map[pattern] !== undefined) {
-    return map[pattern].apply(null, args);
-  }
-
-  throw new Error(`Invalid arguments, expected one of: ${Object.keys(map).join(', ')}`);
-};
