@@ -93,7 +93,7 @@ test('does invoke creator function on selector changes', async () => {
   expect(creator).toBeCalledWith('bar');
 });
 
-test('does stop invoking creator function after unwatch', async () => {
+test('does stop invoking creator function when unwatch is emitted', async () => {
   await store.assign(
     watch(name, selector, creator),
     new Expect.TaskAssignment<State, WatchTask<State, string>>({
