@@ -21,6 +21,7 @@ export { FromTask, from };
 export { ThrottleTask, throttle };
 export { DebounceTask, debounce };
 export { DelayTask, delay };
+export { sequence, SequenceTask };
 
 const timer = {
   start,
