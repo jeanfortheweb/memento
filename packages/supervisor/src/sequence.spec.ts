@@ -5,7 +5,7 @@ import { Task } from '@memento/store';
 const assign = setup<State>(State.defaultState)(accept);
 const tasks: Task[] = [{ kind: 'A', payload: null }, { kind: 'B', payload: null }];
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(sequence.toString()).toEqual(KIND);
 });
 

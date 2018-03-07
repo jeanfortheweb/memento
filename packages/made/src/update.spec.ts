@@ -4,7 +4,7 @@ import update, { accept, KIND, UpdateTask } from './update';
 const defaultState = State.defaultState;
 const assign = setup<State>(defaultState)(accept);
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(update.toString()).toEqual(KIND);
 });
 

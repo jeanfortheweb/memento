@@ -4,7 +4,7 @@ import set, { accept, KIND, SetTask } from './set';
 const defaultState = State.defaultState;
 const assign = setup<State>(defaultState)(accept);
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(set.toString()).toEqual(KIND);
 });
 

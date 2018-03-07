@@ -9,7 +9,7 @@ beforeEach(() => {
   store.reset();
 });
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(delay.toString()).toEqual(KIND);
 });
 

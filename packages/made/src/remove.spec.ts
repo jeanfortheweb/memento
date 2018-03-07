@@ -5,7 +5,7 @@ import remove, { accept, KIND, RemoveTask } from './remove';
 const defaultState = State.defaultState;
 const assign = setup<State>(defaultState)(accept);
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(remove.toString()).toEqual(KIND);
 });
 

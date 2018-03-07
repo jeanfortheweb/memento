@@ -4,7 +4,7 @@ import push, { accept, KIND, PushTask } from './push';
 const defaultState = State.defaultState;
 const assign = setup<State>(defaultState)(accept);
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(push.toString()).toEqual(KIND);
 });
 

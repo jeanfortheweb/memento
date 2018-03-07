@@ -24,7 +24,7 @@ const store = new Store(State.defaultState, createHotline());
 
 beforeEach(() => {});
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(connect.toString()).toEqual(KIND_CONNECT);
   expect(open.toString()).toEqual(KIND_OPEN);
   expect(send.toString()).toEqual(KIND_SEND);

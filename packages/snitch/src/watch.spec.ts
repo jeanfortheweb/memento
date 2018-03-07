@@ -22,13 +22,13 @@ beforeEach(() => {
   selector.mockClear();
 });
 
-test('toString() ouputs the kind as string', () => {
+test('toString() outputs the kind as string', () => {
   expect(watch.toString()).toEqual(KIND_WATCH);
   expect(watch.once.toString()).toEqual(KIND_WATCH_ONCE);
   expect(unwatch.toString()).toEqual(KIND_UNWATCH);
 });
 
-test('makes initial call to creator', async () => {
+test('does invoke creator function initially', async () => {
   await store.assign(
     watch(name, selector, creator),
     new Expect.TaskAssignment<State, WatchTask<State, string>>({
@@ -45,7 +45,7 @@ test('makes initial call to creator', async () => {
   expect(creator).toBeCalledWith(state.host);
 });
 
-test('calls creator on selector changes', async () => {
+test('does invoke creator function on selector changes', async () => {
   const nextState1 = state.set('host', 'foo');
   const nextState2 = state.set('host', 'bar');
 
@@ -93,7 +93,7 @@ test('calls creator on selector changes', async () => {
   expect(creator).toBeCalledWith('bar');
 });
 
-test('stops calling creator after unwatch', async () => {
+test('does stop invoking creator function after unwatch', async () => {
   await store.assign(
     watch(name, selector, creator),
     new Expect.TaskAssignment<State, WatchTask<State, string>>({
@@ -116,7 +116,7 @@ test('stops calling creator after unwatch', async () => {
   expect(creator).toHaveBeenCalledTimes(1);
 });
 
-test('calls creator once', async () => {
+test('does invoke creator function once', async () => {
   await store.assign(
     watch.once(selector, creator),
     new Expect.TaskAssignment<State, WatchOnceTask<State, string>>({
