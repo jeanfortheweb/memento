@@ -41,4 +41,5 @@ export default <TState extends State<TStateProps>, TStateProps extends Object>()
     debounceAccept<TState>(task$, state$),
     delayAccept<TState>(task$, state$),
     timerAccept<TState>(task$, state$),
+    sequenceAccept(task$),
   );
