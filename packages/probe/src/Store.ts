@@ -9,14 +9,14 @@ import History, { State as HistoryState } from './History';
  * to make assertions.
  */
 export default class Store<TState extends State> {
-  private _task$: TaskSubject;
-  private _state$: StateSubject<TState>;
-  private _output$: Subject<Task | Updater<TState>>;
-  private _history: HistoryState;
+  private _task$!: TaskSubject;
+  private _state$!: StateSubject<TState>;
+  private _output$!: Subject<Task | Updater<TState>>;
+  private _history!: HistoryState;
   private _initialState: TState;
-  private _state: TState;
+  private _state!: TState;
   private _worker: Worker<TState>;
-  private _expectations: Expectation<TState>[];
+  private _expectations!: Expectation<TState>[];
   private _expectation?: Expectation<TState>;
 
   /**
@@ -24,21 +24,13 @@ export default class Store<TState extends State> {
    * @param worker The worker to use.
    */
   constructor(initialState: TState, worker: Worker<TState>) {
-    this._task$ = new TaskSubject();
-    this._state$ = new StateSubject<TState>(initialState);
-    this._output$ = new Subject<Task | Updater<TState>>();
-    this._history = new HistoryState();
     this._initialState = initialState;
-    this._state = initialState;
     this._worker = worker;
-    this._expectations = [];
+
     this.reset();
   }
 
-  /**
-   * Resets all internals of the store.
-   */
-  public reset() {
+  private _setupMembers() {
     this._task$ = new TaskSubject();
     this._state$ = new StateSubject<TState>(this._initialState);
     this._output$ = new Subject<Task | Updater<TState>>();
@@ -47,7 +39,9 @@ export default class Store<TState extends State> {
     this._expectation = undefined;
 
     this._state = this._initialState;
+  }
 
+  private _setupSubscriptions() {
     this._state$.subscribe(value => {
       this._history = this._history.update('state', state => state.push(value));
       this._state = value;
@@ -65,7 +59,30 @@ export default class Store<TState extends State> {
       }
     });
 
+    this._output$.subscribe(value => {
+      this._expectation = this._expectations.shift();
+
+      if (typeof value === 'function') {
+        const nextState = value(this._state);
+
+        if (nextState !== this._state) {
+          this._state = nextState;
+          this._state$.next(nextState);
+        }
+      } else {
+        this._task$.next(value);
+      }
+    });
+
     this._worker(this._task$, this._state$).subscribe(this._output$);
+  }
+
+  /**
+   * Resets all internals of the store.
+   */
+  public reset() {
+    this._setupMembers();
+    this._setupSubscriptions();
   }
 
   /**
@@ -76,27 +93,47 @@ export default class Store<TState extends State> {
   }
 
   /**
+   * Runs the given `Updater` as he would run in an actual store
+   * while calling the given expecations with the generating history.
+   *
+   * @param updater
+   * @param expectations
+   */
+  public update(updater: Updater<TState>, ...expectations: Expectation<TState>[]) {
+    this._expectations = expectations;
+
+    return new Promise(resolve => {
+      if (this._expectations.length > 0) {
+        const subscription = this._output$.subscribe(value => {
+          if (this._expectations.length === 0) {
+            subscription.unsubscribe();
+            resolve();
+          }
+        });
+
+        this._output$.next(updater);
+      } else {
+        this._output$.next(updater);
+
+        resolve();
+      }
+    });
+  }
+
+  /**
    * Runs the given `Task` as he would run in an actual store
    * while calling the given expecations with the generating history.
    *
    * @param task The task to run.
    * @param expectations The expectations to make.
    */
-  public run(task: Task, ...expectations: Expectation<TState>[]) {
+  public assign(task: Task, ...expectations: Expectation<TState>[]) {
     this._expectations = expectations;
     this._expectation = this._expectations.shift();
 
     return new Promise(resolve => {
       if (this._expectations.length > 0) {
         const subscription = this._output$.subscribe(value => {
-          this._expectation = this._expectations.shift();
-
-          if (typeof value === 'function') {
-            this._state$.next(value(this._state));
-          } else {
-            this._task$.next(value);
-          }
-
           if (this._expectations.length === 0) {
             subscription.unsubscribe();
             resolve();

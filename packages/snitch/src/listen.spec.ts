@@ -1,6 +1,13 @@
 import { Task, createTask } from '@memento/store';
 import { Store, State, Expect } from '@memento/probe';
-import { listen, accept, KIND_LISTEN, unlisten, KIND_UNLISTEN, KIND_LISTEN_ONCE } from './listen';
+import {
+  listen,
+  accept,
+  KIND_LISTEN,
+  unlisten,
+  KIND_UNLISTEN,
+  KIND_LISTEN_ONCE,
+} from './listen';
 
 const KIND_A = '@TEST/KIND_A';
 const KIND_B = '@TEST/KIND_B';
@@ -22,11 +29,11 @@ const store = new Store(state, accept);
 const assign = jest.fn((payload: TaskA['payload']) => taskB(payload.propertyA));
 
 const expectTaskToBeAssigned = async (task: Task) => {
-  await store.run(task, new Expect.TaskAssignment<State, Task>(task));
+  await store.assign(task, new Expect.TaskAssignment<State, Task>(task));
 };
 
 const expectAssignmentFromListener = async (task: Task) => {
-  await store.run(
+  await store.assign(
     task,
     new Expect.TaskAssignment<State, Task>(task),
     new Expect.TaskAssignment<State, TaskB>({

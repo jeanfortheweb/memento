@@ -2,7 +2,7 @@ import { setup, Expect, State } from '@memento/probe';
 import set, { accept, KIND, SetTask } from './set';
 
 const defaultState = State.defaultState;
-const run = setup<State>(defaultState)(accept);
+const assign = setup<State>(defaultState)(accept);
 
 test('toString() ouputs the kind as string', () => {
   expect(set.toString()).toEqual(KIND);
@@ -11,7 +11,7 @@ test('toString() ouputs the kind as string', () => {
 test('produces the expected output state', async () => {
   const data = 'Foostr. 23';
 
-  await run(
+  await assign(
     set<string>('addresses.0.street', data),
     new Expect.TaskAssignment<State, SetTask<string>>({
       kind: KIND,

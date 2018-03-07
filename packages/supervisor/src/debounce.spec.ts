@@ -23,11 +23,11 @@ test('debounces tasks in specified duration', done => {
     return { kind: 'DEBOUNCED', payload: null };
   });
 
-  store.run(debounce(duration, creator));
-  store.run(debounce(duration, creator));
-  store.run(debounce(duration, creator));
+  store.assign(debounce(duration, creator));
+  store.assign(debounce(duration, creator));
+  store.assign(debounce(duration, creator));
 
-  store.run(
+  store.assign(
     debounce(duration, creator),
     new Expect.TaskAssignment<State, DebounceTask>({
       kind: KIND,

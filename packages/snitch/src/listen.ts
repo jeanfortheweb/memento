@@ -68,6 +68,11 @@ export const unlisten = (name: string): UnListenTask => ({
 unlisten.toString = () => KIND_UNLISTEN;
 
 export function listen<TKind extends string = string, TPayload = any>(
+  kind: TKind | TaskCreator<TKind, TPayload>,
+  creator: CreatorFunction<TPayload>,
+): ListenTask;
+
+export function listen<TKind extends string = string, TPayload = any>(
   name: string,
   kind: TKind | TaskCreator<TKind, TPayload>,
   creator: CreatorFunction<TPayload>,

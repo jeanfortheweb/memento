@@ -17,7 +17,7 @@ test('assigns task after specified duration', async () => {
   const duration = 1000;
   const creator = jest.fn((): Task => ({ kind: 'THROTTLED', payload: null }));
 
-  await store.run(
+  await store.assign(
     throttle(duration, creator),
     new Expect.TaskAssignment<State, ThrottleTask>({
       kind: KIND,
@@ -32,11 +32,11 @@ test('assigns task after specified duration', async () => {
     }),
   );
 
-  await store.run(throttle(duration, creator));
-  await store.run(throttle(duration, creator));
-  await store.run(throttle(duration, creator));
-  await store.run(throttle(duration, creator));
-  await store.run(throttle(duration, creator));
+  await store.assign(throttle(duration, creator));
+  await store.assign(throttle(duration, creator));
+  await store.assign(throttle(duration, creator));
+  await store.assign(throttle(duration, creator));
+  await store.assign(throttle(duration, creator));
 
   expect(creator).toHaveBeenCalledTimes(1);
   expect(store.history.task.size).toEqual(7);

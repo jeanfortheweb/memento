@@ -2,7 +2,7 @@ import { setup, State, Expect } from '@memento/probe';
 import sequence, { accept, KIND } from './sequence';
 import { Task } from '@memento/store';
 
-const run = setup<State>(State.defaultState)(accept);
+const assign = setup<State>(State.defaultState)(accept);
 const tasks: Task[] = [{ kind: 'A', payload: null }, { kind: 'B', payload: null }];
 
 test('toString() ouputs the kind as string', () => {
@@ -10,7 +10,7 @@ test('toString() ouputs the kind as string', () => {
 });
 
 test('does forward all given tasks', async () => {
-  await run(
+  await assign(
     sequence(...tasks),
     new Expect.TaskAssignment({
       kind: KIND,

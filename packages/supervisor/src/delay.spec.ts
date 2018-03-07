@@ -22,7 +22,7 @@ test('assigns task after specified duration', async () => {
 
   const now = Date.now();
 
-  await store.run(
+  await store.assign(
     delay(duration, creator),
     new Expect.TaskAssignment<State, DelayTask>({
       kind: KIND,
