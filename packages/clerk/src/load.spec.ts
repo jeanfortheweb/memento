@@ -45,6 +45,8 @@ test('sets valid data on the state when manually loaded', async () => {
     new Expect.StateChange<State>(state, savedState),
   );
 
+  await new Promise(resolve => setTimeout(() => resolve(), 10));
+
   expect(localStorage.getItem).toHaveBeenLastCalledWith(key);
 });
 
@@ -60,6 +62,29 @@ test('sets valid data on the state when automatically loaded', async () => {
 
   const store = new Store(state, accept(configuration));
 
+  await new Promise(resolve => setTimeout(() => resolve(), 10));
+
   expect((store.history.state.last() as State).toJS()).toMatchObject(savedState.toJS());
   expect(localStorage.getItem).toHaveBeenLastCalledWith(key);
+});
+
+test('invokes empty creator when there is nothing to load', async () => {
+  const empty = jest.fn(() => ({ kind: 'empty' }));
+  const configuration: Configuration = {
+    name,
+    target: Target.Session,
+    save: SaveMode.Manual,
+    load: LoadMode.Auto,
+    empty,
+    path: 'addresses',
+    reviver,
+  };
+
+  sessionStorage.removeItem(getStorageKey(name));
+
+  new Store(state, accept(configuration));
+
+  await new Promise(resolve => setTimeout(() => resolve(), 10));
+
+  expect(empty).toHaveBeenCalledTimes(1);
 });
