@@ -35,7 +35,13 @@ export const accept = <TState extends State>(
     .mapTo(state => state);
 
   if (configuration.save === SaveMode.Auto) {
-    output$ = Observable.merge(output$, state$.select(selector).mapTo(save(name)));
+    output$ = Observable.merge(
+      output$,
+      state$
+        .select(selector)
+        .skip(1)
+        .mapTo(save(name)),
+    );
   }
 
   if (configuration.save === SaveMode.Interval) {

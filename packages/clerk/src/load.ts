@@ -1,4 +1,11 @@
-import { State, Worker, Task, TaskObservable, StateObservable } from '@memento/store';
+import {
+  State,
+  Worker,
+  Task,
+  TaskObservable,
+  StateObservable,
+  Updater,
+} from '@memento/store';
 import { Observable } from '@reactivex/rxjs';
 import { Configuration, Target, LoadMode } from './configuration';
 import { pathToArray, getStorageKey } from './utils';
@@ -18,17 +25,12 @@ export const accept = <TState extends State>(
   const key = getStorageKey(name);
   const storage = target === Target.Local ? localStorage : sessionStorage;
 
-  let output$: Observable<any>;
+  let output$: Observable<Updater<TState> | Task> = task$
+    .accept(load)
+    .filter(task => task.payload === configuration.name);
 
-  switch (configuration.load) {
-    case LoadMode.Auto:
-      output$ = Observable.of(load(name));
-      break;
-
-    case LoadMode.Manual:
-    default:
-      output$ = task$.accept(load).filter(task => task.payload === configuration.name);
-      break;
+  if (configuration.load === LoadMode.Auto) {
+    output$ = Observable.merge(output$, Observable.of(load(name)));
   }
 
   return output$.mapTo(state =>
