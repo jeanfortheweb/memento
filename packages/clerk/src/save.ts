@@ -14,24 +14,28 @@ export const KIND = '@CLERK/SAVE';
 
 export type SaveTask = Task<typeof KIND, string>;
 
+const createSaver = configuration => data => {
+  const { name, target } = configuration;
+  const key = getStorageKey(name);
+  const storage = target === Target.Local ? localStorage : sessionStorage;
+
+  storage.setItem(key, JSON.stringify(data));
+};
+
 export const accept = <TState extends State>(
   configuration: Configuration,
 ): Worker<TState> => (
   task$: TaskObservable & Observable<Task>,
   state$: StateObservable<TState>,
 ) => {
-  const { path, name, target, interval = 5000 } = configuration;
-  const key = getStorageKey(name);
+  const { path, name, interval = 5000 } = configuration;
   const selector = state => state.getIn(pathToArray(path));
-  const storage = target === Target.Local ? localStorage : sessionStorage;
 
   let output$: Observable<Updater<TState> | Task> = task$
     .accept(save)
     .filter(task => task.payload === configuration.name)
     .flatMap(task => state$.select(selector).take(1))
-    .do(data => {
-      storage.setItem(key, JSON.stringify(data));
-    })
+    .do(createSaver(configuration))
     .mapTo(state => state);
 
   if (configuration.save === SaveMode.Auto) {
