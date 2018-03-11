@@ -79,11 +79,6 @@ test('sets valid data on a local storage key when state changes', async () => {
   const store = new Store(state, accept(configuration));
   const nextState = state.update('addresses', addresses => addresses.remove(0));
 
-  expect(localStorage.setItem).toHaveBeenLastCalledWith(
-    key,
-    JSON.stringify(state.addresses.toJS()),
-  );
-
   await store.update(state => nextState, new Expect.StateChange<State>(state, nextState));
 
   expect(localStorage.setItem).toHaveBeenLastCalledWith(
@@ -103,11 +98,6 @@ test('sets valid data on a session storage key when state changes', async () => 
 
   const store = new Store(state, accept(configuration));
   const nextState = state.update('addresses', addresses => addresses.remove(0));
-
-  expect(sessionStorage.setItem).toHaveBeenLastCalledWith(
-    key,
-    JSON.stringify(state.addresses.toJS()),
-  );
 
   await store.update(state => nextState, new Expect.StateChange<State>(state, nextState));
 
