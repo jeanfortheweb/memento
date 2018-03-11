@@ -1,8 +1,14 @@
-import { State, Worker, Task, TaskObservable, StateObservable } from '@memento/store';
+import {
+  State,
+  Worker,
+  Task,
+  TaskObservable,
+  StateObservable,
+  Updater,
+} from '@memento/store';
 import { Observable } from '@reactivex/rxjs';
 import { Configuration, Target, SaveMode } from './configuration';
 import { pathToArray, getStorageKey } from './utils';
-import { Collection } from 'immutable';
 
 export const KIND = '@CLERK/SAVE';
 
@@ -19,33 +25,24 @@ export const accept = <TState extends State>(
   const selector = state => state.getIn(pathToArray(path));
   const storage = target === Target.Local ? localStorage : sessionStorage;
 
-  let output$: Observable<Collection<any, any>>;
-
-  switch (configuration.save) {
-    case SaveMode.Auto:
-      output$ = state$.select(selector);
-      break;
-
-    case SaveMode.Interval:
-      output$ = Observable.interval(interval).flatMap(() =>
-        state$.select(selector).take(1),
-      );
-      break;
-
-    case SaveMode.Manual:
-    default:
-      output$ = task$
-        .accept(save)
-        .filter(task => task.payload === configuration.name)
-        .flatMap(task => state$.select(selector).take(1));
-      break;
-  }
-
-  return output$
+  let output$: Observable<Updater<TState> | Task> = task$
+    .accept(save)
+    .filter(task => task.payload === configuration.name)
+    .flatMap(task => state$.select(selector).take(1))
     .do(data => {
       storage.setItem(key, JSON.stringify(data));
     })
     .mapTo(state => state);
+
+  if (configuration.save === SaveMode.Auto) {
+    output$ = Observable.merge(output$, state$.select(selector).mapTo(save(name)));
+  }
+
+  if (configuration.save === SaveMode.Interval) {
+    output$ = Observable.merge(output$, Observable.interval(interval).mapTo(save(name)));
+  }
+
+  return output$;
 };
 
 export const save = (name: string): SaveTask => ({
