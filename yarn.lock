@@ -16,21 +16,6 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
-"@memento/store@^0.1.0-pre.e631c577":
-  version "0.1.0-pre.f2af840d"
-  resolved "https://registry.yarnpkg.com/@memento/store/-/store-0.1.0-pre.f2af840d.tgz#cd54d8056c934acf1d89c1608b231d1efddb9ee5"
-  dependencies:
-    "@reactivex/rxjs" "^5.5.6"
-    immutable "4.0.0-rc.9"
-
-"@memento/supervisor@^0.1.0-pre.e631c577":
-  version "0.1.0-pre.e631c577"
-  resolved "https://registry.yarnpkg.com/@memento/supervisor/-/supervisor-0.1.0-pre.e631c577.tgz#a488b6e48225f67010d5a4f303de7f501d1acbda"
-  dependencies:
-    "@memento/store" "^0.1.0-pre.e631c577"
-    "@reactivex/rxjs" "^5.5.6"
-    immutable "4.0.0-rc.9"
-
 "@reactivex/rxjs@^5.5.6":
   version "5.5.6"
   resolved "https://registry.yarnpkg.com/@reactivex/rxjs/-/rxjs-5.5.6.tgz#6baf5dfd4f388d506dfe11902ea669e02f651c5f"
