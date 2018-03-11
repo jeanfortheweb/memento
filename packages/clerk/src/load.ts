@@ -27,18 +27,23 @@ export const accept = <TState extends State>(
 
   let output$: Observable<Updater<TState> | Task> = task$
     .accept(load)
-    .filter(task => task.payload === configuration.name);
+    .filter(task => task.payload === configuration.name)
+    .map(() => {
+      let data = JSON.parse(storage.getItem(key) as string);
+
+      if (data === null && configuration.empty) {
+        return configuration.empty();
+      }
+
+      return state => state.setIn(pathToArray(path), fromJS(data, reviver));
+    })
+    .delay(1);
 
   if (configuration.load === LoadMode.Auto) {
     output$ = Observable.merge(output$, Observable.of(load(name)));
   }
 
-  return output$.mapTo(state =>
-    state.setIn(
-      pathToArray(path),
-      fromJS(JSON.parse(storage.getItem(key) as string), reviver),
-    ),
-  );
+  return output$;
 };
 
 export const load = (name: string): LoadTask => ({

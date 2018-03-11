@@ -5,7 +5,8 @@ import { Store } from '@memento/store';
 import createSupervisor, { sequence } from '@memento/supervisor';
 import createMade, { push, merge, update, set } from '@memento/made';
 import createSnitch, { listen, unlisten } from '@memento/snitch';
-import createClerk, { SaveMode, LoadMode } from '@memento/clerk';
+import createClerk, { SaveMode, LoadMode, Target } from '@memento/clerk';
+import * as supervisor from '@memento/supervisor';
 
 // state.
 export class Todo extends Record({
@@ -46,9 +47,13 @@ const store = new Store(new State(), [
   createMade(),
   createSupervisor(),
   createClerk({
+    name: 'todos',
+    target: Target.Local,
     save: SaveMode.Auto,
     load: LoadMode.Auto,
     path: 'todos',
+    empty: () =>
+      sequence(addTodo('Add more features')(), addTodo('Update documentation')()),
     reviver: (key, sequence) => {
       if (typeof key === 'number') {
         return new Todo(sequence);
@@ -58,9 +63,5 @@ const store = new Store(new State(), [
     },
   }),
 ]);
-
-// add some default todos.
-store.assign(addTodo('Add more features')());
-store.assign(addTodo('Update documentation')());
 
 export default store;

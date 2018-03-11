@@ -1,7 +1,7 @@
 import { Task, TaskObservable } from '@memento/store';
 import { Observable } from '@reactivex/rxjs';
 
-export const KIND = '@SEQUENCER/SEQUENCE';
+export const KIND = '@SUPERVISOR/SEQUENCE';
 
 export type SequenceTask = Task<typeof KIND, Task[]>;
 
