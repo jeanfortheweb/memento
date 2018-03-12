@@ -16,7 +16,7 @@ Currently, it's incomplete but already covers some fundamentals of memento. In t
 
 ## Examples
 
-The [react examples](https://github.com/jeanfortheweb/memento/tree/master/packages/react-todo-example) are our playground for new features and showing off alot of mementos power, but to give you a minimal glimpse:
+The [react examples](https://github.com/jeanfortheweb/memento/tree/master/packages/react-examples) are our playground for new features and showing off alot of mementos power, but to give you a minimal glimpse:
 
 ```js
 import { Store } from '@memento/store';
