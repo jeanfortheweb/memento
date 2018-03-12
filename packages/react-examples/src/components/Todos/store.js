@@ -5,7 +5,7 @@ import { Store } from '@memento/store';
 import createSupervisor, { sequence, when } from '@memento/supervisor';
 import createMade, { push, merge, update, set } from '@memento/made';
 import createSnitch, { listen, unlisten } from '@memento/snitch';
-import createClerk, { SaveMode, LoadMode, Target } from '@memento/clerk';
+import createClerk, { createReviver, SaveMode, LoadMode, Target } from '@memento/clerk';
 
 // state.
 export class Todo extends Record({
@@ -48,13 +48,7 @@ const store = new Store(new State(), [
   createClerk({
     name: 'todos',
     path: 'todos',
-    reviver: (key, sequence) => {
-      if (typeof key === 'number') {
-        return new Todo(sequence);
-      }
-
-      return sequence.toList();
-    },
+    reviver: createReviver(sequence => sequence.toList().map(todo => new Todo(todo))),
   }),
 ]);
 

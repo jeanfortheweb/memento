@@ -13,21 +13,27 @@ export type SimpleReviver<T> = {
 };
 
 export type ReviverStruct<T> = {
-  [P in keyof T]: SimpleReviver<T[P]> | ReviverStruct<T[P]>
+  [P in keyof T]: SimpleReviver<T[P]> | GeneratedReviver<T[P]>
 };
+
+export type GeneratedReviver<T> = Reviver<T> & { _isReviver?: true };
 
 export const createReviver = <T, R>(
   rootReviver: SimpleReviver<R>,
   struct?: ReviverStruct<Partial<T>>,
-): Reviver<R> => {
+): GeneratedReviver<R> => {
   const map = struct ? fromJS(struct) : Map();
 
-  return (key, sequence, path) => {
+  const reviver: GeneratedReviver<R> = (key, sequence, path) => {
     if (path && path.length > 0) {
-      const reviver = map.getIn(path);
+      const found = map.getIn(path);
 
-      if (reviver) {
-        return reviver(sequence);
+      if (found) {
+        if (found._isReviver) {
+          return fromJS(sequence.toJS(), found);
+        }
+
+        return found(sequence);
       }
 
       return sequence;
@@ -35,4 +41,8 @@ export const createReviver = <T, R>(
 
     return rootReviver(sequence);
   };
+
+  reviver._isReviver = true;
+
+  return reviver;
 };

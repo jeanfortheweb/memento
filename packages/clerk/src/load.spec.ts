@@ -8,12 +8,21 @@ const name = 'test';
 const key = getStorageKey(name);
 const state = State.defaultState;
 const savedState = state.update('addresses', addresses => addresses.remove(0));
+
 const addressesReviver = createReviver(sequence =>
   sequence.toList().map(address => new State.Address(address)),
 );
 
+const configurationReviver = createReviver<
+  State.Configuration.Props,
+  State.Configuration
+>(sequence => new State.Configuration(sequence), {
+  includes: sequence => sequence.toList(),
+});
+
 const stateReviver = createReviver<State.Props, State>(sequence => new State(sequence), {
-  addresses: sequence => sequence.toList().map(address => new State.Address(address)),
+  addresses: addressesReviver,
+  configuration: configurationReviver,
 });
 
 beforeAll(() => {
@@ -45,7 +54,7 @@ test('sets valid data on the state when manually loaded', async () => {
     }),
     new Expect.StateChange<State>(state, savedState),
   );
-
+  console.log(fromJS(JSON.parse(localStorage.getItem(key) as string), stateReviver));
   expect(localStorage.getItem).toHaveBeenLastCalledWith(key);
 });
 

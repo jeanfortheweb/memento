@@ -9,6 +9,7 @@ export interface StateProps {
   host: string;
   port: number;
   addresses: List<State.Address>;
+  configuration?: State.Configuration;
 }
 
 /**
@@ -19,6 +20,7 @@ class State extends Record<StateProps>({
   host: '',
   port: 0,
   addresses: List(),
+  configuration: undefined,
 }) {}
 
 namespace State {
@@ -59,12 +61,46 @@ namespace State {
     );
   }
 
+  /**
+   * Represents a fictional configuration.
+   */
+  export class Configuration extends Record<Configuration.Props>({
+    theme: 'dark',
+    includes: List(),
+  }) {}
+
+  export namespace Configuration {
+    /**
+     * Defines the properties of the `Configuration`-Record.
+     */
+    export interface Props {
+      theme: string;
+      includes: List<string>;
+    }
+
+    export const generate: Generator<Configuration> = generator(
+      () =>
+        new Configuration({
+          theme: faker.random.arrayElement(['dark', 'bright']),
+          includes: List(
+            generator(() =>
+              faker.system.fileName(
+                faker.system.commonFileExt(),
+                faker.system.commonFileType(),
+              ),
+            )(1, 5),
+          ),
+        }),
+    );
+  }
+
   export const generate: Generator<State> = generator(
     () =>
       new State({
         host: faker.internet.domainName(),
         port: faker.random.number({ min: 1111, max: 9999 }),
         addresses: List(State.Address.generate(5, 10)),
+        configuration: Configuration.generate(),
       }),
   );
 
