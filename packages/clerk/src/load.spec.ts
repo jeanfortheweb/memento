@@ -1,33 +1,20 @@
 import { State, Expect, Store } from '@memento/probe';
 import { load, accept, KIND, LoadTask } from './load';
-import { Configuration, Target, LoadMode, Reviver } from './configuration';
-import { getStorageKey } from './utils';
+import { Configuration, Target, LoadMode } from './configuration';
+import { getStorageKey, createReviver } from './utils';
+import { fromJS } from 'immutable';
 
 const name = 'test';
 const key = getStorageKey(name);
 const state = State.defaultState;
 const savedState = state.update('addresses', addresses => addresses.remove(0));
-const addressesReviver: Reviver = (key, sequence, path) => {
-  if (typeof key === 'number') {
-    return new State.Address(sequence);
-  }
+const addressesReviver = createReviver(sequence =>
+  sequence.toList().map(address => new State.Address(address)),
+);
 
-  return sequence.toList();
-};
-
-const stateReviver: Reviver = (key, sequence, path) => {
-  const [root] = path || [undefined];
-
-  if (key === 'addresses') {
-    return sequence.toList();
-  }
-
-  if (typeof key === 'number' && root === 'addresses') {
-    return new State.Address(sequence);
-  }
-
-  return new State(sequence);
-};
+const stateReviver = createReviver<State.Props, State>(sequence => new State(sequence), {
+  addresses: sequence => sequence.toList().map(address => new State.Address(address)),
+});
 
 beforeAll(() => {
   localStorage.setItem(getStorageKey(name), JSON.stringify(savedState.addresses));

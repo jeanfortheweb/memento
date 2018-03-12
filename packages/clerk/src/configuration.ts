@@ -16,12 +16,12 @@ export enum Target {
   Session = 'session',
 }
 
-export interface Reviver {
+export interface Reviver<T = any> {
   (
     key: string | number,
     sequence: Collection.Keyed<string, any> | Collection.Indexed<any>,
     path?: Array<string | number>,
-  ): any;
+  ): T;
 }
 
 export interface Configuration {

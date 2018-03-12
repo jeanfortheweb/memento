@@ -5,7 +5,7 @@ import * as faker from 'faker';
 /**
  * Defines the properties of the `ProbeState`-Record.
  */
-export interface Props {
+export interface StateProps {
   host: string;
   port: number;
   addresses: List<State.Address>;
@@ -15,7 +15,7 @@ export interface Props {
  * The `ProbeState` is a `State` implementation for common testing purposes.
  * It contains a variety of data structures to mimic real world application scenarios.
  */
-class State extends Record<Props>({
+class State extends Record<StateProps>({
   host: '',
   port: 0,
   addresses: List(),
@@ -23,19 +23,14 @@ class State extends Record<Props>({
 
 namespace State {
   /**
-   * Defines the properties of the `AddressState`-Record.
+   * Defines the properties of the `ProbeState`-Record.
    */
-  export interface Props {
-    street: string;
-    postalCode: string;
-    country: string;
-    state: string;
-  }
+  export interface Props extends StateProps {}
 
   /**
    * Represents a fictional address.
    */
-  export class Address extends Record<Props>({
+  export class Address extends Record<Address.Props>({
     street: '',
     postalCode: '',
     country: '',
@@ -43,6 +38,16 @@ namespace State {
   }) {}
 
   export namespace Address {
+    /**
+     * Defines the properties of the `AddressState`-Record.
+     */
+    export interface Props {
+      street: string;
+      postalCode: string;
+      country: string;
+      state: string;
+    }
+
     export const generate: Generator<Address> = generator(
       () =>
         new Address({
