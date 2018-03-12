@@ -54,7 +54,7 @@ test('sets valid data on the state when manually loaded', async () => {
     }),
     new Expect.StateChange<State>(state, savedState),
   );
-  console.log(fromJS(JSON.parse(localStorage.getItem(key) as string), stateReviver));
+
   expect(localStorage.getItem).toHaveBeenLastCalledWith(key);
 });
 
