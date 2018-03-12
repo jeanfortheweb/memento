@@ -12,13 +12,11 @@ export const accept = <TState extends State>(
   task$: TaskObservable & Observable<Task>,
   state$: StateObservable<TState>,
 ) =>
-  task$.accept(when).flatMap(task =>
-    state$
-      .select(state => state)
-      .take(1)
-      .filter(state => task.payload.predicate(state))
-      .map(() => task.payload.creator()),
-  );
+  task$
+    .accept(when)
+    .withLatestFrom(state$)
+    .filter(([task, state]) => task.payload.predicate(state))
+    .map(([task]) => task.payload.creator());
 
 export const when = <TState extends State>(
   predicate: Selector<TState, boolean>,
