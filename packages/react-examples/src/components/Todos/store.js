@@ -53,6 +53,7 @@ const store = new Store(new State(), [
   }),
 ]);
 
+// when we didn't load any todos from local storage, we create some.
 store.assign(
   when(
     state => state.todos.size === 0,
