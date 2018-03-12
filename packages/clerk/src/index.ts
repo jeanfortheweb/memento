@@ -14,7 +14,7 @@ export default <TState extends State<TStateProps>, TStateProps extends Object>(
 ): Worker<TState> => {
   return (task$, state$) =>
     Observable.merge(
-      loadAccept<TState>(configuration)(task$, state$),
       saveAccept<TState>(configuration)(task$, state$),
+      loadAccept<TState>(configuration)(task$, state$),
     );
 };

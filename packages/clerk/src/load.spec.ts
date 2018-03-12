@@ -68,23 +68,21 @@ test('sets valid data on the state when automatically loaded', async () => {
   expect(localStorage.getItem).toHaveBeenLastCalledWith(key);
 });
 
-test('invokes empty creator when there is nothing to load', async () => {
-  const empty = jest.fn(() => ({ kind: 'empty' }));
+test('keeps state unchanged when no data is stored', async () => {
   const configuration: Configuration = {
     name,
     target: Target.Session,
     save: SaveMode.Manual,
     load: LoadMode.Auto,
-    empty,
     path: 'addresses',
     reviver,
   };
 
   sessionStorage.removeItem(getStorageKey(name));
 
-  new Store(state, accept(configuration));
+  const store = new Store(state, accept(configuration));
 
   await new Promise(resolve => setTimeout(() => resolve(), 10));
 
-  expect(empty).toHaveBeenCalledTimes(1);
+  expect(store.history.state.size).toEqual(1);
 });

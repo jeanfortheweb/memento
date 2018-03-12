@@ -1,5 +1,4 @@
 import { Collection } from 'immutable';
-import { Task } from '@memento/store';
 
 export enum SaveMode {
   Auto = 'auto',
@@ -33,5 +32,4 @@ export interface Configuration {
   name: string;
   path: string;
   reviver?: Reviver;
-  empty?: () => Task;
 }

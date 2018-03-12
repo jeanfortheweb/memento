@@ -2,11 +2,10 @@ import { Observable, withLatestFrom, flatMap } from '@reactivex/rxjs';
 import { Record, List } from 'immutable';
 import shortid from 'shortid';
 import { Store } from '@memento/store';
-import createSupervisor, { sequence } from '@memento/supervisor';
+import createSupervisor, { sequence, when } from '@memento/supervisor';
 import createMade, { push, merge, update, set } from '@memento/made';
 import createSnitch, { listen, unlisten } from '@memento/snitch';
 import createClerk, { SaveMode, LoadMode, Target } from '@memento/clerk';
-import * as supervisor from '@memento/supervisor';
 
 // state.
 export class Todo extends Record({
@@ -52,8 +51,6 @@ const store = new Store(new State(), [
     save: SaveMode.Auto,
     load: LoadMode.Auto,
     path: 'todos',
-    empty: () =>
-      sequence(addTodo('Add more features')(), addTodo('Update documentation')()),
     reviver: (key, sequence) => {
       if (typeof key === 'number') {
         return new Todo(sequence);
@@ -63,5 +60,12 @@ const store = new Store(new State(), [
     },
   }),
 ]);
+
+store.assign(
+  when(
+    state => state.todos.size === 0,
+    () => sequence(addTodo('Add more features')(), addTodo('Update documentation')()),
+  ),
+);
 
 export default store;
