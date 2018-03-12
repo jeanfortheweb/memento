@@ -47,9 +47,6 @@ const store = new Store(new State(), [
   createSupervisor(),
   createClerk({
     name: 'todos',
-    target: Target.Local,
-    save: SaveMode.Auto,
-    load: LoadMode.Auto,
     path: 'todos',
     reviver: (key, sequence) => {
       if (typeof key === 'number') {
