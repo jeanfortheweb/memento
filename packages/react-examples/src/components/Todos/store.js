@@ -42,8 +42,12 @@ export const getFilter = state => state.filter;
 // create the store with required workers.
 const store = new Store(new State(), [createSnitch(), createMade(), createSupervisor()]);
 
-// add some default todos.
-store.assign(addTodo('Add more features')());
-store.assign(addTodo('Update documentation')());
+// when we didn't load any todos from local storage, we create some.
+store.assign(
+  when(
+    state => state.todos.size === 0,
+    () => sequence(addTodo('Add more features')(), addTodo('Update documentation')()),
+  ),
+);
 
 export default store;
