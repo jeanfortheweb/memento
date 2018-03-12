@@ -48,7 +48,7 @@ const store = new Store(new State(), [
   createClerk({
     name: 'todos',
     path: 'todos',
-    reviver: createReviver(sequence => sequence.toList().map(todo => new Todo(todo))),
+    reviver: createReviver(data => data.toList().map(todo => new Todo(todo))),
   }),
 ]);
 
