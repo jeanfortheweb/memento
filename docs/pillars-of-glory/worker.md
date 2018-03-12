@@ -118,7 +118,7 @@ store.assign({
 ##### Combining incoming tasks with current state.
 
 Sometimes you want to accept tasks, but also use state data at the same time.
-This is easy, since you can use the `combineLatest` operator of the observable to combine the task you've accepted with the newest state we have.
+This is easy, since you can use the `withLatestFrom` operator of the observable to combine the task you've accepted with the newest state we have.
 
 {% sample lang="js" %}
 
@@ -127,7 +127,7 @@ This is easy, since you can use the `combineLatest` operator of the observable t
 const updateTodoStats = (task$, state$) =>
   task$
     .accept('UPDATE_TODO_STATS')
-    .combineLatest(state$.select(state => state.todos))
+    .withLatestFrom(state$.select(state => state.todos))
     .do([task, todos] => console.log('Updating stats for', todos.toJS()))
     .mapTo(state => state);
 ```
@@ -139,7 +139,7 @@ const updateTodoStats = (task$, state$) =>
 const updateTodoStats: Worker<State> = (task$, state$) =>
   task$
     .accept('UPDATE_TODO_STATS')
-    .combineLatest(state$.select(state => state.todos))
+    .withLatestFrom(state$.select(state => state.todos))
     .do([task, todos] => console.log('Updating stats for', todos.toJS()))
     .mapTo(state => state);
 ```

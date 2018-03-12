@@ -12,12 +12,10 @@ export const accept = <TState extends State>(
   task$: TaskObservable & Observable<Task>,
   state$: StateObservable<TState>,
 ) =>
-  task$.accept(from).mergeMap(task =>
-    Observable.of(task)
-      .combineLatest(state$)
-      .take(1)
-      .map(([task, state]) => task.payload.creator(task.payload.selector(state))),
-  );
+  task$
+    .accept(from)
+    .withLatestFrom(state$)
+    .map(([task, state]) => task.payload.creator(task.payload.selector(state)));
 
 export const from = <TState extends State, TData = any>(
   selector: Selector<TState, TData>,
