@@ -1,6 +1,6 @@
 import { State, Expect, Store } from '@memento/probe';
 import { save, accept, KIND, SaveTask } from './save';
-import { Configuration, Target, SaveMode, LoadMode } from './configuration';
+import { Configuration, Target, SaveMode } from './configuration';
 import { getStorageKey } from './utils';
 
 const name = 'test';
@@ -22,8 +22,6 @@ test('sets valid data on a local storage key when manually saved', async () => {
     name,
     target: Target.Local,
     save: SaveMode.Manual,
-    load: LoadMode.Auto,
-    path: 'addresses',
   };
 
   const store = new Store(state, accept(configuration));
@@ -38,7 +36,7 @@ test('sets valid data on a local storage key when manually saved', async () => {
 
   expect(localStorage.setItem).toHaveBeenLastCalledWith(
     key,
-    JSON.stringify(state.addresses.toJS()),
+    JSON.stringify(state.toJS()),
   );
 });
 
@@ -47,7 +45,6 @@ test('sets valid data on a session storage key when manually saved', async () =>
     name,
     target: Target.Session,
     save: SaveMode.Manual,
-    load: LoadMode.Auto,
     path: 'addresses.0',
   };
 
@@ -72,7 +69,6 @@ test('sets valid data on a local storage key when state changes', async () => {
     name,
     target: Target.Local,
     save: SaveMode.Auto,
-    load: LoadMode.Auto,
     path: 'addresses',
   };
 
@@ -92,7 +88,6 @@ test('sets valid data on a session storage key when state changes', async () => 
     name,
     target: Target.Session,
     save: SaveMode.Auto,
-    load: LoadMode.Auto,
     path: 'addresses',
   };
 
@@ -113,7 +108,6 @@ test('sets valid data on a local storage key in a fixed interval', async () => {
     target: Target.Local,
     save: SaveMode.Interval,
     interval: 500,
-    load: LoadMode.Auto,
     path: 'addresses',
   };
 
@@ -136,7 +130,6 @@ test('sets valid data on a session storage key in a fixed interval', async () =>
     target: Target.Session,
     save: SaveMode.Interval,
     interval: 500,
-    load: LoadMode.Auto,
     path: 'addresses',
   };
 

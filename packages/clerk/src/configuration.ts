@@ -25,11 +25,11 @@ export interface Reviver {
 }
 
 export interface Configuration {
-  load: LoadMode;
-  save: SaveMode;
-  interval?: number;
-  target: Target;
   name: string;
-  path: string;
+  load?: LoadMode;
+  save?: SaveMode;
+  interval?: number;
+  target?: Target;
+  path?: string;
   reviver?: Reviver;
 }

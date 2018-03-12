@@ -12,9 +12,17 @@ export { Configuration, SaveMode, LoadMode, Target, Reviver };
 export default <TState extends State<TStateProps>, TStateProps extends Object>(
   configuration: Configuration,
 ): Worker<TState> => {
+  const configurationWithDefaults: Configuration = {
+    load: LoadMode.Auto,
+    save: SaveMode.Auto,
+    target: Target.Local,
+    interval: 5000,
+    ...configuration,
+  };
+
   return (task$, state$) =>
     Observable.merge(
-      saveAccept<TState>(configuration)(task$, state$),
-      loadAccept<TState>(configuration)(task$, state$),
+      saveAccept<TState>(configurationWithDefaults)(task$, state$),
+      loadAccept<TState>(configurationWithDefaults)(task$, state$),
     );
 };

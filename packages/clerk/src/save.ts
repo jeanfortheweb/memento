@@ -22,14 +22,22 @@ const createSaver = configuration => data => {
   storage.setItem(key, JSON.stringify(data));
 };
 
+const createSelector = configuration => state => {
+  if (configuration.path) {
+    return state.getIn(pathToArray(configuration.path));
+  }
+
+  return state;
+};
+
 export const accept = <TState extends State>(
   configuration: Configuration,
 ): Worker<TState> => (
   task$: TaskObservable & Observable<Task>,
   state$: StateObservable<TState>,
 ) => {
-  const { path, name, interval = 5000 } = configuration;
-  const selector = state => state.getIn(pathToArray(path));
+  const { name, interval = 5000 } = configuration;
+  const selector = createSelector(configuration);
 
   let output$: Observable<Updater<TState> | Task> = task$
     .accept(save)

@@ -1,18 +1,32 @@
 import { State, Expect, Store } from '@memento/probe';
 import { load, accept, KIND, LoadTask } from './load';
-import { Configuration, Target, SaveMode, LoadMode, Reviver } from './configuration';
+import { Configuration, Target, LoadMode, Reviver } from './configuration';
 import { getStorageKey } from './utils';
 
 const name = 'test';
 const key = getStorageKey(name);
 const state = State.defaultState;
 const savedState = state.update('addresses', addresses => addresses.remove(0));
-const reviver: Reviver = (key, sequence, path) => {
+const addressesReviver: Reviver = (key, sequence, path) => {
   if (typeof key === 'number') {
     return new State.Address(sequence);
   }
 
   return sequence.toList();
+};
+
+const stateReviver: Reviver = (key, sequence, path) => {
+  const [root] = path || [undefined];
+
+  if (key === 'addresses') {
+    return sequence.toList();
+  }
+
+  if (typeof key === 'number' && root === 'addresses') {
+    return new State.Address(sequence);
+  }
+
+  return new State(sequence);
 };
 
 beforeAll(() => {
@@ -25,13 +39,13 @@ test('toString() outputs the kind as string', () => {
 });
 
 test('sets valid data on the state when manually loaded', async () => {
+  localStorage.setItem(getStorageKey(name), JSON.stringify(savedState));
+
   const configuration: Configuration = {
     name,
     target: Target.Local,
-    save: SaveMode.Manual,
     load: LoadMode.Manual,
-    path: 'addresses',
-    reviver,
+    reviver: stateReviver,
   };
 
   const store = new Store(state, accept(configuration));
@@ -45,8 +59,6 @@ test('sets valid data on the state when manually loaded', async () => {
     new Expect.StateChange<State>(state, savedState),
   );
 
-  await new Promise(resolve => setTimeout(() => resolve(), 10));
-
   expect(localStorage.getItem).toHaveBeenLastCalledWith(key);
 });
 
@@ -54,10 +66,9 @@ test('sets valid data on the state when automatically loaded', async () => {
   const configuration: Configuration = {
     name,
     target: Target.Session,
-    save: SaveMode.Manual,
     load: LoadMode.Auto,
     path: 'addresses',
-    reviver,
+    reviver: addressesReviver,
   };
 
   const store = new Store(state, accept(configuration));
@@ -72,10 +83,9 @@ test('keeps state unchanged when no data is stored', async () => {
   const configuration: Configuration = {
     name,
     target: Target.Session,
-    save: SaveMode.Manual,
     load: LoadMode.Auto,
     path: 'addresses',
-    reviver,
+    reviver: addressesReviver,
   };
 
   sessionStorage.removeItem(getStorageKey(name));

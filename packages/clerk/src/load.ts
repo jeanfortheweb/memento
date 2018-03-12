@@ -21,8 +21,17 @@ const createLoader = (configuration: Configuration) => () => {
   const key = getStorageKey(name);
   const data = JSON.parse(storage.getItem(key) as string);
 
-  return state =>
-    data !== null ? state.setIn(pathToArray(path), fromJS(data, reviver)) : state;
+  return state => {
+    if (data === null) {
+      return state;
+    }
+
+    if (path) {
+      return state.setIn(pathToArray(path), fromJS(data, reviver));
+    }
+
+    return fromJS(data, reviver);
+  };
 };
 
 export const accept = <TState extends State>(
