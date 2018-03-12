@@ -5,7 +5,8 @@ import { Store } from '@memento/store';
 import createSupervisor, { sequence, when } from '@memento/supervisor';
 import createMade, { push, merge, update, set } from '@memento/made';
 import createSnitch, { listen, unlisten } from '@memento/snitch';
-import createClerk, { createReviver, SaveMode, LoadMode, Target } from '@memento/clerk';
+import createClerk, { SaveMode, LoadMode, Target } from '@memento/clerk';
+import createReviver from '@memento/reviver';
 
 // state.
 export class Todo extends Record({

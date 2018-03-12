@@ -1,7 +1,8 @@
 import { State, Expect, Store } from '@memento/probe';
+import createReviver from '@memento/reviver';
 import { load, accept, KIND, LoadTask } from './load';
 import { Configuration, Target, LoadMode } from './configuration';
-import { getStorageKey, createReviver } from './utils';
+import { getStorageKey } from './utils';
 
 const name = 'test';
 const key = getStorageKey(name);

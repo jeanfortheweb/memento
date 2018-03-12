@@ -16,14 +16,6 @@ export enum Target {
   Session = 'session',
 }
 
-export interface Reviver<T = any> {
-  (
-    key: string | number,
-    sequence: Collection.Keyed<string, any> | Collection.Indexed<any>,
-    path?: Array<string | number>,
-  ): T;
-}
-
 export interface Configuration {
   name: string;
   load?: LoadMode;
@@ -31,5 +23,9 @@ export interface Configuration {
   interval?: number;
   target?: Target;
   path?: string;
-  reviver?: Reviver;
+  reviver?: (
+    key: string | number,
+    sequence: Collection.Keyed<string, any> | Collection.Indexed<any>,
+    path?: Array<string | number>,
+  ) => any;
 }
