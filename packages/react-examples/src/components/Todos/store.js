@@ -2,9 +2,11 @@ import { Observable, withLatestFrom, flatMap } from '@reactivex/rxjs';
 import { Record, List } from 'immutable';
 import shortid from 'shortid';
 import { Store } from '@memento/store';
-import createSupervisor, { sequence } from '@memento/supervisor';
+import createSupervisor, { sequence, when } from '@memento/supervisor';
 import createMade, { push, merge, update, set } from '@memento/made';
 import createSnitch, { listen, unlisten } from '@memento/snitch';
+import createClerk, { SaveMode, LoadMode, Target } from '@memento/clerk';
+import createReviver from '@memento/reviver';
 
 // state.
 export class Todo extends Record({
@@ -40,10 +42,23 @@ export const getTodoText = state => state.text;
 export const getFilter = state => state.filter;
 
 // create the store with required workers.
-const store = new Store(new State(), [createSnitch(), createMade(), createSupervisor()]);
+const store = new Store(new State(), [
+  createSnitch(),
+  createMade(),
+  createSupervisor(),
+  createClerk({
+    name: 'todos',
+    path: 'todos',
+    reviver: createReviver(data => data.toList().map(todo => new Todo(todo))),
+  }),
+]);
 
-// add some default todos.
-store.assign(addTodo('Add more features')());
-store.assign(addTodo('Update documentation')());
+// when we didn't load any todos from local storage, we create some.
+store.assign(
+  when(
+    state => state.todos.size === 0,
+    () => sequence(addTodo('Add more features')(), addTodo('Update documentation')()),
+  ),
+);
 
 export default store;
