@@ -12,7 +12,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["flux", "state management"],
+  "keywords": [
+    "flux",
+    "state management"
+  ],
   "author": "jeanfortheweb",
   "devDependencies": {
     "@types/jest": "^22.1.1",
@@ -30,7 +33,10 @@
     "transform": {
       "^.+\\.ts$": "ts-jest"
     },
-    "moduleFileExtensions": ["ts", "js"],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
     "testRegex": "\\.spec\\.ts$"
   }
 }
