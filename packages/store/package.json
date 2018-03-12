@@ -2,6 +2,7 @@
   "name": "@memento/store",
   "version": "0.0.1",
   "license": "MIT",
+  "description": "Declarative and efficient state management without boilerplate",
   "main": "es5/index.js",
   "types": "es5/index.d.ts",
   "scripts": {

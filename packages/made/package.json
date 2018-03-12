@@ -1,6 +1,7 @@
 {
   "name": "@memento/made",
   "version": "0.0.1",
+  "description": "State manipulation utlities for memento",
   "license": "MIT",
   "main": "es5/index.js",
   "types": "es5/index.d.ts",

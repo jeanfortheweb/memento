@@ -1,6 +1,7 @@
 {
   "name": "@memento/clerk",
   "version": "0.0.1",
+  "description": "Local and session storage management for memento",
   "license": "MIT",
   "main": "es5/index.js",
   "types": "es5/index.d.ts",

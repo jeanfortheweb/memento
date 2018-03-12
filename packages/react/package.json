@@ -2,6 +2,7 @@
   "name": "@memento/react",
   "version": "0.0.1",
   "license": "MIT",
+  "description": "React bindings for memento",
   "main": "es5/index.js",
   "types": "es5/index.d.ts",
   "scripts": {
