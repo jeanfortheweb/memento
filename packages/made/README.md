@@ -1,8 +1,8 @@
-# Memento/Made - State Manipulation Tools
+# Memento/Made - You Mate to get your State made
 
 [![Build Status](https://travis-ci.org/jeanfortheweb/memento.svg?branch=master)](https://travis-ci.org/jeanfortheweb/memento) [![Maintainability](https://api.codeclimate.com/v1/badges/5494041ca69fd977cae6/maintainability)](https://codeclimate.com/github/jeanfortheweb/memento/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/5494041ca69fd977cae6/test_coverage)](https://codeclimate.com/github/jeanfortheweb/memento/test_coverage)
 
-Made is a standard library for memento, your mate to get your state made. It gives you a good variety of task creators to manipulate your state in a pure and functional way without the need for custom tasks and/or workers.
+Made is a standard library for memento. It gives you a good variety of task creators to manipulate your state in a pure and functional way without the need for custom tasks and/or workers.
 
 ## Documentation
 
