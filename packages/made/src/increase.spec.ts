@@ -41,20 +41,3 @@ test('produces the expected output state when passing numeric delta value', asyn
     ),
   );
 });
-
-test('produces the expected output state when passing path as delta value', async () => {
-  await assign(
-    increase('port', 'port'),
-    new Expect.TaskAssignment<State, IncreaseTask>({
-      kind: KIND,
-      payload: {
-        path: 'port',
-        delta: 'port',
-      },
-    }),
-    new Expect.StateChange<State>(
-      defaultState,
-      defaultState.set('port', defaultState.port + defaultState.port),
-    ),
-  );
-});
