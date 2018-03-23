@@ -49,5 +49,5 @@ ReactDOM.render(<App />, document.getElementById('#app'));
 To use Memento with Snitch and React, you'll need to install at least:
 
 ```sh
-yarn install @memento/store @memento/react @memento/snitch immutable
+yarn install @memento/store @memento/react @memento/snitch immutable react react-dom
 ```
