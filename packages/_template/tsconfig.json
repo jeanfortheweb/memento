@@ -10,7 +10,9 @@
     "noImplicitThis": false,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "sourceMap": true,
+    "importHelpers": true
   },
   "include": ["src", "node_modules/@types"]
 }
