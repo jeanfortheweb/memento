@@ -7,6 +7,9 @@ import {
   ModelCreator,
   ViewCreators,
   DefaultViewCreators,
+  ViewComponentClasses,
+  Output,
+  Input,
 } from './core';
 import { view } from '.';
 import { Observable } from 'rxjs';
@@ -58,43 +61,65 @@ export default function model<
 export default function model(inputCreator, outputCreator, viewCreators?) {
   return function create(options?) {
     const input = inputCreator(options as any);
-
-    let output = outputCreator(input, options as any);
-    let views = {};
-
-    if (viewCreators) {
-      views = Object.keys(viewCreators).reduce(
-        (views, name) => ({
-          ...views,
-          [name]: viewCreators[name](input, output),
-        }),
-        {},
-      ) as any;
-    }
-
-    if (Object.keys(views).length === 0) {
-      views = {
-        View: defaultView(input, output),
-      };
-    }
-
-    if (output instanceof Observable) {
-      output = output.pipe(distinctUntilChanged());
-    } else {
-      output = Object.keys(output).reduce((mapped: any, name) => {
-        let output$ = output[name].pipe(distinctUntilChanged());
-
-        return {
-          ...mapped,
-          [name]: output$,
-        };
-      }, {});
-    }
+    const output = makeOutput(outputCreator, input, options);
+    const views = makeViews(input, output, viewCreators);
 
     return {
       input,
       output,
-      ...(views as any),
+      ...views,
     };
   };
+}
+
+function makeOutput<TInput, TOutput, TOptions>(
+  outputCreator: OutputCreator<TInput, TOutput, TOptions>,
+  input: Input<TInput>,
+  options: TOptions,
+): Output<any> {
+  let output: Output<TOutput> | Observable<TOutput> = outputCreator(
+    input,
+    options as any,
+  );
+
+  if (output instanceof Observable) {
+    output = output.pipe(distinctUntilChanged());
+  } else {
+    output = Object.keys(output).reduce((mapped: any, name) => {
+      let output$ = output[name].pipe(distinctUntilChanged());
+
+      return {
+        ...mapped,
+        [name]: output$,
+      };
+    }, {});
+  }
+
+  return output;
+}
+
+function makeViews(
+  input,
+  output,
+  viewCreators?: ViewCreators,
+): ViewComponentClasses<ViewCreators> {
+  let views = {};
+
+  if (viewCreators) {
+    views = Object.keys(viewCreators).reduce(
+      (views, name) => ({
+        ...views,
+        [name]: viewCreators[name](input, output),
+      }),
+      {},
+    ) as any;
+  }
+
+  if (Object.keys(views).length === 0) {
+    views = {
+      View: defaultView(input, output),
+    };
+  }
+
+  return views;
 }

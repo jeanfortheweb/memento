@@ -9,6 +9,7 @@ export default function connect<
 >(
   modelA: Model<TInputA, TOutputA>,
   modelB: Model<TInputB, TOutputB>,
+  bidirectional?: false,
 ): Connection;
 
 export default function connect<
@@ -32,20 +33,19 @@ export default function connect<
   modelB: Model<TInputB, TOutputB>,
   bidirectional?,
 ): Connection {
-  let subscriptions: Subscription[] = Object.keys(modelB.input)
-    .filter(name => modelA.output[name])
-    .map(name => modelA.output[name].subscribe(modelB.input[name]));
+  let subscriptions = subscribeTo(modelA, modelB);
 
   if (bidirectional) {
-    subscriptions = [
-      ...subscriptions,
-      ...Object.keys(modelA.input)
-        .filter(name => modelB.output[name])
-        .map(name => modelB.output[name].subscribe(modelA.input[name])),
-    ];
+    subscriptions = [...subscriptions, ...subscribeTo(modelB, modelA)];
   }
 
   return () => {
     subscriptions.forEach(subscription => subscription.unsubscribe());
   };
+}
+
+function subscribeTo(modelA: Model, modelB: Model): Subscription[] {
+  return Object.keys(modelB.input)
+    .filter(name => modelA.output[name])
+    .map(name => modelA.output[name].subscribe(modelB.input[name]));
 }
