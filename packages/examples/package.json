@@ -6,8 +6,8 @@
   "types": "es5/index.d.ts",
   "scripts": {
     "start:javascript:counter": "parcel ./src/javascript/counter/index.html",
-    "start:javascript:default-views":
-      "parcel ./src/javascript/default-views/index.html",
+    "start:javascript:default-views": "parcel ./src/javascript/default-views/index.html",
+    "start:javascript:connections": "parcel ./src/javascript/connections/index.html",
     "test": "jest",
     "coverage": "jest --coverage",
     "analyze": "codeclimate analyze",
@@ -16,7 +16,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["flux", "state management"],
+  "keywords": [
+    "flux",
+    "state management"
+  ],
   "author": "jeanfortheweb",
   "devDependencies": {
     "@types/jest": "22.2.2",
@@ -33,14 +36,18 @@
     "react-dom": "^16.3.1",
     "rxjs": "beta",
     "semantic-ui-css": "^2.3.1",
-    "semantic-ui-react": "^0.79.1"
+    "semantic-ui-react": "^0.79.1",
+    "shortid": "^2.2.8"
   },
   "jest": {
     "bail": true,
     "transform": {
       "^.+\\.ts$": "ts-jest"
     },
-    "moduleFileExtensions": ["ts", "js"],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
     "testRegex": "\\.spec\\.ts$"
   }
 }
