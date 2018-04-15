@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, shareReplay } from 'rxjs/operators';
+import { shareReplay } from 'rxjs/operators';
 import view from './view';
 import {
   InputCreator,
