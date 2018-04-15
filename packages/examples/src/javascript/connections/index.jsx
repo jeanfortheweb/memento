@@ -2,7 +2,6 @@ import 'semantic-ui-css/semantic.min.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { connect } from '@memento/memento';
 import {
   Container,
   Button,
@@ -16,35 +15,7 @@ import {
   Form,
 } from 'semantic-ui-react';
 
-import contacts from './models/contacts';
-import form from './models/form';
-
-// create model instances.
-const ContactsModel = contacts();
-const FormModel = form();
-
-// create some default contacts.
-ContactsModel.input.create.next({
-  firstName: 'Jean',
-  lastName: 'For The Web',
-  phone: '12345',
-});
-
-ContactsModel.input.create.next({
-  firstName: 'Bill',
-  lastName: 'Gates',
-  phone: '78910',
-});
-
-// create a bidirectional connection between contacts and form.
-// that will connect:
-//
-// Contacts::selected -> Form::selected
-// Contacts::contacts -> Form::contacts
-// Contacts::create   <- Form::create
-// Contacts::update   <- Form::update
-// Contacts::select   <- Form::select
-connect(ContactsModel, FormModel, true);
+import { ContactsModel, FormModel } from './models';
 
 const InfoBox = () => (
   <Message icon info>
