@@ -12,7 +12,7 @@
       "ignore": "@memento/---"
     },
     "run": {
-      "ignore": ["@memento/---"]
+      "ignore": ["@memento/---", "@memento/examples"]
     }
   }
 }
