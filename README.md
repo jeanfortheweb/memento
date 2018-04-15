@@ -2,52 +2,61 @@
 
 [![Build Status](https://travis-ci.org/jeanfortheweb/memento.svg?branch=master)](https://travis-ci.org/jeanfortheweb/memento) [![Maintainability](https://api.codeclimate.com/v1/badges/5494041ca69fd977cae6/maintainability)](https://codeclimate.com/github/jeanfortheweb/memento/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/5494041ca69fd977cae6/test_coverage)](https://codeclimate.com/github/jeanfortheweb/memento/test_coverage)
 
-Memento is a state management library which is mainly aims to be used with react. It has four main goals in mind:
+Memento is a state management library designed for react. It's API is inspired by MVVM and Flux patterns.
+Mementos goals are:
 
-* **DRY** Other popular libraries tend to produce heavy boilerplate, even for the simplest things. Memento avoids that with several techniques but also with standard tools which let you express most of the common and also more advanced needs without any real boilerplate. On the other hand, custom solutions and tools share the same aspects: easy to write, none to almost no boilerplate.
-* **Declarative** Libraries these days tend to split business logic into alls kinds of separations and often end in so called "Higher Order Components" which tend to hide and complicate things. They are often hard to follow when stacked and can even create conflicts. Memento does not use or need a single "Higher Order Component", but it still lets you express any variety of views or actions, just in place. It is always easy to reason about where values come from and where they go. Conflicts are basically impossible.
-* **Modular** Unlike others, Memento embraces the idea of multiple stores. Whenever it makes sense to isolate data into a separate store you can and should do so. This makes it incredible easy to write isolated application parts which really work without any external dependency. Even the standard tools coming with Memento are clever isolated so that you only include what you need and nothing more (or less!).
-* **Efficient** Memento makes it somewhat hard to mess up your props or selectors in a way that your component render performance goes down. This comes from it simple patterns, glued together in an intelligent way, taking away the computation logic spread over files and lets you focus on the actual problems.
+* **Scalable** Based on a well designed functional approach which defaults for most common use cases, you will never have to write tons of boilerplate code for the simplest things again. On the other hand, the connection design of Memento allows you to easily extend the features of your app.
+* **Predictable** Using pure rxjs observables as the base for input and output interaction, your business logic and state gets more predictable and since we take advantage of rxjs, we also get the full power of managed async data flow and a declarative way.
+* **Efficient** Views in Memento are bound to distinct observables which allows it to rerender components only when they really have to.
 
 ## Documentation
 
-You can find the memento documentation at [memento.js.org](http://memento.js.org).
-Currently, it's incomplete but already covers some fundamentals of memento. In the meantime, don't forget to checkout our examples for more information.
+The documentation is currently out of date and will be updated soon. Until then, checkout the examples package in this repository.
 
 ## Examples
 
-The [react examples](https://github.com/jeanfortheweb/memento/tree/master/packages/react-examples) are our playground for new features and showing off alot of mementos power, but to give you a minimal glimpse:
+The can be found in our [examples](https://github.com/jeanfortheweb/memento/tree/master/packages/examples) package. It's our playground for new features and showing off alot of Mementos power. But to give you a glimpse of the most basic usage:
 
-```js
-import { Store } from '@memento/store';
-import { View } from '@memento/react';
-import { Record } from 'immutable';
+```jsx
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Subject } from 'rxjs';
+import { model, state } from '@memento/memento';
 
-class State extends Record({
-  message: 'Hello World',
-}) {}
+const counter = model(
+  () => ({
+    increment: new Subject(),
+    decrement: new Subject(),
+  }),
 
-const store = new Store(new State(), []);
-
-const App = () => (
-  <View
-    store={store}
-    message={state => state.message}
-    compute={props => props.message.toUpperCase()}
-  >
-    {yelledMessage => <div>{yelledMessage}</div>}
-  </View>
+  input =>
+    state(
+      0,
+      state.action(input.increment, () => count => count + 1),
+      state.action(input.decrement, () => count => count - 1),
+    ),
 );
 
-ReactDOM.render(<App />, document.getElementById('#app'));
+const Counter = counter();
+
+ReactDOM.render(
+  <Counter.View>
+    {(actions, count) => (
+      <>
+        <span>Count: {count}</span>
+        <div>
+          <button onClick={actions.increment}>Increment</button>
+          <button onClick={actions.decrement}>Decrement</button>
+        </div>
+      </>
+    )}
+  </Counter.View>,
+  document.getElementById('#app'),
+);
 ```
 
 ## Installation
 
-To use Memento with React, you'll need to install at least:
-
 ```sh
-yarn install @memento/store @memento/react immutable react react-dom
+yarn install @memento/memento
 ```
