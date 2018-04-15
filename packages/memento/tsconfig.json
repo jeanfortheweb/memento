@@ -6,6 +6,7 @@
     "outDir": "./es5",
     "declaration": true,
     "strict": true,
+    "jsx": "react",
     "noImplicitAny": false,
     "noImplicitThis": false,
     "strictNullChecks": true,

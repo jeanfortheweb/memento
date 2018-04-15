@@ -52,6 +52,12 @@ export interface ViewProps<TActions, TData> {
   children(actions: TActions, data: TData): ReactNode;
 }
 
+export interface ViewState<TActions, TData> {
+  actions: TActions;
+  data: TData;
+  data$: Observable<TData>;
+}
+
 export interface ViewCreator<
   TInput = any,
   TOutput = any,

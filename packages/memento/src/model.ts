@@ -1,7 +1,7 @@
-import { distinctUntilChanged } from 'rxjs/operators';
-import { ReactNode } from 'react';
+import { Observable } from 'rxjs';
+import { distinctUntilChanged, shareReplay } from 'rxjs/operators';
+import view from './view';
 import {
-  Actions,
   InputCreator,
   OutputCreator,
   ModelCreator,
@@ -11,27 +11,6 @@ import {
   Output,
   Input,
 } from './core';
-import { view } from '.';
-import { Observable } from 'rxjs';
-
-function defaultView(input, output) {
-  const mapInputToActions = input =>
-    Object.keys(input).reduce(
-      (actions, name) => ({
-        ...actions,
-        [name]: value => input[name].next(value),
-      }),
-      {},
-    );
-
-  const mapOutputToData = output => output;
-
-  return view(mapInputToActions, mapOutputToData)(input, output);
-}
-
-export interface ConnectProps<I extends {}, O extends {}> {
-  children: (inputs: Actions<I>, outputs: O) => ReactNode;
-}
 
 export default function model<TInput, TOutput>(
   inputCreator: InputCreator<TInput, never>,
@@ -54,8 +33,9 @@ export default function model<
   TOptions,
   TViewCreators extends ViewCreators
 >(
-  inputCreator: InputCreator<TInput, never>,
-  outputCreator: OutputCreator<TInput, TOutput, never>,
+  inputCreator: InputCreator<TInput, TOptions>,
+  outputCreator: OutputCreator<TInput, TOutput, TOptions>,
+  viewCreators: TViewCreators,
 ): ModelCreator<TInput, TOutput, TOptions, TViewCreators>;
 
 export default function model(inputCreator, outputCreator, viewCreators?) {
@@ -86,7 +66,7 @@ function makeOutput<TInput, TOutput, TOptions>(
     output = output.pipe(distinctUntilChanged());
   } else {
     output = Object.keys(output).reduce((mapped: any, name) => {
-      let output$ = output[name].pipe(distinctUntilChanged());
+      let output$ = output[name].pipe(distinctUntilChanged(), shareReplay(1));
 
       return {
         ...mapped,
@@ -117,7 +97,7 @@ function makeViews(
 
   if (Object.keys(views).length === 0) {
     views = {
-      View: defaultView(input, output),
+      View: view.passthrough()(input, output),
     };
   }
 
