@@ -1,4 +1,4 @@
-import { Model, Merge, Connection } from './core';
+import { Model, Merge, Disconnect } from './core';
 import { Subscription } from 'rxjs';
 
 export default function connect<
@@ -10,7 +10,7 @@ export default function connect<
   modelA: Model<TInputA, TOutputA>,
   modelB: Model<TInputB, TOutputB>,
   bidirectional?: false,
-): Connection;
+): Disconnect;
 
 export default function connect<
   TInputA extends Merge<TInputA, TOutputB>,
@@ -21,7 +21,7 @@ export default function connect<
   modelA: Model<TInputA, TOutputA>,
   modelB: Model<TInputB, TOutputB>,
   bidirectional: true,
-): Connection;
+): Disconnect;
 
 export default function connect<
   TInputA,
@@ -32,7 +32,7 @@ export default function connect<
   modelA: Model<TInputA, TOutputA>,
   modelB: Model<TInputB, TOutputB>,
   bidirectional?,
-): Connection {
+): Disconnect {
   let subscriptions = subscribeTo(modelA, modelB);
 
   if (bidirectional) {

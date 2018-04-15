@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Subject, merge, Subscription, Observable } from 'rxjs';
+import { Subject, merge, Observable } from 'rxjs';
 import { startWith, delay } from 'rxjs/operators';
 import { configure, mount } from 'enzyme';
 import * as Adapter from 'enzyme-adapter-react-16';

@@ -118,7 +118,7 @@ export type ViewComponentClasses<TViewCreators extends ViewCreators> = {
   >
 };
 
-export interface Connection {
+export interface Disconnect {
   (): void;
 }
 

@@ -1,6 +1,5 @@
 import { state } from './helpers';
 import { Subject, Observable } from 'rxjs';
-import { mapTo } from 'rxjs/operators';
 
 function getStateValue<T>(state$: Observable<T>): Promise<T> {
   return new Promise(resolve => {
