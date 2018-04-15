@@ -1,0 +1,41 @@
+{
+  "name": "@memento/examples",
+  "version": "2.0.0",
+  "license": "MIT",
+  "main": "es5/index.js",
+  "types": "es5/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "analyze": "codeclimate analyze",
+    "prepublish": "tsc --p ./tsconfig.publish.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": ["flux", "state management"],
+  "author": "jeanfortheweb",
+  "devDependencies": {
+    "@types/jest": "22.2.2",
+    "jest": "22.4.3",
+    "ts-jest": "22.4.2",
+    "tslib": "1.9.0",
+    "typescript": "2.8.1"
+  },
+  "dependencies": {
+    "@memento/memento": "2.0.0",
+    "immutable": "4.0.0-rc.9",
+    "parcel-bundler": "^1.7.0",
+    "react": "^16.3.1",
+    "react-dom": "^16.3.1",
+    "rxjs": "beta"
+  },
+  "jest": {
+    "bail": true,
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "moduleFileExtensions": ["ts", "js"],
+    "testRegex": "\\.spec\\.ts$"
+  }
+}
