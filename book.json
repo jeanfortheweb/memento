@@ -1,7 +1,7 @@
 {
   "root": "./docs",
   "title": "Memento Documentation",
-  "plugins": ["theme-api", "github", "anchorjs", "edit-link"],
+  "plugins": ["github", "anchorjs", "edit-link"],
   "pluginsConfig": {
     "github": {
       "url": "https://github.com/jeanfortheweb/memento"
@@ -17,23 +17,6 @@
     "edit-link": {
       "base": "https://www.gitbook.com/book/jeanfortheweb/memento/tree/master",
       "label": "Edit This Page"
-    },
-    "theme-api": {
-      "split": true,
-      "theme": "dark",
-      "family": "sans",
-      "size": 3,
-      "languages": [
-        {
-          "lang": "redux",
-          "name": "Redux",
-          "default": true
-        },
-        {
-          "lang": "memento",
-          "name": "Memento"
-        }
-      ]
     }
   }
 }
