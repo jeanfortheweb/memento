@@ -20,6 +20,7 @@ The can be found in our [examples](https://github.com/jeanfortheweb/memento/tree
 ```jsx
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Subject } from 'rxjs';
 import { model, state } from '@memento/memento';
 
 const counter = model(
