@@ -15,7 +15,7 @@ The documentation is currently out of date and will be updated soon. Until then,
 
 ## Examples
 
-The can be found in our [examples](https://github.com/jeanfortheweb/memento/tree/master/packages/examples) package. It's our playground for new features and showing off alot of Mementos power. But to give you a glimpse of the most basic usage:
+Our examples can be found in our [examples](https://github.com/jeanfortheweb/memento/tree/master/packages/examples) package. It's our playground for new features and showing off alot of Mementos power. But to give you a glimpse of the most basic usage:
 
 ```jsx
 import React from 'react';
@@ -51,7 +51,7 @@ ReactDOM.render(
       </>
     )}
   </Counter.View>,
-  document.getElementById('#app'),
+  document.getElementById('app'),
 );
 ```
 
