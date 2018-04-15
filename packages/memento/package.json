@@ -7,15 +7,13 @@
   "scripts": {
     "test": "jest",
     "coverage": "jest --coverage",
+    "analyze": "codeclimate analyze",
     "prepublish": "tsc --p ./tsconfig.publish.json"
   },
   "publishConfig": {
     "access": "public"
   },
-  "keywords": [
-    "flux",
-    "state management"
-  ],
+  "keywords": ["flux", "state management"],
   "author": "jeanfortheweb",
   "devDependencies": {
     "@types/enzyme": "^3.1.9",
@@ -39,11 +37,7 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
+    "moduleFileExtensions": ["ts", "tsx", "js"],
     "testRegex": "\\.spec\\.tsx?$"
   }
 }
