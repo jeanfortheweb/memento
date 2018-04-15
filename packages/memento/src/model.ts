@@ -98,6 +98,8 @@ function makeViews(
   if (Object.keys(views).length === 0) {
     views = {
       View: view.passthrough()(input, output),
+      ActionView: view.passthrough(true, false)(input, output),
+      DataView: view.passthrough(false, true)(input, output),
     };
   }
 
