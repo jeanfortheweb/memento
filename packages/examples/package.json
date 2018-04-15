@@ -5,7 +5,7 @@
   "main": "es5/index.js",
   "types": "es5/index.d.ts",
   "scripts": {
-    "start:counter": "parcel ./src/javascript/counter/index.html",
+    "start:javascript:counter": "parcel ./src/javascript/counter/index.html",
     "test": "jest",
     "coverage": "jest --coverage",
     "analyze": "codeclimate analyze",
