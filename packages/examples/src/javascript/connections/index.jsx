@@ -20,17 +20,17 @@ import contacts from './models/contacts';
 import form from './models/form';
 
 // create model instances.
-const Contacts = contacts();
-const EditForm = form();
+const ContactsModel = contacts();
+const FormModel = form();
 
 // create some default contacts.
-Contacts.input.create.next({
+ContactsModel.input.create.next({
   firstName: 'Jean',
   lastName: 'For The Web',
   phone: '12345',
 });
 
-Contacts.input.create.next({
+ContactsModel.input.create.next({
   firstName: 'Bill',
   lastName: 'Gates',
   phone: '78910',
@@ -44,7 +44,7 @@ Contacts.input.create.next({
 // Contacts::create   <- Form::create
 // Contacts::update   <- Form::update
 // Contacts::select   <- Form::select
-connect(Contacts, EditForm, true);
+connect(ContactsModel, FormModel, true);
 
 const InfoBox = () => (
   <Message icon info>
@@ -56,79 +56,121 @@ const InfoBox = () => (
         These two models are connected to each other bidirectionally. Check our
         the documentation for connections to learn more!
       </p>
-      <p>
-        Please note that this example has not been optimized for performance. We
-        are only using default views and functional components. The focus of
-        this example is on the connection feature.
-      </p>
     </Message.Content>
   </Message>
 );
 
-const ContactListItem = ({ contact, selected, actions }) => (
-  <List.Item active={selected === contact.id}>
-    <List.Content
-      as="a"
-      floated="left"
-      onClick={() => actions.select(contact.id)}
-    >
-      {contact.firstName}
-    </List.Content>
-    <List.Content floated="right">
-      <Icon
-        name="trash"
-        color="red"
-        onClick={() => actions.remove(contact.id)}
-      />
-    </List.Content>
-  </List.Item>
+const ContactList = () => (
+  <Segment>
+    <List divided selection verticalAlign="middle">
+      <ContactsModel.List>
+        {(actions, data) =>
+          data.contacts.map(contact => (
+            <Contact
+              key={contact.id}
+              contact={contact}
+              selected={data.selected === contact.id}
+              onSelect={actions.onSelect}
+              onRemoveClick={actions.onRemoveClick}
+            />
+          ))
+        }
+      </ContactsModel.List>
+    </List>
+  </Segment>
 );
 
-const ContactEditForm = ({ actions, data }) => (
-  <div>
-    <Form as={Segment} clearing attached="top">
-      <Form.Group widths="equal">
-        <Form.Input
-          fluid
-          label="First name"
-          placeholder="First name"
-          onChange={event => actions.change(['firstName', event.target.value])}
-          value={data.contact.firstName}
-        />
-        <Form.Input
-          fluid
-          label="Last name"
-          placeholder="Last name"
-          onChange={event => actions.change(['lastName', event.target.value])}
-          value={data.contact.lastName}
-        />
-        <Form.Input
-          fluid
-          label="Phone"
-          placeholder="Phone"
-          onChange={event => actions.change(['phone', event.target.value])}
-          value={data.contact.phone}
-        />
-      </Form.Group>
-    </Form>
-    <Button.Group attached="bottom">
-      <Button
-        disabled={data.valid}
-        primary
-        icon
-        labelPosition="left"
-        onClick={actions.save}
-      >
-        <Icon name="save" />
-        Save
-      </Button>
+class Contact extends React.PureComponent {
+  constructor(props) {
+    super(props);
 
-      <Button primary icon labelPosition="left" onClick={actions.clear}>
-        <Icon name="file" />
-        New
-      </Button>
-    </Button.Group>
-  </div>
+    this.onSelect = this.onSelect.bind(this);
+    this.onRemoveClick = this.onRemoveClick.bind(this);
+  }
+
+  onSelect() {
+    this.props.onSelect(this.props.contact.id);
+  }
+
+  onRemoveClick() {
+    this.props.onRemoveClick(this.props.contact.id);
+  }
+
+  render() {
+    const { contact, selected, onSelect, onRemoveClick } = this.props;
+
+    return (
+      <List.Item active={selected}>
+        <List.Content as="a" floated="left" onClick={this.onSelect}>
+          {contact.lastName}, {contact.firstName}
+        </List.Content>
+        <List.Content floated="right">
+          <Icon name="trash" color="red" onClick={this.onRemoveClick} />
+        </List.Content>
+      </List.Item>
+    );
+  }
+}
+
+const ContactForm = () => (
+  <FormModel.Form>
+    {(actions, data) => (
+      <Form as={Segment} clearing attached="top">
+        <Form.Group widths="equal">
+          <Form.Input
+            fluid
+            label="First name"
+            placeholder="First name"
+            onChange={actions.onChangeFirstName}
+            value={data.contact.firstName}
+          />
+          <Form.Input
+            fluid
+            label="Last name"
+            placeholder="Last name"
+            onChange={actions.onChangeLastName}
+            value={data.contact.lastName}
+          />
+          <Form.Input
+            fluid
+            label="Phone"
+            placeholder="Phone"
+            onChange={actions.onChangePhone}
+            value={data.contact.phone}
+          />
+        </Form.Group>
+      </Form>
+    )}
+  </FormModel.Form>
+);
+
+const ContactFormActions = () => (
+  <FormModel.Actions>
+    {(actions, data) => (
+      <Button.Group attached="bottom">
+        <Button
+          disabled={data.valid}
+          primary
+          icon
+          labelPosition="left"
+          onClick={actions.onSaveClick}
+        >
+          <Icon name="save" />
+          Save
+        </Button>
+
+        <Button
+          primary
+          icon
+          labelPosition="left"
+          onClick={actions.onClearClick}
+        >
+          <Icon name="file" />
+          New
+        </Button>
+      </Button.Group>
+    )}
+  </FormModel.Actions>
 );
 
 ReactDOM.render(
@@ -141,29 +183,11 @@ ReactDOM.render(
 
         <Grid>
           <Grid.Column width={6}>
-            <Segment>
-              <List divided selection verticalAlign="middle">
-                <Contacts.View>
-                  {(actions, data) =>
-                    data.contacts.map(contact => (
-                      <ContactListItem
-                        contact={contact}
-                        selected={data.selected}
-                        actions={actions}
-                        key={contact.id}
-                      />
-                    ))
-                  }
-                </Contacts.View>
-              </List>
-            </Segment>
+            <ContactList />
           </Grid.Column>
           <Grid.Column width={10}>
-            <EditForm.View>
-              {(actions, data) => (
-                <ContactEditForm actions={actions} data={data} />
-              )}
-            </EditForm.View>
+            <ContactForm />
+            <ContactFormActions />
           </Grid.Column>
         </Grid>
       </Grid.Column>
