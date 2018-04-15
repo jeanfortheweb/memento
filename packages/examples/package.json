@@ -6,6 +6,8 @@
   "types": "es5/index.d.ts",
   "scripts": {
     "start:javascript:counter": "parcel ./src/javascript/counter/index.html",
+    "start:javascript:default-views":
+      "parcel ./src/javascript/default-views/index.html",
     "test": "jest",
     "coverage": "jest --coverage",
     "analyze": "codeclimate analyze",

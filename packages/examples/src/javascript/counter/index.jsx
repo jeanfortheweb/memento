@@ -37,7 +37,7 @@ ReactDOM.render(
             </p>
             <p>
               To see how you can optimize views for both - usage and performance
-              - checkout the other examples.
+              - checkout the "default-views" example.
             </p>
           </Message.Content>
         </Message>
