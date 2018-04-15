@@ -63,10 +63,10 @@ function makeOutput<TInput, TOutput, TOptions>(
   );
 
   if (output instanceof Observable) {
-    output = output.pipe(shareReplay(1), distinctUntilChanged());
+    output = output.pipe(shareReplay(1));
   } else {
     output = Object.keys(output).reduce((mapped: any, name) => {
-      let output$ = output[name].pipe(shareReplay(1), distinctUntilChanged());
+      let output$ = output[name].pipe(shareReplay(1));
 
       output$.subscribe(() => {});
 
