@@ -11,7 +11,7 @@ Mementos goals are:
 
 ## Documentation
 
-The documentation is currently out of date and will be updated soon. Until then, checkout the examples package in this repository.
+You can find our official documentation at [memento.js.org](https://memento.js.org) or in this [repository](https://github.com/jeanfortheweb/memento/blob/master/docs/SUMMARY.md).
 
 ## Examples
 
