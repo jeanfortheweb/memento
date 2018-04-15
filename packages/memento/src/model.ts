@@ -68,6 +68,8 @@ function makeOutput<TInput, TOutput, TOptions>(
     output = Object.keys(output).reduce((mapped: any, name) => {
       let output$ = output[name].pipe(distinctUntilChanged(), shareReplay(1));
 
+      output$.subscribe(() => {});
+
       return {
         ...mapped,
         [name]: output$,
