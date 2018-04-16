@@ -1,11 +1,5 @@
 import { Observable, merge } from 'rxjs';
-import {
-  distinctUntilChanged,
-  map,
-  scan,
-  tap,
-  shareReplay,
-} from 'rxjs/operators';
+import { distinctUntilChanged, map, scan, shareReplay } from 'rxjs/operators';
 
 export interface Updater<S> {
   (state: S): S;
