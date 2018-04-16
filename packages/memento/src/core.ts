@@ -127,3 +127,11 @@ export type Merge<TInput, TOutput> = {
     ? TOutput[K] extends TInput[K] ? TInput[K] : TOutput[K]
     : TInput[K]
 };
+
+export interface Plugger {
+  <T>(output: Observable<T>, input: Subject<T>): void;
+}
+
+export interface ConnectCreator<TModelA extends Model, TModelB extends Model> {
+  (modelA: TModelA, modelB: TModelB, plug: Plugger): void;
+}
