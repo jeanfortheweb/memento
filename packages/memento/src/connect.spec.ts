@@ -66,7 +66,7 @@ test('should connect models unidirectional', async () => {
 
   const outputBefore = await getOutputValue(modelB.output.f);
 
-  expect(outputBefore).toEqual(0);
+  expect(outputBefore).toEqual(10);
 
   modelA.input.a.next(5);
   modelA.input.b.next(5);
@@ -106,4 +106,30 @@ test('should connect models bidirectional', async () => {
   const outputAfterDisconnect = await getOutputValue(modelB.output.f);
 
   expect(outputAfterDisconnect).toEqual(12);
+});
+
+test('should custom connect models', async () => {
+  const disconnect = connect(modelA, modelB, (a, b, plug) => {
+    plug(a.output.c, b.input.c);
+    plug(b.output.b, a.input.b);
+  });
+
+  const outputBefore = await getOutputValue(modelB.output.f);
+
+  expect(outputBefore).toEqual(16);
+
+  modelB.input.h.next(2);
+
+  const outputAfter = await getOutputValue(modelB.output.f);
+
+  expect(outputAfter).toEqual(17);
+
+  disconnect();
+
+  modelA.input.a.next(5);
+  modelA.input.b.next(5);
+
+  const outputAfterDisconnect = await getOutputValue(modelB.output.f);
+
+  expect(outputAfterDisconnect).toEqual(17);
 });
