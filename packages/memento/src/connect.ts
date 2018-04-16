@@ -1,5 +1,5 @@
-import { Model, Merge, Disconnect } from './core';
-import { Subscription } from 'rxjs';
+import { Model, Merge, Disconnect, Plugger, ConnectCreator } from './core';
+import { Subscription, Observable, Subject } from 'rxjs';
 
 export default function connect<
   TInputA,
@@ -24,6 +24,20 @@ export default function connect<
 ): Disconnect;
 
 export default function connect<
+  TInputA extends Merge<TInputA, TOutputB>,
+  TOutputA,
+  TInputB extends Merge<TInputB, TOutputA>,
+  TOutputB
+>(
+  modelA: Model<TInputA, TOutputA>,
+  modelB: Model<TInputB, TOutputB>,
+  connectCreator: ConnectCreator<
+    Model<TInputA, TOutputA>,
+    Model<TInputB, TOutputB>
+  >,
+): Disconnect;
+
+export default function connect<
   TInputA,
   TOutputA,
   TInputB extends Merge<TInputB, TOutputA>,
@@ -31,12 +45,20 @@ export default function connect<
 >(
   modelA: Model<TInputA, TOutputA>,
   modelB: Model<TInputB, TOutputB>,
-  bidirectional?,
+  mode?,
 ): Disconnect {
-  let subscriptions = subscribeTo(modelA, modelB);
+  let subscriptions: Subscription[] = [];
 
-  if (bidirectional) {
-    subscriptions = [...subscriptions, ...subscribeTo(modelB, modelA)];
+  if (typeof mode === 'boolean' || mode === undefined) {
+    subscriptions = subscribeTo(modelA, modelB);
+
+    if (mode) {
+      subscriptions = [...subscriptions, ...subscribeTo(modelB, modelA)];
+    }
+  } else {
+    mode(modelA, modelB, (output: Observable<any>, input: Subject<any>) => {
+      subscriptions.push(output.subscribe(input));
+    });
   }
 
   return () => {
