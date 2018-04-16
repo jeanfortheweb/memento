@@ -147,7 +147,7 @@ const ContactFormActions = () => (
 ReactDOM.render(
   <Container>
     <Grid centered>
-      <Grid.Column width={12}>
+      <Grid.Column width={16}>
         <Divider hidden />
 
         <InfoBox />
