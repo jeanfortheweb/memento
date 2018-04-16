@@ -1,4 +1,4 @@
-import { Model, Merge, Disconnect, Plugger, ConnectCreator } from './core';
+import { Model, Merge, Disconnect, ConnectCreator } from './core';
 import { Subscription, Observable, Subject } from 'rxjs';
 
 export default function connect<
