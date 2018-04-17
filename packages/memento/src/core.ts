@@ -32,11 +32,11 @@ export type ViewCreators<TCreators extends {} = any> = {
   [K in keyof TCreators]: ViewCreator
 };
 
-export type DefaultViewCreators<TInput, TOutput> = ViewCreators<{
-  View: ViewCreator<TInput, TOutput, TInput, TOutput>;
-  ActionView: ViewCreator<TInput, never, TInput, never>;
-  DataView: ViewCreator<never, TOutput, never, TOutput>;
-}>;
+export type DefaultViewCreators<TInput, TOutput> = {
+  View: () => ComponentClass<ViewProps<Actions<TInput>, TOutput, {}>>;
+  ActionView: () => ComponentClass<ViewProps<Actions<TInput>, never, {}>>;
+  DataView: () => ComponentClass<ViewProps<never, TOutput, {}>>;
+};
 
 export interface ModelCreator<
   TInput,
@@ -95,7 +95,7 @@ export interface ViewCreator<
     input: Input<TInput>,
     output: Output<TOutput>,
     options: TOptions,
-  ): ComponentClass<ViewProps<TActions, TData, TProps>>;
+  ): ComponentClass<ViewProps<Actions<TActions>, Readonly<TData>, TProps>>;
 }
 
 export type Props<P> = { [K in keyof P]: P[K] };
@@ -110,16 +110,13 @@ export interface ViewState<TActions, TData> {
   data$: Observable<TData>;
 }
 
-export type ViewComponentClasses<TViewCreators extends ViewCreators> = {
-  [K in keyof TViewCreators]: ComponentClass<
-    ExtractPropsType<TViewCreators[K]> & {
-      children(
-        actions: ExtractActionType<TViewCreators[K]>,
-        data: ExtractDataType<TViewCreators[K]>,
-      ): ReactNode;
-    }
-  >
-};
+export type ViewComponentClasses<
+  TViewCreators extends ViewCreators<TViewCreators>
+> = { [K in keyof TViewCreators]: ReturnType<TViewCreators[K]> };
+
+type a = ViewComponentClasses<
+  ViewCreators<DefaultViewCreators<{ a: number }, { b: number }>>
+>;
 
 export type ExtractActionType<
   TViewCreator extends ViewCreator

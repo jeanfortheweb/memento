@@ -7,6 +7,7 @@ import {
   ViewCreator,
   ViewProps,
   ViewState,
+  Actions,
 } from './core';
 
 function view<
@@ -26,7 +27,7 @@ function view<
   mapOutputToData: MapOutputToData<TOutput, TData, TProps, TOptions> | null,
 ): ViewCreator<TInput, TOutput, TActions, TData, TProps> {
   return function create(input, output, options) {
-    return class View extends ViewBase<TActions, TData, TProps> {
+    return class View extends ViewBase<Actions<TActions>, TData, TProps> {
       static getDerivedStateFromProps = makeGetDerivedStateFromProps(
         input,
         output,
