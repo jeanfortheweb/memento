@@ -13,10 +13,15 @@ import {
   ViewsCreator,
 } from './core';
 
-export default function model<TInput, TOutput>(
-  inputCreator: InputCreator<TInput, never>,
-  outputCreator: OutputCreator<TInput, TOutput, never>,
-): ModelCreator<TInput, TOutput, never, DefaultViewCreators<TInput, TOutput>>;
+export default function model<TInput, TOutput, TOptions = any>(
+  inputCreator: InputCreator<TInput, TOptions>,
+  outputCreator: OutputCreator<TInput, TOutput, TOptions>,
+): ModelCreator<
+  TInput,
+  TOutput,
+  TOptions,
+  DefaultViewCreators<TInput, TOutput>
+>;
 
 export default function model<
   TInput,

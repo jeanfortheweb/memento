@@ -48,14 +48,15 @@ export interface ModelCreator<
   <TLateViewCreators extends ViewCreators>(
     options: TOptions,
     viewCreators?: TLateViewCreators,
-  ): Model<TInput, TOutput, TViewCreators & TLateViewCreators>;
+  ): Model<TInput, TOutput, TViewCreators, TLateViewCreators>;
 }
 
 export type Model<
   TInput extends {} = any,
   TOutput extends {} = any,
-  TViewCreators extends ViewCreators = any
-> = ViewComponentClasses<TViewCreators> & {
+  TViewCreators extends ViewCreators = any,
+  TLateViewCreators extends ViewCreators = any
+> = ViewComponentClasses<TViewCreators, TLateViewCreators> & {
   readonly input: Input<TInput>;
   readonly output: Output<TOutput>;
 };
@@ -114,8 +115,21 @@ export interface ViewState<TActions, TData> {
 }
 
 export type ViewComponentClasses<
-  TViewCreators extends ViewCreators<TViewCreators>
-> = { [K in keyof TViewCreators]: ReturnType<TViewCreators[K]> };
+  TViewCreators extends ViewCreators<TViewCreators>,
+  TLateViewCreators extends ViewCreators<TLateViewCreators>
+> = {
+  [K in keyof TViewCreators]: ViewComponentClass<
+    TViewCreators[K],
+    TLateViewCreators[K]
+  >
+};
+
+export type ViewComponentClass<
+  TViewCreator extends ViewCreator,
+  TLateViewCreator extends any
+> = TLateViewCreator extends ViewCreator
+  ? ReturnType<TLateViewCreator>
+  : ReturnType<TViewCreator>;
 
 export type ExtractActionType<
   TViewCreator extends ViewCreator
