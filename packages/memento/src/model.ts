@@ -34,7 +34,7 @@ export default function model(
   outputCreator,
   viewCreatorsCreator?,
 ) {
-  return function create(options?) {
+  return function create(options = {}) {
     const input = inputCreator(options as any);
     const output = makeOutput(outputCreator, input, options);
     const views = makeViews(input, output, options, viewCreatorsCreator);
