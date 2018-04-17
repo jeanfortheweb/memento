@@ -6,7 +6,6 @@ Memento gives you the possibility to pass **options** when calling a **model cre
 
 * The **input creator** of the model.
 * The **output creator** of the model.
-* The **views creator** of the model.
 * The **actions creator** of a view.
 * The **data creator** of a view.
 

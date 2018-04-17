@@ -215,13 +215,11 @@ import result from '../views/result';
 
 // ...inputCreator, outputCreator, ...etc
 
-export default model(inputCreator, outputCreator, options => ({
+export default model(inputCreator, outputCreator, {
   Form: form,
   Result: result,
-}));
+});
 ```
-
-Notice that, when bound at **model creation time**, we pass a function instead. This is the **views creator** function. We do so, because at this point, **view creators** could be build with a [configuration](../advanced/options.md) parameter.
 
 Now, whenever you create an instance of the **multiplier** model, they have the **Form** and **Result** view available by default.
 If you still define them at **instantation time**, you will overwrite these defaults, allowing you to customize these views when needed.
