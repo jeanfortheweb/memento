@@ -34,6 +34,8 @@ export type ViewCreators<TCreators extends {} = any> = {
 
 export type DefaultViewCreators<TInput, TOutput> = ViewCreators<{
   View: ViewCreator<TInput, TOutput>;
+  ActionView: ViewCreator<TInput, never>;
+  DataView: ViewCreator<never, TOutput>;
 }>;
 
 export interface ModelCreator<
