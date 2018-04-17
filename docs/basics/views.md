@@ -11,7 +11,6 @@ By default, when you don't define any **view creators** on a model, Memento will
 * **ActionView:** A view component that passes only the inputs of your model.
 * **DataView:** A view component that passes only the outputs of your model 1:1.
 
-
 ## Defining a View
 
 To define a view, we have to use the `view` function from Memento. To be precise again, `view` does not create a component, it creates a **view creator**. Therefore, the `view` function works almost identical to the `model` function. The only thing that really changes are the semantics.
@@ -216,12 +215,13 @@ import result from '../views/result';
 
 // ...inputCreator, outputCreator, ...etc
 
-export default model(inputCreator, outputCreator, {
+export default model(inputCreator, outputCreator, options => ({
   Form: form,
   Result: result,
-});
+}));
 ```
+
+Notice that, when bound at **model creation time**, we pass a function instead. This is the **views creator** function. We do so, because at this point, **view creators** could be build with a [configuration](../advanced/options.md) parameter.
 
 Now, whenever you create an instance of the **multiplier** model, they have the **Form** and **Result** view available by default.
 If you still define them at **instantation time**, you will overwrite these defaults, allowing you to customize these views when needed.
-
