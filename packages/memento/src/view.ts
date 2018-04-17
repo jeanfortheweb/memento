@@ -9,15 +9,28 @@ import {
   ViewState,
 } from './core';
 
-function view<TInput, TOutput, TActions, TData, TProps extends {}>(
-  mapInputToActions: MapInputToActions<TInput, TActions, TProps> | null,
-  mapOutputToData: MapOutputToData<TOutput, TData, TProps> | null,
+function view<
+  TInput,
+  TOutput,
+  TActions,
+  TData,
+  TProps extends {},
+  TOptions extends {}
+>(
+  mapInputToActions: MapInputToActions<
+    TInput,
+    TActions,
+    TProps,
+    TOptions
+  > | null,
+  mapOutputToData: MapOutputToData<TOutput, TData, TProps, TOptions> | null,
 ): ViewCreator<TInput, TOutput, TActions, TData, TProps> {
-  return function create(input, output) {
+  return function create(input, output, options) {
     return class View extends ViewBase<TActions, TData, TProps> {
       static getDerivedStateFromProps = makeGetDerivedStateFromProps(
         input,
         output,
+        options,
         mapInputToActions,
         mapOutputToData,
       );
@@ -74,6 +87,7 @@ function makePropsMemory() {
 function makeGetDerivedStateFromProps(
   input,
   output,
+  options?,
   mapInputToActions?,
   mapOutputToData?,
 ) {
@@ -81,8 +95,8 @@ function makeGetDerivedStateFromProps(
 
   return function(nextProps, prevState) {
     if (propsChanged(nextProps) || !prevState.data$) {
-      const data = makeData(output, nextProps, mapOutputToData);
-      const actions = makeActions(input, nextProps, mapInputToActions);
+      const data = makeData(output, options, nextProps, mapOutputToData);
+      const actions = makeActions(input, options, nextProps, mapInputToActions);
 
       return {
         actions,
@@ -118,17 +132,17 @@ function makeDataObservable(data) {
   return observable;
 }
 
-function makeActions(input, props, mapInputToActions) {
+function makeActions(input, options, props, mapInputToActions) {
   if (mapInputToActions) {
-    return mapInputToActions(input, props);
+    return mapInputToActions(input, props, options);
   }
 
   return {};
 }
 
-function makeData(output, props, mapOutputToData) {
+function makeData(output, options, props, mapOutputToData) {
   if (mapOutputToData) {
-    return mapOutputToData(output, props);
+    return mapOutputToData(output, props, options);
   }
 
   return {};
