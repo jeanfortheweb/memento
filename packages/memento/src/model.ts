@@ -29,15 +29,17 @@ export default function model<
   viewsCreator: ViewsCreator<TViewCreators, TOptions>,
 ): ModelCreator<TInput, TOutput, TOptions, TViewCreators>;
 
-export default function model(
-  inputCreator,
-  outputCreator,
-  viewCreatorsCreator?,
-) {
-  return function create(options = {}) {
+export default function model(inputCreator, outputCreator, viewsCreator?) {
+  return function create(options = {}, lateViewCreators?) {
     const input = inputCreator(options as any);
     const output = makeOutput(outputCreator, input, options);
-    const views = makeViews(input, output, options, viewCreatorsCreator);
+    const views = makeViews(
+      input,
+      output,
+      options,
+      viewsCreator,
+      lateViewCreators,
+    );
 
     return {
       input,
@@ -79,12 +81,17 @@ function makeViews(
   input,
   output,
   options?,
-  viewCreatorsCreator?: ViewsCreator,
+  viewsCreator?: ViewsCreator,
+  lateViewCreators?: ViewCreators,
 ): ViewComponentClasses<ViewCreators> {
   let views = {};
 
-  if (viewCreatorsCreator) {
-    const viewCreators = viewCreatorsCreator(options);
+  if (viewsCreator) {
+    const viewCreators = Object.assign(
+      {},
+      viewsCreator(options),
+      lateViewCreators || {},
+    );
 
     views = Object.keys(viewCreators).reduce(
       (views, name) => ({

@@ -157,3 +157,32 @@ test('should pass options to all creators', () => {
   expect(viewCreator).toBeCalledWith(options);
   expect(outputCreator.mock.calls[0][1]).toEqual(options);
 });
+
+test('should override view creators with late view creators', () => {
+  const inputCreator = jest.fn(() => ({
+    a: new Subject(),
+    b: new Subject(),
+  }));
+
+  const outputCreator = jest.fn(input => ({
+    c: merge(input.a, input.b),
+  }));
+
+  const firstViewCreator = jest.fn(view(input => ({}), output => output));
+  const lateViewCreator = jest.fn(view(input => ({}), output => output));
+  const viewCreator = jest.fn(() => ({
+    Custom: firstViewCreator,
+    Overriden: firstViewCreator,
+    Late: firstViewCreator,
+  }));
+
+  const modelCreator = model(inputCreator, outputCreator, viewCreator);
+
+  modelCreator(null, {
+    Overriden: lateViewCreator,
+    Late: lateViewCreator,
+  });
+
+  expect(firstViewCreator).toHaveBeenCalledTimes(1);
+  expect(lateViewCreator).toHaveBeenCalledTimes(2);
+});

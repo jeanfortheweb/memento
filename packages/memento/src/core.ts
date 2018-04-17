@@ -45,7 +45,10 @@ export interface ModelCreator<
   TViewCreators extends ViewCreators
 > {
   (): Model<TInput, TOutput, TViewCreators>;
-  (options: TOptions): Model<TInput, TOutput, TViewCreators>;
+  <TLateViewCreators extends ViewCreators>(
+    options: TOptions,
+    viewCreators?: TLateViewCreators,
+  ): Model<TInput, TOutput, TViewCreators & TLateViewCreators>;
 }
 
 export type Model<
