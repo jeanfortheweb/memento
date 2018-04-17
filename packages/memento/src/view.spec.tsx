@@ -42,9 +42,6 @@ const outputCreator: OutputCreator<Input, Output> = input => ({
   c: merge(input.a, input.b).pipe(startWith(0)),
 });
 
-const modelCreator = model(inputCreator, outputCreator);
-const modelInstance = modelCreator();
-
 let actions;
 
 const mapInputToActions: MapInputToActions<Input, Actions> = input =>
@@ -65,6 +62,15 @@ const viewCreator = view(mapInputToActions, mapOutputToData);
 const singleOutputViewCreator = view(mapInputToActions, mapOutputToSingleData);
 const noActionsViewCreator = view(null, mapOutputToSingleData);
 const noDataViewCreator = view(mapInputToActions, null);
+
+const modelCreator = model(inputCreator, outputCreator, {
+  View: noActionsViewCreator,
+});
+
+const modelInstance = modelCreator(null, {
+  A: noActionsViewCreator,
+});
+
 const View = viewCreator(modelInstance.input, modelInstance.output, {});
 const NoActionsView = noActionsViewCreator(
   modelInstance.input,

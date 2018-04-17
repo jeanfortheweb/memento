@@ -21,13 +21,6 @@ export interface OutputCreator<TInput, TOutput, TOptions = any> {
   (input: Input<TInput>, options: TOptions): Output<TOutput>;
 }
 
-export interface ViewsCreator<
-  TViewCreators extends ViewCreators = any,
-  TOptions = any
-> {
-  (options: TOptions): TViewCreators;
-}
-
 export type ViewCreators<TCreators extends {} = any> = {
   [K in keyof TCreators]: ViewCreator
 };
@@ -45,9 +38,10 @@ export interface ModelCreator<
   TViewCreators extends ViewCreators
 > {
   (): Model<TInput, TOutput, TViewCreators>;
+  (options: TOptions): Model<TInput, TOutput, TViewCreators, TViewCreators>;
   <TLateViewCreators extends ViewCreators>(
     options: TOptions,
-    viewCreators?: TLateViewCreators,
+    lateViewCreators?: TLateViewCreators,
   ): Model<TInput, TOutput, TViewCreators, TLateViewCreators>;
 }
 
@@ -117,19 +111,31 @@ export interface ViewState<TActions, TData> {
 export type ViewComponentClasses<
   TViewCreators extends ViewCreators<TViewCreators>,
   TLateViewCreators extends ViewCreators<TLateViewCreators>
+> = ModelViewComponentClasses<TViewCreators, TLateViewCreators> &
+  InstanceViewComponentClasses<TViewCreators, TLateViewCreators>;
+
+export type ModelViewComponentClasses<
+  TViewCreators extends ViewCreators,
+  TLateViewCreators extends ViewCreators
 > = {
-  [K in keyof TViewCreators]: ViewComponentClass<
-    TViewCreators[K],
-    TLateViewCreators[K]
+  [K in keyof TViewCreators]: ReturnType<
+    K extends keyof TLateViewCreators ? TLateViewCreators[K] : TViewCreators[K]
   >
 };
 
-export type ViewComponentClass<
-  TViewCreator extends ViewCreator,
-  TLateViewCreator extends any
-> = TLateViewCreator extends ViewCreator
-  ? ReturnType<TLateViewCreator>
-  : ReturnType<TViewCreator>;
+export type Diff<T extends string, U extends string> = ({ [P in T]: P } &
+  { [P in U]: never } & { [x: string]: never })[T];
+export type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;
+
+export type InstanceViewComponentClasses<
+  TViewCreators extends ViewCreators,
+  TLateViewCreators extends ViewCreators
+> = {
+  [K in keyof Omit<
+    TLateViewCreators,
+    keyof TViewCreators
+  >]: K extends keyof TViewCreators ? never : ReturnType<TLateViewCreators[K]>
+};
 
 export type ExtractActionType<
   TViewCreator extends ViewCreator

@@ -1,11 +1,5 @@
 import { Observable, Subject, merge } from 'rxjs';
-import {
-  InputCreator,
-  OutputCreator,
-  ViewCreators,
-  Model,
-  ViewsCreator,
-} from './core';
+import { InputCreator, OutputCreator, ViewCreators, Model } from './core';
 import model from './model';
 import { view } from '.';
 
@@ -121,9 +115,9 @@ test('should create model instance with custom views', () => {
     c: merge(input.a, input.b),
   });
 
-  const viewCreators: ViewsCreator<any, any> = () => ({
+  const viewCreators = {
     Custom: view(input => ({}), output => output),
-  });
+  };
 
   instantiate(inputCreator, outputCreator, viewCreators, {
     a: 0,
@@ -146,15 +140,19 @@ test('should pass options to all creators', () => {
     c: merge(input.a, input.b),
   }));
 
-  const viewCreator = jest.fn(options => ({
-    Custom: view(input => ({}), output => output),
-  }));
+  const mapInputToActions = jest.fn();
+  const mapDataToOutput = jest.fn();
+  const viewCreators = {
+    Custom: view(mapInputToActions, mapDataToOutput),
+  };
 
-  const modelCreator = model(inputCreator, outputCreator, viewCreator);
+  const modelCreator = model(inputCreator, outputCreator, viewCreators);
   modelCreator(options);
 
+  expect(inputCreator).toHaveBeenCalledTimes(1);
+  expect(outputCreator).toHaveBeenCalledTimes(1);
+
   expect(inputCreator).toBeCalledWith(options);
-  expect(viewCreator).toBeCalledWith(options);
   expect(outputCreator.mock.calls[0][1]).toEqual(options);
 });
 
@@ -170,13 +168,13 @@ test('should override view creators with late view creators', () => {
 
   const firstViewCreator = jest.fn(view(input => ({}), output => output));
   const lateViewCreator = jest.fn(view(input => ({}), output => output));
-  const viewCreator = jest.fn(() => ({
+  const viewCreators = {
     Custom: firstViewCreator,
     Overriden: firstViewCreator,
     Late: firstViewCreator,
-  }));
+  };
 
-  const modelCreator = model(inputCreator, outputCreator, viewCreator);
+  const modelCreator = model(inputCreator, outputCreator, viewCreators);
 
   modelCreator(null, {
     Overriden: lateViewCreator,

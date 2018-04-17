@@ -10,7 +10,6 @@ import {
   ViewComponentClasses,
   Output,
   Input,
-  ViewsCreator,
 } from './core';
 
 export default function model<TInput, TOutput, TOptions = any>(
@@ -31,10 +30,10 @@ export default function model<
 >(
   inputCreator: InputCreator<TInput, TOptions>,
   outputCreator: OutputCreator<TInput, TOutput, TOptions>,
-  viewsCreator: ViewsCreator<TViewCreators, TOptions>,
+  viewsCreator: TViewCreators,
 ): ModelCreator<TInput, TOutput, TOptions, TViewCreators>;
 
-export default function model(inputCreator, outputCreator, viewsCreator?) {
+export default function model(inputCreator, outputCreator, viewCreators?) {
   return function create(options = {}, lateViewCreators?) {
     const input = inputCreator(options as any);
     const output = makeOutput(outputCreator, input, options);
@@ -42,8 +41,7 @@ export default function model(inputCreator, outputCreator, viewsCreator?) {
       input,
       output,
       options,
-      viewsCreator,
-      lateViewCreators,
+      Object.assign({}, viewCreators || {}, lateViewCreators || {}),
     );
 
     return {
@@ -85,27 +83,18 @@ function makeOutput<TInput, TOutput, TOptions>(
 function makeViews(
   input,
   output,
-  options?,
-  viewsCreator?: ViewsCreator,
-  lateViewCreators?: ViewCreators,
-): ViewComponentClasses<ViewCreators> {
+  options,
+  viewCreators: ViewCreators,
+): ViewComponentClasses<ViewCreators, any> {
   let views = {};
 
-  if (viewsCreator) {
-    const viewCreators = Object.assign(
-      {},
-      viewsCreator(options),
-      lateViewCreators || {},
-    );
-
-    views = Object.keys(viewCreators).reduce(
-      (views, name) => ({
-        ...views,
-        [name]: viewCreators[name](input, output),
-      }),
-      {},
-    ) as any;
-  }
+  views = Object.keys(viewCreators).reduce(
+    (views, name) => ({
+      ...views,
+      [name]: viewCreators[name](input, output, options),
+    }),
+    {},
+  ) as any;
 
   if (Object.keys(views).length === 0) {
     views = {
