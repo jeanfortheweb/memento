@@ -10,7 +10,7 @@ import {
   ViewComponentClasses,
   Output,
   Input,
-  ViewCreatorsCreator,
+  ViewsCreator,
 } from './core';
 
 export default function model<TInput, TOutput>(
@@ -26,7 +26,7 @@ export default function model<
 >(
   inputCreator: InputCreator<TInput, TOptions>,
   outputCreator: OutputCreator<TInput, TOutput, TOptions>,
-  viewCreators: ViewCreatorsCreator<TViewCreators, TOptions>,
+  viewsCreator: ViewsCreator<TViewCreators, TOptions>,
 ): ModelCreator<TInput, TOutput, TOptions, TViewCreators>;
 
 export default function model(
@@ -79,7 +79,7 @@ function makeViews(
   input,
   output,
   options?,
-  viewCreatorsCreator?: ViewCreatorsCreator,
+  viewCreatorsCreator?: ViewsCreator,
 ): ViewComponentClasses<ViewCreators> {
   let views = {};
 

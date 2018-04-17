@@ -84,7 +84,7 @@ const SingleView = singleOutputViewCreator(
 
 function waitForDataUpdate<TOutput>(
   component: React.Component<
-    ViewProps<any, TOutput> & { prop: boolean },
+    ViewProps<any, TOutput, any> & { prop: boolean },
     ViewState<any, TOutput>
   >,
 ): Promise<TOutput> {

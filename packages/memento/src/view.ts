@@ -149,7 +149,7 @@ function makeData(output, options, props, mapOutputToData) {
 }
 
 class ViewBase<TActions, TData, TProps> extends Component<
-  ViewProps<TActions, TData> & TProps,
+  ViewProps<TActions, TData, TProps>,
   ViewState<TActions, TData>
 > {
   protected subscription!: Subscription;

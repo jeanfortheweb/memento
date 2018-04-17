@@ -21,7 +21,7 @@ export interface OutputCreator<TInput, TOutput, TOptions = any> {
   (input: Input<TInput>, options: TOptions): Output<TOutput>;
 }
 
-export interface ViewCreatorsCreator<
+export interface ViewsCreator<
   TViewCreators extends ViewCreators = any,
   TOptions = any
 > {
@@ -83,18 +83,20 @@ export interface ViewCreator<
   TActions = any,
   TData = any,
   TProps extends {} = any,
-  TOptions extends {} = any
+  TOptions extends {} = {}
 > {
   (
     input: Input<TInput>,
     output: Output<TOutput>,
     options: TOptions,
-  ): ComponentClass<ViewProps<TActions, TData> & TProps>;
+  ): ComponentClass<ViewProps<TActions, TData, TProps>>;
 }
 
-export interface ViewProps<TActions, TData> {
+export type Props<P> = { [K in keyof P]: P[K] };
+
+export type ViewProps<TActions, TData, TProps> = Props<TProps> & {
   children(actions: TActions, data: TData): ReactNode;
-}
+};
 
 export interface ViewState<TActions, TData> {
   actions: TActions;

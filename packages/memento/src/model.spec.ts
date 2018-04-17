@@ -4,7 +4,7 @@ import {
   OutputCreator,
   ViewCreators,
   Model,
-  ViewCreatorsCreator,
+  ViewsCreator,
 } from './core';
 import model from './model';
 import { view } from '.';
@@ -121,7 +121,7 @@ test('should create model instance with custom views', () => {
     c: merge(input.a, input.b),
   });
 
-  const viewCreators: ViewCreatorsCreator<any, any> = () => ({
+  const viewCreators: ViewsCreator<any, any> = () => ({
     Custom: view(input => ({}), output => output),
   });
 
