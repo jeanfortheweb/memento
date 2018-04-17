@@ -8,6 +8,7 @@ import {
   Actions,
   InputCreator,
   OutputCreator,
+  ViewsCreator,
   MapInputToActions,
   MapOutputToData,
 } from './core';
@@ -15,6 +16,7 @@ import {
 export {
   InputCreator,
   OutputCreator,
+  ViewsCreator,
   MapInputToActions,
   MapOutputToData,
   Input,

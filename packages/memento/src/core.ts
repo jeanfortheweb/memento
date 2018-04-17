@@ -58,23 +58,27 @@ export type Model<
 export interface MapInputToActions<
   TInput,
   TActions,
-  TProps extends {} = any,
+  TProps extends {} = {},
   TOptions extends {} = any
 > {
-  (input: Input<TInput>, props: Readonly<TProps>, options: TOptions): Actions<
-    TActions
-  >;
+  (
+    input: Readonly<Input<TInput>>,
+    props: Readonly<TProps>,
+    options: Readonly<TOptions>,
+  ): Actions<TActions>;
 }
 
 export interface MapOutputToData<
   TOutput,
   TData,
-  TProps extends {} = any,
+  TProps extends {} = {},
   TOptions extends {} = any
 > {
-  (output: Output<TOutput>, props: Readonly<TProps>, options: TOptions): Output<
-    TData
-  >;
+  (
+    output: Readonly<Output<TOutput>>,
+    props: Readonly<TProps>,
+    options: Readonly<TOptions>,
+  ): Output<TData>;
 }
 
 export interface ViewCreator<
@@ -82,7 +86,7 @@ export interface ViewCreator<
   TOutput = any,
   TActions = any,
   TData = any,
-  TProps extends {} = any,
+  TProps extends {} = {},
   TOptions extends {} = {}
 > {
   (
