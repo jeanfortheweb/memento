@@ -1,6 +1,6 @@
 {
   "name": "@memento/memento",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "license": "MIT",
   "main": "es5/index.js",
   "types": "es5/index.d.ts",
@@ -13,7 +13,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["flux", "state management"],
+  "keywords": [
+    "flux",
+    "state management"
+  ],
   "author": "jeanfortheweb",
   "devDependencies": {
     "@types/enzyme": "3.1.9",
@@ -37,7 +40,11 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "moduleFileExtensions": ["ts", "tsx", "js"],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
     "testRegex": "\\.spec\\.tsx?$"
   }
 }

@@ -1,19 +1,30 @@
 {
   "lerna": "2.8.0",
-  "packages": ["packages/*"],
+  "packages": [
+    "packages/*"
+  ],
   "npmClient": "yarn",
   "useWorkspaces": true,
-  "version": "2.1.0",
+  "version": "2.1.1",
   "commands": {
     "publish": {
-      "ignore": ["@memento/---", "@memento/examples"],
-      "ignoreChanges": ["examples", "*.md"]
+      "ignore": [
+        "@memento/---",
+        "@memento/examples"
+      ],
+      "ignoreChanges": [
+        "examples",
+        "*.md"
+      ]
     },
     "bootstrap": {
       "ignore": "@memento/---"
     },
     "run": {
-      "ignore": ["@memento/---", "@memento/examples"]
+      "ignore": [
+        "@memento/---",
+        "@memento/examples"
+      ]
     }
   }
 }
