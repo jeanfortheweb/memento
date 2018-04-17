@@ -10,6 +10,7 @@ import {
   ViewComponentClasses,
   Output,
   Input,
+  ViewCreatorsCreator,
 } from './core';
 
 export default function model<TInput, TOutput>(
@@ -20,29 +21,23 @@ export default function model<TInput, TOutput>(
 export default function model<
   TInput,
   TOutput,
-  TViewCreators extends ViewCreators<TViewCreators>
->(
-  inputCreator: InputCreator<TInput, never>,
-  outputCreator: OutputCreator<TInput, TOutput, never>,
-  viewCreators: TViewCreators,
-): ModelCreator<TInput, TOutput, never, TViewCreators>;
-
-export default function model<
-  TInput,
-  TOutput,
   TOptions,
   TViewCreators extends ViewCreators
 >(
   inputCreator: InputCreator<TInput, TOptions>,
   outputCreator: OutputCreator<TInput, TOutput, TOptions>,
-  viewCreators: TViewCreators,
+  viewCreators: ViewCreatorsCreator<TViewCreators, TOptions>,
 ): ModelCreator<TInput, TOutput, TOptions, TViewCreators>;
 
-export default function model(inputCreator, outputCreator, viewCreators?) {
-  return function create(options?) {
+export default function model(
+  inputCreator,
+  outputCreator,
+  viewCreatorsCreator?,
+) {
+  return function create(options = {}) {
     const input = inputCreator(options as any);
     const output = makeOutput(outputCreator, input, options);
-    const views = makeViews(input, output, viewCreators);
+    const views = makeViews(input, output, options, viewCreatorsCreator);
 
     return {
       input,
@@ -83,11 +78,14 @@ function makeOutput<TInput, TOutput, TOptions>(
 function makeViews(
   input,
   output,
-  viewCreators?: ViewCreators,
+  options?,
+  viewCreatorsCreator?: ViewCreatorsCreator,
 ): ViewComponentClasses<ViewCreators> {
   let views = {};
 
-  if (viewCreators) {
+  if (viewCreatorsCreator) {
+    const viewCreators = viewCreatorsCreator(options);
+
     views = Object.keys(viewCreators).reduce(
       (views, name) => ({
         ...views,
@@ -99,9 +97,9 @@ function makeViews(
 
   if (Object.keys(views).length === 0) {
     views = {
-      View: view.passthrough()(input, output),
-      ActionView: view.passthrough(true, false)(input, output),
-      DataView: view.passthrough(false, true)(input, output),
+      View: view.passthrough()(input, output, options),
+      ActionView: view.passthrough(true, false)(input, output, options),
+      DataView: view.passthrough(false, true)(input, output, options),
     };
   }
 

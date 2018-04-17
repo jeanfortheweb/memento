@@ -79,9 +79,9 @@ const outputCreator = input => {
   };
 };
 
-const viewCreators = {
+const viewCreator = () => ({
   Actions: actions,
   Form: form,
-};
+});
 
-export default model(inputCreator, outputCreator, viewCreators);
+export default model(inputCreator, outputCreator, viewCreator);

@@ -68,8 +68,8 @@ const outputCreator = input => {
   };
 };
 
-const viewCreators = {
+const viewCreator = () => ({
   List: list,
-};
+});
 
-export default model(inputCreator, outputCreator, viewCreators);
+export default model(inputCreator, outputCreator, viewCreator);

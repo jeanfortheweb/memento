@@ -65,15 +65,21 @@ const viewCreator = view(mapInputToActions, mapOutputToData);
 const singleOutputViewCreator = view(mapInputToActions, mapOutputToSingleData);
 const noActionsViewCreator = view(null, mapOutputToSingleData);
 const noDataViewCreator = view(mapInputToActions, null);
-const View = viewCreator(modelInstance.input, modelInstance.output);
+const View = viewCreator(modelInstance.input, modelInstance.output, {});
 const NoActionsView = noActionsViewCreator(
   modelInstance.input,
   modelInstance.output,
+  {},
 );
-const NoDataView = noDataViewCreator(modelInstance.input, modelInstance.output);
+const NoDataView = noDataViewCreator(
+  modelInstance.input,
+  modelInstance.output,
+  {},
+);
 const SingleView = singleOutputViewCreator(
   modelInstance.input,
   modelInstance.output,
+  {},
 );
 
 function waitForDataUpdate<TOutput>(
@@ -101,6 +107,7 @@ test('should create and render a passthrough view', async () => {
   const PassthroughView = passthroughViewCreator(
     modelInstance.input,
     modelInstance.output,
+    {},
   );
 
   expect(typeof PassthroughView).toEqual('function');

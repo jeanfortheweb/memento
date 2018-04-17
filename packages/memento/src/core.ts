@@ -13,22 +13,28 @@ export type Actions<T extends {}> = {
   [K in keyof T]: T[K] extends void ? () => void : (input: T[K]) => void
 };
 
-export type Model<
-  TInput extends {} = any,
-  TOutput extends {} = any,
-  TViewCreators extends ViewCreators = any
-> = ViewComponentClasses<TViewCreators> & {
-  readonly input: Input<TInput>;
-  readonly output: Output<TOutput>;
-};
-
-export interface InputCreator<TInput = any, TOptions = never> {
+export interface InputCreator<TInput = any, TOptions = any> {
   (options: TOptions): Input<TInput>;
 }
 
-export interface OutputCreator<TInput, TOutput, TOptions = never> {
+export interface OutputCreator<TInput, TOutput, TOptions = any> {
   (input: Input<TInput>, options: TOptions): Output<TOutput>;
 }
+
+export interface ViewCreatorsCreator<
+  TViewCreators extends ViewCreators = any,
+  TOptions = any
+> {
+  (options: TOptions): TViewCreators;
+}
+
+export type ViewCreators<TCreators extends {} = any> = {
+  [K in keyof TCreators]: ViewCreator
+};
+
+export type DefaultViewCreators<TInput, TOutput> = ViewCreators<{
+  View: ViewCreator<TInput, TOutput>;
+}>;
 
 export interface ModelCreator<
   TInput,
@@ -40,12 +46,50 @@ export interface ModelCreator<
   (options: TOptions): Model<TInput, TOutput, TViewCreators>;
 }
 
-export interface MapInputToActions<TInput, TActions, TProps extends {} = {}> {
-  (input: Input<TInput>, props: Readonly<TProps>): Actions<TActions>;
+export type Model<
+  TInput extends {} = any,
+  TOutput extends {} = any,
+  TViewCreators extends ViewCreators = any
+> = ViewComponentClasses<TViewCreators> & {
+  readonly input: Input<TInput>;
+  readonly output: Output<TOutput>;
+};
+
+export interface MapInputToActions<
+  TInput,
+  TActions,
+  TProps extends {} = any,
+  TOptions extends {} = any
+> {
+  (input: Input<TInput>, props: Readonly<TProps>, options: TOptions): Actions<
+    TActions
+  >;
 }
 
-export interface MapOutputToData<TOutput, TData, TProps extends {} = {}> {
-  (input: Output<TOutput>, props: Readonly<TProps>): Output<TData>;
+export interface MapOutputToData<
+  TOutput,
+  TData,
+  TProps extends {} = any,
+  TOptions extends {} = any
+> {
+  (output: Output<TOutput>, props: Readonly<TProps>, options: TOptions): Output<
+    TData
+  >;
+}
+
+export interface ViewCreator<
+  TInput = any,
+  TOutput = any,
+  TActions = any,
+  TData = any,
+  TProps extends {} = any,
+  TOptions extends {} = any
+> {
+  (
+    input: Input<TInput>,
+    output: Output<TOutput>,
+    options: TOptions,
+  ): ComponentClass<ViewProps<TActions, TData> & TProps>;
 }
 
 export interface ViewProps<TActions, TData> {
@@ -58,25 +102,16 @@ export interface ViewState<TActions, TData> {
   data$: Observable<TData>;
 }
 
-export interface ViewCreator<
-  TInput = any,
-  TOutput = any,
-  TActions = any,
-  TData = any,
-  TProps extends {} = any
-> {
-  (input: Input<TInput>, output: Output<TOutput>): ComponentClass<
-    ViewProps<TActions, TData> & TProps
-  >;
-}
-
-export type ViewCreators<TCreators extends {} = any> = {
-  [K in keyof TCreators]: ViewCreator
+export type ViewComponentClasses<TViewCreators extends ViewCreators> = {
+  [K in keyof TViewCreators]: ComponentClass<
+    ExtractPropsType<TViewCreators[K]> & {
+      children(
+        actions: ExtractActionType<TViewCreators[K]>,
+        data: ExtractDataType<TViewCreators[K]>,
+      ): ReactNode;
+    }
+  >
 };
-
-export type DefaultViewCreators<TInput, TOutput> = ViewCreators<{
-  View: ViewCreator<TInput, TOutput>;
-}>;
 
 export type ExtractActionType<
   TViewCreator extends ViewCreator
@@ -106,17 +141,6 @@ export type ExtractOutputType<TModel extends Model> = TModel extends Model<
 >
   ? TOutput extends Output<infer TOutputType> ? TOutputType : never
   : never;
-
-export type ViewComponentClasses<TViewCreators extends ViewCreators> = {
-  [K in keyof TViewCreators]: ComponentClass<
-    ExtractPropsType<TViewCreators[K]> & {
-      children(
-        actions: ExtractActionType<TViewCreators[K]>,
-        data: ExtractDataType<TViewCreators[K]>,
-      ): ReactNode;
-    }
-  >
-};
 
 export interface Disconnect {
   (): void;

@@ -1,5 +1,11 @@
 import { Observable, Subject, merge } from 'rxjs';
-import { InputCreator, OutputCreator, ViewCreators, Model } from './core';
+import {
+  InputCreator,
+  OutputCreator,
+  ViewCreators,
+  Model,
+  ViewCreatorsCreator,
+} from './core';
 import model from './model';
 import { view } from '.';
 
@@ -10,6 +16,11 @@ type Input = {
 
 type Output = {
   c: number;
+};
+
+type Options = {
+  optionA: boolean;
+  optionB: boolean;
 };
 
 type SingleOutput = Observable<number>;
@@ -110,12 +121,39 @@ test('should create model instance with custom views', () => {
     c: merge(input.a, input.b),
   });
 
-  const viewCreators: ViewCreators = {
+  const viewCreators: ViewCreatorsCreator<any, any> = () => ({
     Custom: view(input => ({}), output => output),
-  };
+  });
 
   instantiate(inputCreator, outputCreator, viewCreators, {
     a: 0,
     b: 1,
   });
+});
+
+test('should pass options to all creators', () => {
+  const options: Options = {
+    optionA: true,
+    optionB: false,
+  };
+
+  const inputCreator = jest.fn((o: typeof options) => ({
+    a: new Subject(),
+    b: new Subject(),
+  }));
+
+  const outputCreator = jest.fn((input, o: typeof options) => ({
+    c: merge(input.a, input.b),
+  }));
+
+  const viewCreator = jest.fn(options => ({
+    Custom: view(input => ({}), output => output),
+  }));
+
+  const modelCreator = model(inputCreator, outputCreator, viewCreator);
+  modelCreator(options);
+
+  expect(inputCreator).toBeCalledWith(options);
+  expect(viewCreator).toBeCalledWith(options);
+  expect(outputCreator.mock.calls[0][1]).toEqual(options);
 });
