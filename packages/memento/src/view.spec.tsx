@@ -63,13 +63,8 @@ const singleOutputViewCreator = view(mapInputToActions, mapOutputToSingleData);
 const noActionsViewCreator = view(null, mapOutputToSingleData);
 const noDataViewCreator = view(mapInputToActions, null);
 
-const modelCreator = model(inputCreator, outputCreator, {
-  View: noActionsViewCreator,
-});
-
-const modelInstance = modelCreator(null, {
-  A: noActionsViewCreator,
-});
+const modelCreator = model(inputCreator, outputCreator);
+const modelInstance = modelCreator();
 
 const View = viewCreator(modelInstance.input, modelInstance.output, {});
 const NoActionsView = noActionsViewCreator(

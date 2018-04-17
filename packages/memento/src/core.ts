@@ -1,6 +1,11 @@
 import { Subject, Observable } from 'rxjs';
 import { ComponentClass, ReactNode } from 'react';
 
+export type Diff<T extends string, U extends string> = ({ [P in T]: P } &
+  { [P in U]: never } & { [x: string]: never })[T];
+
+export type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;
+
 export type Input<T extends {}> = {
   [K in keyof T]: T[K] extends void ? Subject<{}> : Subject<T[K]>
 };
@@ -118,14 +123,10 @@ export type ModelViewComponentClasses<
   TViewCreators extends ViewCreators,
   TLateViewCreators extends ViewCreators
 > = {
-  [K in keyof TViewCreators]: ReturnType<
-    K extends keyof TLateViewCreators ? TLateViewCreators[K] : TViewCreators[K]
+  [K in keyof Omit<TViewCreators, keyof TLateViewCreators>]: ReturnType<
+    TViewCreators[K]
   >
 };
-
-export type Diff<T extends string, U extends string> = ({ [P in T]: P } &
-  { [P in U]: never } & { [x: string]: never })[T];
-export type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>;
 
 export type InstanceViewComponentClasses<
   TViewCreators extends ViewCreators,
