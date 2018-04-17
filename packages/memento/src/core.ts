@@ -114,10 +114,6 @@ export type ViewComponentClasses<
   TViewCreators extends ViewCreators<TViewCreators>
 > = { [K in keyof TViewCreators]: ReturnType<TViewCreators[K]> };
 
-type a = ViewComponentClasses<
-  ViewCreators<DefaultViewCreators<{ a: number }, { b: number }>>
->;
-
 export type ExtractActionType<
   TViewCreator extends ViewCreator
 > = TViewCreator extends ViewCreator<any, any, infer TActions>
