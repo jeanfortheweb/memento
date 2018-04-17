@@ -1,6 +1,6 @@
 {
   "name": "@memento/memento",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "license": "MIT",
   "main": "es5/index.js",
   "types": "es5/index.d.ts",
