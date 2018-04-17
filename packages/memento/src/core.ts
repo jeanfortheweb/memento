@@ -138,35 +138,6 @@ export type InstanceViewComponentClasses<
   >]: K extends keyof TViewCreators ? never : ReturnType<TLateViewCreators[K]>
 };
 
-export type ExtractActionType<
-  TViewCreator extends ViewCreator
-> = TViewCreator extends ViewCreator<any, any, infer TActions>
-  ? Actions<TActions>
-  : {};
-
-export type ExtractDataType<
-  TViewCreator extends ViewCreator
-> = TViewCreator extends ViewCreator<any, any, any, infer TData> ? TData : {};
-
-export type ExtractPropsType<
-  TViewCreator extends ViewCreator
-> = TViewCreator extends ViewCreator<any, any, any, any, infer TProps>
-  ? TProps
-  : {};
-
-export type ExtractInputType<TModel extends Model> = TModel extends Model<
-  infer TInput
->
-  ? TInput extends Input<infer TInputType> ? TInputType : never
-  : never;
-
-export type ExtractOutputType<TModel extends Model> = TModel extends Model<
-  any,
-  infer TOutput
->
-  ? TOutput extends Output<infer TOutputType> ? TOutputType : never
-  : never;
-
 export interface Disconnect {
   (): void;
 }
