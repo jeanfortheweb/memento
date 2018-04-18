@@ -1,39 +1,53 @@
 import { Subscription, merge, Observable } from 'rxjs';
 import { distinctUntilChanged, map, scan, startWith } from 'rxjs/operators';
-import { Component } from 'react';
+import { Component, GetDerivedStateFromProps } from 'react';
 import {
-  MapInputToActions,
-  MapOutputToData,
+  ActionCreator,
+  DataCreator,
   ViewCreator,
   ViewProps,
   ViewState,
+  InputSet,
+  ObservableOrOutputSet,
   ActionSet,
+  ViewCreatorProps,
 } from './core';
 
-function view<
+function view<TInput, TOutput, TProps, TOptions>(): ViewCreator<
   TInput,
   TOutput,
-  TActions,
-  TData,
-  TProps extends {},
-  TOptions extends {}
->(
-  mapInputToActions: MapInputToActions<
-    TInput,
-    TActions,
-    TProps,
-    TOptions
-  > | null,
-  mapOutputToData: MapOutputToData<TOutput, TData, TProps, TOptions> | null,
-): ViewCreator<TInput, TOutput, TActions, TData, TProps> {
+  null,
+  null,
+  TProps,
+  TOptions
+>;
+
+function view<TInput, TOutput, TData, TProps, TOptions>(
+  actionCreator: null,
+  dataCreator: DataCreator<TOutput, TData, TProps, TOptions>,
+): ViewCreator<TInput, TOutput, null, TData, TProps, TOptions>;
+
+function view<TInput, TOuput, TActions, TProps, TOptions>(
+  actionCreator: ActionCreator<TInput, TActions, TProps, TOptions>,
+): ViewCreator<TInput, TOuput, TActions, null, TProps, TOptions>;
+
+function view<TInput, TOutput, TActions, TData, TProps, TOptions>(
+  actionCreator: ActionCreator<TInput, TActions, TProps, TOptions>,
+  dataCreator: DataCreator<TOutput, TData, TProps, TOptions>,
+): ViewCreator<TInput, TOutput, TActions, TData, TProps, TOptions>;
+
+function view<TInput, TOutput, TActions, TData, TProps, TOptions>(
+  actionCreator?: ActionCreator<TInput, TActions, TProps, TOptions> | null,
+  dataCreator?: DataCreator<TOutput, TData, TProps, TOptions>,
+): ViewCreator<TInput, TOutput, TActions, TData, TProps, TOptions> {
   return function create(input, output, options) {
-    return class View extends ViewBase<ActionSet<TActions>, TData, TProps> {
-      static getDerivedStateFromProps = makeGetDerivedStateFromProps(
+    return class View extends ViewBase<TActions, TData, TProps> {
+      static getDerivedStateFromProps = createGetDerivedStateFromProps(
         input,
         output,
+        actionCreator ? actionCreator : null,
+        dataCreator ? dataCreator : null,
         options,
-        mapInputToActions,
-        mapOutputToData,
       );
     };
   };
@@ -46,7 +60,7 @@ namespace view {
     actions: boolean = true,
     data: boolean = true,
   ): ViewCreator<any> {
-    const mapInputToActions = input =>
+    const actionCreator = input =>
       Object.keys(input).reduce(
         (actions, name) => ({
           ...actions,
@@ -55,18 +69,27 @@ namespace view {
         {},
       );
 
-    const mapOutputToData = output => output;
+    const dataCreator = output => output;
 
-    return view(
-      actions ? mapInputToActions : null,
-      data ? mapOutputToData : null,
-    );
+    if (actions && data) {
+      return view(actionCreator, dataCreator);
+    }
+
+    if (actions) {
+      return view(actionCreator);
+    }
+
+    if (data) {
+      return view(null, dataCreator);
+    }
+
+    return view();
   }
 }
 
 export default view;
 
-function memory() {
+function memory<TProps>() {
   let prevProps = {};
 
   return function(nextProps) {
@@ -85,23 +108,33 @@ function memory() {
   };
 }
 
-function makeGetDerivedStateFromProps(
-  input,
-  output,
-  options?,
-  mapInputToActions?,
-  mapOutputToData?,
-) {
+function createGetDerivedStateFromProps<
+  TInput extends {},
+  TOutput extends {},
+  TActions extends {},
+  TData extends {},
+  TProps extends {},
+  TOptions extends {}
+>(
+  input: InputSet<TInput>,
+  output: ObservableOrOutputSet<TOutput>,
+  actionCreator: ActionCreator<TInput, TActions, TProps, TOptions> | null,
+  dataCreator: DataCreator<TOutput, TData, TProps, TOptions> | null,
+  options: TOptions | {},
+): GetDerivedStateFromProps<
+  ViewCreatorProps<TProps>,
+  ViewState<TActions, TData>
+> {
   const propsChanged = memory();
 
   return function(nextProps, prevState) {
     if (propsChanged(nextProps) || !prevState.observable) {
-      const data = mapData(output, options, nextProps, mapOutputToData);
-      const actions = mapActions(input, options, nextProps, mapInputToActions);
+      const actions = createActions(actionCreator, input, nextProps, options);
+      const data = createData(dataCreator, output, nextProps, options);
 
       return {
         actions,
-        observable: mapObservable(data),
+        observable: createObservable(data),
         data: undefined as any,
       };
     }
@@ -110,7 +143,9 @@ function makeGetDerivedStateFromProps(
   };
 }
 
-function mapObservable(data) {
+function createObservable<TData>(
+  data: ObservableOrOutputSet<TData>,
+): Observable<TData> {
   if (data instanceof Observable) {
     return data.pipe(distinctUntilChanged());
   }
@@ -133,24 +168,34 @@ function mapObservable(data) {
   return observable;
 }
 
-function mapActions(input, options, props, mapInputToActions) {
-  if (mapInputToActions) {
-    return mapInputToActions(input, props, options);
+function createActions<TInput, TActions, TProps, TOptions>(
+  actionCreator: ActionCreator<TInput, TActions, TProps, TOptions> | null,
+  input: InputSet<TInput>,
+  props: Readonly<ViewCreatorProps<TProps>>,
+  options: TOptions | {},
+): ActionSet<TActions> {
+  if (actionCreator) {
+    return actionCreator(input, props, options);
   }
 
-  return {};
+  return {} as any;
 }
 
-function mapData(output, options, props, mapOutputToData) {
-  if (mapOutputToData) {
-    return mapOutputToData(output, props, options);
+function createData<TOutput, TData, TProps, TOptions>(
+  dataCreator: DataCreator<TOutput, TData, TProps, TOptions> | null,
+  output: ObservableOrOutputSet<TOutput>,
+  props: Readonly<ViewCreatorProps<TProps>>,
+  options: TOptions | {},
+): ObservableOrOutputSet<TData> {
+  if (dataCreator) {
+    return dataCreator(output, props, options);
   }
 
-  return {};
+  return {} as any;
 }
 
 class ViewBase<TActions, TData, TProps> extends Component<
-  ViewProps<TActions, TData, TProps>,
+  ViewProps<TActions, TData> & ViewCreatorProps<TProps>,
   ViewState<TActions, TData>
 > {
   protected subscription!: Subscription;
@@ -199,7 +244,7 @@ class ViewBase<TActions, TData, TProps> extends Component<
 
   render() {
     return this.state.data !== undefined
-      ? this.props.children(this.state.actions as any, this.state.data)
+      ? this.props.children(this.state.actions, this.state.data)
       : null;
   }
 }

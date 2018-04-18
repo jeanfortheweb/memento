@@ -16,38 +16,59 @@ export type ObservableOrOutputSet<
   T extends {} | Observable<any>
 > = T extends Observable<infer TData> ? Observable<TData> : OutputSet<T>;
 
-export type ActionSet<T extends {}> = {
-  [K in keyof T]: T[K] extends void ? () => void : (input: T[K]) => void
-};
+export type ActionSet<TSet> = TSet extends null
+  ? null
+  : {
+      [K in keyof TSet]: TSet[K] extends void
+        ? () => void
+        : (input: TSet[K]) => void
+    };
 
-export interface InputCreator<TInput = any, TOptions = any> {
-  (options: TOptions): InputSet<TInput>;
+export interface InputCreator<TInput = any, TOptions = null> {
+  (options: Options<TOptions>): InputSet<TInput>;
 }
 
-export interface OutputCreator<TInput, TOutput, TOptions = any> {
-  (input: InputSet<TInput>, options: TOptions): ObservableOrOutputSet<TOutput>;
+export interface OutputCreator<TInput, TOutput, TOptions = null> {
+  (input: InputSet<TInput>, options: Options<TOptions>): ObservableOrOutputSet<
+    TOutput
+  >;
 }
 
 export type ViewCreatorSet<TSet extends {} = any> = {
   [K in keyof TSet]: ViewCreator
 };
 
+export type Options<TOptions> = TOptions extends null
+  ? {}
+  : { [K in keyof TOptions]: TOptions[K] };
+
 export type DefaultViewCreatorSet<TInput, TOutput> = {
-  View: () => ComponentClass<ViewProps<ActionSet<TInput>, TOutput, {}>>;
-  ActionView: () => ComponentClass<ViewProps<ActionSet<TInput>, never, {}>>;
-  DataView: () => ComponentClass<ViewProps<never, TOutput, {}>>;
+  View: ViewCreator<TInput, TOutput, TInput, TOutput>;
+  ActionView: ViewCreator<TInput, null, TInput, null>;
+  DataView: ViewCreator<null, TOutput, TInput, null>;
 };
 
-export interface ModelCreator<
+export interface ConfigurableModelCreator<
   TInput,
   TOutput,
   TOptions,
   TViewCreatorSet extends ViewCreatorSet
 > {
-  (): Model<TInput, TOutput, TViewCreatorSet>;
-  (options: TOptions): Model<TInput, TOutput, TViewCreatorSet, TViewCreatorSet>;
+  (options: Options<TOptions>): Model<TInput, TOutput, TViewCreatorSet>;
   <TLateViewCreatorSet extends ViewCreatorSet>(
-    options: TOptions,
+    options: Options<TOptions>,
+    lateViewCreatorSet?: TLateViewCreatorSet,
+  ): Model<TInput, TOutput, TViewCreatorSet, TLateViewCreatorSet>;
+}
+
+export interface ModelCreator<
+  TInput,
+  TOutput,
+  TViewCreatorSet extends ViewCreatorSet
+> {
+  (): Model<TInput, TOutput, TViewCreatorSet>;
+  <TLateViewCreatorSet extends ViewCreatorSet>(
+    options: null,
     lateViewCreatorSet?: TLateViewCreatorSet,
   ): Model<TInput, TOutput, TViewCreatorSet, TLateViewCreatorSet>;
 }
@@ -62,29 +83,29 @@ export type Model<
   readonly output: ObservableOrOutputSet<TOutput>;
 };
 
-export interface MapInputToActions<
-  TInput,
-  TActions,
-  TProps extends {} = {},
-  TOptions extends {} = any
+export interface ActionCreator<
+  TInput = {},
+  TActions = {},
+  TProps = any,
+  TOptions = any
 > {
   (
-    input: Readonly<InputSet<TInput>>,
-    props: Readonly<TProps>,
-    options: Readonly<TOptions>,
+    input: InputSet<TInput>,
+    props: Readonly<ViewCreatorProps<TProps>>,
+    options: Readonly<TOptions> | {},
   ): ActionSet<TActions>;
 }
 
-export interface MapOutputToData<
-  TOutput,
-  TData,
-  TProps extends {} = {},
-  TOptions extends {} = any
+export interface DataCreator<
+  TOutput = {},
+  TData = {},
+  TProps = any,
+  TOptions = any
 > {
   (
     output: Readonly<ObservableOrOutputSet<TOutput>>,
-    props: Readonly<TProps>,
-    options: Readonly<TOptions>,
+    props: Readonly<ViewCreatorProps<TProps>>,
+    options: Readonly<TOptions> | {},
   ): ObservableOrOutputSet<TData>;
 }
 
@@ -93,24 +114,29 @@ export interface ViewCreator<
   TOutput = any,
   TActions = any,
   TData = any,
-  TProps extends {} = {},
-  TOptions extends {} = {}
+  TProps = any,
+  TOptions = any
 > {
   (
     input: InputSet<TInput>,
     output: ObservableOrOutputSet<TOutput>,
-    options: TOptions,
-  ): ComponentClass<ViewProps<ActionSet<TActions>, Readonly<TData>, TProps>>;
+    options: Options<TOptions>,
+  ): ComponentClass<ViewProps<TActions, TData> & ViewCreatorProps<TProps>>;
 }
 
-export type ViewCreatorProps<P> = { [K in keyof P]: P[K] };
+export type ViewCreatorProps<P> = P extends null
+  ? null
+  : { [K in keyof P]: P[K] };
 
-export type ViewProps<TActions, TData, TProps> = ViewCreatorProps<TProps> & {
-  children(actions: TActions, data: TData): ReactNode;
+export type ViewProps<TActions = null, TData = null> = {
+  children(
+    actions: Readonly<ActionSet<TActions>>,
+    data: Readonly<TData>,
+  ): ReactNode;
 };
 
 export interface ViewState<TActions, TData> {
-  actions: TActions;
+  actions: ActionSet<TActions>;
   data: TData;
   observable: Observable<TData>;
 }

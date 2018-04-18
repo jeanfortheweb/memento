@@ -8,15 +8,15 @@ import {
   ActionSet,
   InputCreator,
   OutputCreator,
-  MapInputToActions,
-  MapOutputToData,
+  ActionCreator,
+  DataCreator,
 } from './core';
 
 export {
   InputCreator,
   OutputCreator,
-  MapInputToActions,
-  MapOutputToData,
+  ActionCreator,
+  DataCreator,
   InputSet,
   ObservableOrOutputSet,
   ActionSet,

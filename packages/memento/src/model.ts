@@ -10,12 +10,29 @@ import {
   ViewClassSet,
   ObservableOrOutputSet,
   InputSet,
+  Options,
+  ConfigurableModelCreator,
 } from './core';
 
-export default function model<TInput, TOutput, TOptions = any>(
+export default function model<TInput, TOutput>(
+  inputCreator: InputCreator<TInput, null>,
+  outputCreator: OutputCreator<TInput, TOutput, null>,
+): ModelCreator<TInput, TOutput, DefaultViewCreatorSet<TInput, TOutput>>;
+
+export default function model<
+  TInput,
+  TOutput,
+  TViewCreatorSet extends ViewCreatorSet
+>(
+  inputCreator: InputCreator<TInput, null>,
+  outputCreator: OutputCreator<TInput, TOutput, null>,
+  viewCreatorSet: TViewCreatorSet,
+): ModelCreator<TInput, TOutput, TViewCreatorSet>;
+
+export default function model<TInput, TOutput, TOptions>(
   inputCreator: InputCreator<TInput, TOptions>,
   outputCreator: OutputCreator<TInput, TOutput, TOptions>,
-): ModelCreator<
+): ConfigurableModelCreator<
   TInput,
   TOutput,
   TOptions,
@@ -31,7 +48,7 @@ export default function model<
   inputCreator: InputCreator<TInput, TOptions>,
   outputCreator: OutputCreator<TInput, TOutput, TOptions>,
   viewCreatorSet: TViewCreatorSet,
-): ModelCreator<TInput, TOutput, TOptions, TViewCreatorSet>;
+): ConfigurableModelCreator<TInput, TOutput, TOptions, TViewCreatorSet>;
 
 export default function model(inputCreator, outputCreator, viewCreators?) {
   return function create(options = {}, lateViewCreators?) {
@@ -54,7 +71,7 @@ export default function model(inputCreator, outputCreator, viewCreators?) {
 
 function createInput<TInput, TOptions>(
   inputCreator: InputCreator<TInput, TOptions>,
-  options: TOptions,
+  options: Options<TOptions>,
 ): InputSet<TInput> {
   return inputCreator(options);
 }
@@ -89,7 +106,7 @@ function createOutput<TInput, TOutput, TOptions>(
 function createViews<TInput, TOutput, TOptions>(
   input: InputSet<TInput>,
   output: ObservableOrOutputSet<TOutput>,
-  options: TOptions,
+  options: Options<TOptions>,
   viewCreators: ViewCreatorSet,
 ): ViewClassSet<ViewCreatorSet, any> {
   let views = {};

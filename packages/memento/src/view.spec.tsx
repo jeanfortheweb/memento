@@ -8,8 +8,8 @@ import model from './model';
 import {
   InputCreator,
   OutputCreator,
-  MapInputToActions,
-  MapOutputToData,
+  ActionCreator,
+  DataCreator,
   ViewProps,
   ViewState,
 } from './core';
@@ -44,16 +44,16 @@ const outputCreator: OutputCreator<Input, Output> = input => ({
 
 let actions;
 
-const mapInputToActions: MapInputToActions<Input, Actions> = input =>
+const mapInputToActions: ActionCreator<Input, Actions> = input =>
   (actions = {
     a: value => input.a.next(value),
   });
 
-const mapOutputToData: MapOutputToData<Output, Data> = (output, props) => ({
+const mapOutputToData: DataCreator<Output, Data> = (output, props) => ({
   c: output.c,
 });
 
-const mapOutputToSingleData: MapOutputToData<Output, Observable<number>> = (
+const mapOutputToSingleData: DataCreator<Output, Observable<number>> = (
   output,
   props,
 ) => output.c;
@@ -61,7 +61,7 @@ const mapOutputToSingleData: MapOutputToData<Output, Observable<number>> = (
 const viewCreator = view(mapInputToActions, mapOutputToData);
 const singleOutputViewCreator = view(mapInputToActions, mapOutputToSingleData);
 const noActionsViewCreator = view(null, mapOutputToSingleData);
-const noDataViewCreator = view(mapInputToActions, null);
+const noDataViewCreator = view(mapInputToActions);
 
 const modelCreator = model(inputCreator, outputCreator);
 const modelInstance = modelCreator();
@@ -85,7 +85,7 @@ const SingleView = singleOutputViewCreator(
 
 function waitForDataUpdate<TOutput>(
   component: React.Component<
-    ViewProps<any, TOutput, any> & { prop: boolean },
+    ViewProps<any, TOutput> & { prop: boolean },
     ViewState<any, TOutput>
   >,
 ): Promise<TOutput> {
