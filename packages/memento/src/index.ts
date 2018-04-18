@@ -3,9 +3,9 @@ import view from './view';
 import connect from './connect';
 import { state } from './helpers';
 import {
-  Input,
-  Output,
-  Actions,
+  InputSet,
+  ObservableOrOutputSet,
+  ActionSet,
   InputCreator,
   OutputCreator,
   MapInputToActions,
@@ -17,9 +17,9 @@ export {
   OutputCreator,
   MapInputToActions,
   MapOutputToData,
-  Input,
-  Output,
-  Actions,
+  InputSet,
+  ObservableOrOutputSet,
+  ActionSet,
   state,
   model,
   view,

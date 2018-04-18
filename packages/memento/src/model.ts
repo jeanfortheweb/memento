@@ -5,11 +5,11 @@ import {
   InputCreator,
   OutputCreator,
   ModelCreator,
-  ViewCreators,
-  DefaultViewCreators,
-  ViewComponentClasses,
-  Output,
-  Input,
+  ViewCreatorSet,
+  DefaultViewCreatorSet,
+  ViewClassSet,
+  ObservableOrOutputSet,
+  InputSet,
 } from './core';
 
 export default function model<TInput, TOutput, TOptions = any>(
@@ -19,19 +19,19 @@ export default function model<TInput, TOutput, TOptions = any>(
   TInput,
   TOutput,
   TOptions,
-  DefaultViewCreators<TInput, TOutput>
+  DefaultViewCreatorSet<TInput, TOutput>
 >;
 
 export default function model<
   TInput,
   TOutput,
   TOptions,
-  TViewCreators extends ViewCreators
+  TViewCreatorSet extends ViewCreatorSet
 >(
   inputCreator: InputCreator<TInput, TOptions>,
   outputCreator: OutputCreator<TInput, TOutput, TOptions>,
-  viewCreatorSet: TViewCreators,
-): ModelCreator<TInput, TOutput, TOptions, TViewCreators>;
+  viewCreatorSet: TViewCreatorSet,
+): ModelCreator<TInput, TOutput, TOptions, TViewCreatorSet>;
 
 export default function model(inputCreator, outputCreator, viewCreators?) {
   return function create(options = {}, lateViewCreators?) {
@@ -55,19 +55,18 @@ export default function model(inputCreator, outputCreator, viewCreators?) {
 function createInput<TInput, TOptions>(
   inputCreator: InputCreator<TInput, TOptions>,
   options: TOptions,
-): Input<TInput> {
+): InputSet<TInput> {
   return inputCreator(options);
 }
 
 function createOutput<TInput, TOutput, TOptions>(
   outputCreator: OutputCreator<TInput, TOutput, TOptions>,
-  input: Input<TInput>,
+  input: InputSet<TInput>,
   options: TOptions,
-): Output<any> {
-  let output: Output<TOutput> | Observable<TOutput> = outputCreator(
-    input,
-    options as any,
-  );
+): ObservableOrOutputSet<any> {
+  let output:
+    | ObservableOrOutputSet<TOutput>
+    | Observable<TOutput> = outputCreator(input, options as any);
 
   if (output instanceof Observable) {
     output = output.pipe(shareReplay(1));
@@ -88,11 +87,11 @@ function createOutput<TInput, TOutput, TOptions>(
 }
 
 function createViews<TInput, TOutput, TOptions>(
-  input: Input<TInput>,
-  output: Output<TOutput>,
+  input: InputSet<TInput>,
+  output: ObservableOrOutputSet<TOutput>,
   options: TOptions,
-  viewCreators: ViewCreators,
-): ViewComponentClasses<ViewCreators, any> {
+  viewCreators: ViewCreatorSet,
+): ViewClassSet<ViewCreatorSet, any> {
   let views = {};
 
   views = Object.keys(viewCreators).reduce(

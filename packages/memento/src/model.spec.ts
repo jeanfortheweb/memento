@@ -1,5 +1,5 @@
 import { Observable, Subject, merge } from 'rxjs';
-import { InputCreator, OutputCreator, ViewCreators, Model } from './core';
+import { InputCreator, OutputCreator, ViewCreatorSet, Model } from './core';
 import model from './model';
 import { view } from '.';
 
@@ -23,7 +23,7 @@ function instantiate<
   TInput,
   TOutput,
   TOptions,
-  TViewCreators extends ViewCreators<TViewCreators>
+  TViewCreators extends ViewCreatorSet<TViewCreators>
 >(
   inputCreator: InputCreator<TInput>,
   outputCreator: OutputCreator<TInput, TOutput>,

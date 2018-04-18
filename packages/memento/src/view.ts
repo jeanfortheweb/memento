@@ -7,7 +7,7 @@ import {
   ViewCreator,
   ViewProps,
   ViewState,
-  Actions,
+  ActionSet,
 } from './core';
 
 function view<
@@ -27,7 +27,7 @@ function view<
   mapOutputToData: MapOutputToData<TOutput, TData, TProps, TOptions> | null,
 ): ViewCreator<TInput, TOutput, TActions, TData, TProps> {
   return function create(input, output, options) {
-    return class View extends ViewBase<Actions<TActions>, TData, TProps> {
+    return class View extends ViewBase<ActionSet<TActions>, TData, TProps> {
       static getDerivedStateFromProps = makeGetDerivedStateFromProps(
         input,
         output,
@@ -66,7 +66,7 @@ namespace view {
 
 export default view;
 
-function makePropsMemory() {
+function memory() {
   let prevProps = {};
 
   return function(nextProps) {
@@ -92,16 +92,16 @@ function makeGetDerivedStateFromProps(
   mapInputToActions?,
   mapOutputToData?,
 ) {
-  const propsChanged = makePropsMemory();
+  const propsChanged = memory();
 
   return function(nextProps, prevState) {
-    if (propsChanged(nextProps) || !prevState.data$) {
-      const data = makeData(output, options, nextProps, mapOutputToData);
-      const actions = makeActions(input, options, nextProps, mapInputToActions);
+    if (propsChanged(nextProps) || !prevState.observable) {
+      const data = mapData(output, options, nextProps, mapOutputToData);
+      const actions = mapActions(input, options, nextProps, mapInputToActions);
 
       return {
         actions,
-        data$: makeDataObservable(data),
+        observable: mapObservable(data),
         data: undefined as any,
       };
     }
@@ -110,7 +110,7 @@ function makeGetDerivedStateFromProps(
   };
 }
 
-function makeDataObservable(data) {
+function mapObservable(data) {
   if (data instanceof Observable) {
     return data.pipe(distinctUntilChanged());
   }
@@ -133,7 +133,7 @@ function makeDataObservable(data) {
   return observable;
 }
 
-function makeActions(input, options, props, mapInputToActions) {
+function mapActions(input, options, props, mapInputToActions) {
   if (mapInputToActions) {
     return mapInputToActions(input, props, options);
   }
@@ -141,7 +141,7 @@ function makeActions(input, options, props, mapInputToActions) {
   return {};
 }
 
-function makeData(output, options, props, mapOutputToData) {
+function mapData(output, options, props, mapOutputToData) {
   if (mapOutputToData) {
     return mapOutputToData(output, props, options);
   }
@@ -162,15 +162,15 @@ class ViewBase<TActions, TData, TProps> extends Component<
   }
 
   componentDidMount() {
-    this.subscribe(this.state.data$);
+    this.subscribe(this.state.observable);
   }
 
-  subscribe(data) {
+  subscribe(observable) {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
 
-    this.subscription = data.subscribe(data => {
+    this.subscription = observable.subscribe(data => {
       this.setState(prevState => ({
         ...prevState,
         data,
@@ -183,8 +183,8 @@ class ViewBase<TActions, TData, TProps> extends Component<
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.data$ !== this.state.data$) {
-      this.subscribe(this.state.data$);
+    if (prevState.observable !== this.state.observable) {
+      this.subscribe(this.state.observable);
     }
   }
 

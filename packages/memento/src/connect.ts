@@ -1,4 +1,4 @@
-import { Model, Merge, Disconnect, ConnectCreator } from './core';
+import { Model, Merge, Disconnect, Connector } from './core';
 import { Subscription, Observable, Subject } from 'rxjs';
 
 export default function connect<
@@ -31,10 +31,7 @@ export default function connect<
 >(
   modelA: Model<TInputA, TOutputA>,
   modelB: Model<TInputB, TOutputB>,
-  connectCreator: ConnectCreator<
-    Model<TInputA, TOutputA>,
-    Model<TInputB, TOutputB>
-  >,
+  connectCreator: Connector<Model<TInputA, TOutputA>, Model<TInputB, TOutputB>>,
 ): Disconnect;
 
 export default function connect<

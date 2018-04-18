@@ -90,7 +90,7 @@ function waitForDataUpdate<TOutput>(
   >,
 ): Promise<TOutput> {
   return new Promise(resolve => {
-    const subscription = component.state.data$
+    const subscription = component.state.observable
       .pipe(delay(10))
       .subscribe(value => {
         subscription.unsubscribe();
