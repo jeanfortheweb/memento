@@ -14,11 +14,12 @@ This allows you to create very flexible models that you can reuse over and over 
 
 ## Creating a configurable model
 
-Let's take the exampel model from the connections chapter:
+Let's take the example model from the [connections chapter](./connections.md):
 
 ```js
 // models/filterable-list.js
 import { model } from '@memento/memento';
+import { combineLatest } from 'rxjs';
 
 const inputCreator = () => ({
     list: new Subject(),
