@@ -15,9 +15,9 @@ By default, when you don't define any **view creators** on a model, Memento will
 
 To define a view, we have to use the `view` function from Memento. To be precise again, `view` does not create a component, it creates a **view creator**. Therefore, the `view` function works almost identical to the `model` function. The only thing that really changes are the semantics.
 
-To create a **view creator**, you have to provide an **action creator** and a **data creator**, but we call them **mapInputToActions** and **mapOutputToData**.
+To create a **view creator**, you have to provide an **action creator** and a **data creator**.
 
-### Action Creators (mapInputToActions)
+### Action Creators
 
 About **action creators**:
 
@@ -25,7 +25,7 @@ About **action creators**:
 * Each action creator has to return a map of function which should send values to the given inputs. Other values are not permitted.
 
 ```js
-const mapInputToActions = input => ({
+const actionCreator = input => ({
   onChangeX: event => input.x.next(event.target.value),
   onChangeY: event => input.y.next(event.target.value),
 });
@@ -33,7 +33,7 @@ const mapInputToActions = input => ({
 
 As you can see, we've created two simple functions that just forward the value of the incoming event to our model inputs. That makes these action very easy to use in views, since we can directly assign them as event handlers.
 
-### Data Creators (mapOutputToData)
+### Data Creators
 
 About **data creators**:
 
@@ -42,7 +42,7 @@ About **data creators**:
 * Data creators can make transformations to the outputs which are meaningful for the view, but not the model itself.
 
 ```js
-const mapOutputToData = output => ({
+const dataCreator = output => ({
   x: output.x,
   y: output.y,
   result: output.z,
@@ -56,7 +56,7 @@ Now we can combine these to create a **view creator**:
 ```js
 import { view } from '@memento/memento';
 
-const form = view(mapInputToActions, mapOutputToData);
+const form = view(actionCreator, dataCreator);
 ```
 
 As you can see, this is almost identical to the **model creation api** from the previous chapter. Only the semantics have changed to fit those of a view.
@@ -130,8 +130,8 @@ render(
 
 The **render prop** of a Memento view component class always receives the same set of arguments:
 
-* **actions:** The actions mapped by the **action creator/mapInputToActions**.
-* **data:** The data mapped by the **data creator/mapOutputToData**.
+* **actions:** The actions mapped by the **action creator**.
+* **data:** The data mapped by the **data creator**.
 
 Each of those can be empty. That depends on the model and/or the **view creator** output.
 
@@ -146,9 +146,9 @@ To emphasize the power behind this architecture, we create yet another **view cr
 ```js
 import { view } from '@memento/memento';
 
-const mapOutputToData = output => output.z;
+const dataCreator = output => output.z;
 
-export default view(null, mapOutputToData);
+export default view(null, dataCreator);
 ```
 
 Then we add it to our **view creator** map:
