@@ -51,13 +51,13 @@ export default function model<
 ): ConfigurableModelCreator<TInput, TOutput, TOptions, TViewCreatorSet>;
 
 export default function model(inputCreator, outputCreator, viewCreators?) {
-  return function create(options = {}, lateViewCreators?) {
-    const input = createInput(inputCreator, options);
-    const output = createOutput(outputCreator, input, options);
+  return function create(options, lateViewCreators?) {
+    const input = createInput(inputCreator, options || {});
+    const output = createOutput(outputCreator, input, options || {});
     const views = createViews(
       input,
       output,
-      options,
+      options || {},
       Object.assign({}, viewCreators || {}, lateViewCreators || {}),
     );
 
