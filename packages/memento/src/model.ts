@@ -30,7 +30,7 @@ export default function model<
 >(
   inputCreator: InputCreator<TInput, TOptions>,
   outputCreator: OutputCreator<TInput, TOutput, TOptions>,
-  viewsCreator: TViewCreators,
+  viewCreatorSet: TViewCreators,
 ): ModelCreator<TInput, TOutput, TOptions, TViewCreators>;
 
 export default function model(inputCreator, outputCreator, viewCreators?) {
