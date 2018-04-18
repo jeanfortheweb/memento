@@ -31,7 +31,7 @@ export default function connect<
 >(
   modelA: Model<TInputA, TOutputA>,
   modelB: Model<TInputB, TOutputB>,
-  connectCreator: Connector<Model<TInputA, TOutputA>, Model<TInputB, TOutputB>>,
+  connector: Connector<Model<TInputA, TOutputA>, Model<TInputB, TOutputB>>,
 ): Disconnect;
 
 export default function connect<
