@@ -35,9 +35,9 @@ export default function model<
 
 export default function model(inputCreator, outputCreator, viewCreators?) {
   return function create(options = {}, lateViewCreators?) {
-    const input = inputCreator(options as any);
-    const output = makeOutput(outputCreator, input, options);
-    const views = makeViews(
+    const input = createInput(inputCreator, options);
+    const output = createOutput(outputCreator, input, options);
+    const views = createViews(
       input,
       output,
       options,
@@ -52,7 +52,14 @@ export default function model(inputCreator, outputCreator, viewCreators?) {
   };
 }
 
-function makeOutput<TInput, TOutput, TOptions>(
+function createInput<TInput, TOptions>(
+  inputCreator: InputCreator<TInput, TOptions>,
+  options: TOptions,
+): Input<TInput> {
+  return inputCreator(options);
+}
+
+function createOutput<TInput, TOutput, TOptions>(
   outputCreator: OutputCreator<TInput, TOutput, TOptions>,
   input: Input<TInput>,
   options: TOptions,
@@ -80,10 +87,10 @@ function makeOutput<TInput, TOutput, TOptions>(
   return output;
 }
 
-function makeViews(
-  input,
-  output,
-  options,
+function createViews<TInput, TOutput, TOptions>(
+  input: Input<TInput>,
+  output: Output<TOutput>,
+  options: TOptions,
   viewCreators: ViewCreators,
 ): ViewComponentClasses<ViewCreators, any> {
   let views = {};
