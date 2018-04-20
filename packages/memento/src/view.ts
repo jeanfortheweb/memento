@@ -94,9 +94,9 @@ function memory<TProps>() {
 
   return function(nextProps) {
     const propsChanged =
-      Object.keys(nextProps).every(
-        name => nextProps[name] === prevProps[name],
-      ) === false;
+      Object.keys(nextProps)
+        .filter(name => name !== 'children')
+        .every(name => nextProps[name] === prevProps[name]) === false;
 
     if (propsChanged) {
       prevProps = nextProps;
