@@ -12,9 +12,9 @@ export type InputSet<T extends {}> = {
 
 export type OutputSet<T extends {}> = { [K in keyof T]: Observable<T[K]> };
 
-export type ObservableOrOutputSet<
-  T extends {} | Observable<any>
-> = T extends Observable<infer TData> ? Observable<TData> : OutputSet<T>;
+export type OutputOrOutputSet<T> = T extends { [key: string]: any }
+  ? OutputSet<T>
+  : Observable<T>;
 
 export type ActionSet<TSet> = TSet extends null
   ? null
@@ -29,7 +29,7 @@ export interface InputCreator<TInput = any, TOptions = null> {
 }
 
 export interface OutputCreator<TInput, TOutput, TOptions = null> {
-  (input: InputSet<TInput>, options: Options<TOptions>): ObservableOrOutputSet<
+  (input: InputSet<TInput>, options: Options<TOptions>): OutputOrOutputSet<
     TOutput
   >;
 }
@@ -80,7 +80,7 @@ export type Model<
   TLateViewCreatorSet extends ViewCreatorSet = any
 > = ViewClassSet<TViewCreators, TLateViewCreatorSet> & {
   readonly input: InputSet<TInput>;
-  readonly output: ObservableOrOutputSet<TOutput>;
+  readonly output: OutputOrOutputSet<TOutput>;
 };
 
 export interface ActionCreator<
@@ -93,7 +93,7 @@ export interface ActionCreator<
     input: InputSet<TInput>,
     props: Readonly<ViewCreatorProps<TProps>>,
     options: Readonly<TOptions> | {},
-  ): ActionSet<TActions>;
+  ): Readonly<ActionSet<TActions>>;
 }
 
 export interface DataCreator<
@@ -103,10 +103,10 @@ export interface DataCreator<
   TOptions = any
 > {
   (
-    output: Readonly<ObservableOrOutputSet<TOutput>>,
+    output: Readonly<OutputOrOutputSet<TOutput>>,
     props: Readonly<ViewCreatorProps<TProps>>,
     options: Readonly<TOptions> | {},
-  ): ObservableOrOutputSet<TData>;
+  ): Readonly<OutputOrOutputSet<TData>>;
 }
 
 export interface ViewCreator<
@@ -119,7 +119,7 @@ export interface ViewCreator<
 > {
   (
     input: InputSet<TInput>,
-    output: ObservableOrOutputSet<TOutput>,
+    output: OutputOrOutputSet<TOutput>,
     options: Options<TOptions>,
   ): ComponentClass<ViewProps<TActions, TData> & ViewCreatorProps<TProps>>;
 }
@@ -129,16 +129,16 @@ export type ViewCreatorProps<P> = P extends null
   : { [K in keyof P]: P[K] };
 
 export type ViewProps<TActions = null, TData = null> = {
-  children(
+  children?(
     actions: Readonly<ActionSet<TActions>>,
     data: Readonly<TData>,
   ): ReactNode;
 };
 
 export interface ViewState<TActions, TData> {
-  actions: ActionSet<TActions>;
-  data: TData;
-  observable: Observable<TData>;
+  actions: Readonly<ActionSet<TActions>>;
+  data: Readonly<TData>;
+  observable: Readonly<Observable<TData>>;
 }
 
 export type ViewClassSet<

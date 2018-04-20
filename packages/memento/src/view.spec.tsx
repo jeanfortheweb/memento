@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Subject, merge, Observable } from 'rxjs';
+import { Subject, merge } from 'rxjs';
 import { startWith, delay } from 'rxjs/operators';
 import { configure, mount } from 'enzyme';
 import * as Adapter from 'enzyme-adapter-react-16';
@@ -53,10 +53,8 @@ const mapOutputToData: DataCreator<Output, Data> = (output, props) => ({
   c: output.c,
 });
 
-const mapOutputToSingleData: DataCreator<Output, Observable<number>> = (
-  output,
-  props,
-) => output.c;
+const mapOutputToSingleData: DataCreator<Output, number> = (output, props) =>
+  output.c;
 
 const viewCreator = view(mapInputToActions, mapOutputToData);
 const singleOutputViewCreator = view(mapInputToActions, mapOutputToSingleData);
@@ -178,16 +176,26 @@ test('should render a view without actions', async () => {
   wrapper.unmount();
 });
 
+test('should render a view without children', async () => {
+  const wrapper = mount(<NoActionsView />);
+
+  const data = await waitForDataUpdate<Output>(wrapper.instance());
+
+  expect(wrapper.text()).toEqual(data.toString());
+
+  wrapper.unmount();
+});
+
 test('should render a view without data', async () => {
   const render = jest.fn((actions, data) => 'NoData');
   const wrapper = mount(<NoDataView>{render}</NoDataView>);
 
   const data = await waitForDataUpdate<Output>(wrapper.instance());
 
-  expect(data).toMatchObject({});
-  expect(wrapper.text()).toEqual('NoData');
+  expect(data).toEqual(null);
   expect(render).toHaveBeenCalledTimes(1);
-  expect(render).toHaveBeenLastCalledWith(actions, {});
+  expect(render).toHaveBeenLastCalledWith(actions, null);
+  expect(wrapper.text()).toEqual('NoData');
 
   wrapper.unmount();
 });

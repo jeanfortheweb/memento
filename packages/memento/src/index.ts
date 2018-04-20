@@ -4,7 +4,7 @@ import connect from './connect';
 import { state } from './helpers';
 import {
   InputSet,
-  ObservableOrOutputSet,
+  OutputOrOutputSet,
   ActionSet,
   InputCreator,
   OutputCreator,
@@ -18,7 +18,7 @@ export {
   ActionCreator,
   DataCreator,
   InputSet,
-  ObservableOrOutputSet,
+  OutputOrOutputSet,
   ActionSet,
   state,
   model,

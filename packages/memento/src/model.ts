@@ -8,7 +8,7 @@ import {
   ViewCreatorSet,
   DefaultViewCreatorSet,
   ViewClassSet,
-  ObservableOrOutputSet,
+  OutputOrOutputSet,
   InputSet,
   Options,
   ConfigurableModelCreator,
@@ -80,10 +80,11 @@ function createOutput<TInput, TOutput, TOptions>(
   outputCreator: OutputCreator<TInput, TOutput, TOptions>,
   input: InputSet<TInput>,
   options: TOptions,
-): ObservableOrOutputSet<any> {
-  let output:
-    | ObservableOrOutputSet<TOutput>
-    | Observable<TOutput> = outputCreator(input, options as any);
+): OutputOrOutputSet<any> {
+  let output: OutputOrOutputSet<TOutput> | Observable<TOutput> = outputCreator(
+    input,
+    options as any,
+  );
 
   if (output instanceof Observable) {
     output = output.pipe(shareReplay(1));
@@ -105,7 +106,7 @@ function createOutput<TInput, TOutput, TOptions>(
 
 function createViews<TInput, TOutput, TOptions>(
   input: InputSet<TInput>,
-  output: ObservableOrOutputSet<TOutput>,
+  output: OutputOrOutputSet<TOutput>,
   options: Options<TOptions>,
   viewCreators: ViewCreatorSet,
 ): ViewClassSet<ViewCreatorSet, any> {

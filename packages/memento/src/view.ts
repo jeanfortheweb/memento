@@ -8,7 +8,7 @@ import {
   ViewProps,
   ViewState,
   InputSet,
-  ObservableOrOutputSet,
+  OutputOrOutputSet,
   ActionSet,
   ViewCreatorProps,
 } from './core';
@@ -117,7 +117,7 @@ function createGetDerivedStateFromProps<
   TOptions extends {}
 >(
   input: InputSet<TInput>,
-  output: ObservableOrOutputSet<TOutput>,
+  output: OutputOrOutputSet<TOutput>,
   actionCreator: ActionCreator<TInput, TActions, TProps, TOptions> | null,
   dataCreator: DataCreator<TOutput, TData, TProps, TOptions> | null,
   options: TOptions | {},
@@ -144,7 +144,7 @@ function createGetDerivedStateFromProps<
 }
 
 function createObservable<TData>(
-  data: ObservableOrOutputSet<TData>,
+  data: Readonly<OutputOrOutputSet<TData>>,
 ): Observable<TData> {
   if (data instanceof Observable) {
     return data.pipe(distinctUntilChanged());
@@ -162,7 +162,7 @@ function createObservable<TData>(
   );
 
   if (Object.keys(data).length === 0) {
-    observable = observable.pipe(startWith({}));
+    observable = observable.pipe(startWith(null));
   }
 
   return observable;
@@ -173,7 +173,7 @@ function createActions<TInput, TActions, TProps, TOptions>(
   input: InputSet<TInput>,
   props: Readonly<ViewCreatorProps<TProps>>,
   options: TOptions | {},
-): ActionSet<TActions> {
+): Readonly<ActionSet<TActions>> {
   if (actionCreator) {
     return actionCreator(input, props, options);
   }
@@ -183,10 +183,10 @@ function createActions<TInput, TActions, TProps, TOptions>(
 
 function createData<TOutput, TData, TProps, TOptions>(
   dataCreator: DataCreator<TOutput, TData, TProps, TOptions> | null,
-  output: ObservableOrOutputSet<TOutput>,
+  output: OutputOrOutputSet<TOutput>,
   props: Readonly<ViewCreatorProps<TProps>>,
   options: TOptions | {},
-): ObservableOrOutputSet<TData> {
+): Readonly<OutputOrOutputSet<TData>> {
   if (dataCreator) {
     return dataCreator(output, props, options);
   }
@@ -243,8 +243,17 @@ class ViewBase<TActions, TData, TProps> extends Component<
   }
 
   render() {
-    return this.state.data !== undefined
-      ? this.props.children(this.state.actions, this.state.data)
-      : null;
+    if (this.state.data !== undefined) {
+      if (this.props.children) {
+        return (this.props.children as Function)(
+          this.state.actions,
+          this.state.data,
+        );
+      }
+
+      return String(this.state.data);
+    }
+
+    return null;
   }
 }
