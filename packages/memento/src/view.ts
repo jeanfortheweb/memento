@@ -48,9 +48,11 @@ function view<TInput, TOutput, TActions, TData, TProps, TOptions>(
       static getDerivedStateFromProps(nextProps, { id, ...prevState }) {
         const propsChanged =
           !id ||
-          Object.keys(nextProps).every(
-            name => cache.get(id) && nextProps[name] === cache.get(id)[name],
-          ) === false;
+          Object.keys(nextProps)
+            .filter(name => name !== 'children')
+            .every(
+              name => cache.get(id) && nextProps[name] === cache.get(id)[name],
+            ) === false;
 
         if (propsChanged || !prevState.observable) {
           cache.set(id, nextProps);
