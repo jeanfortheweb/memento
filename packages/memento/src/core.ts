@@ -93,7 +93,7 @@ export interface ActionCreator<
     input: InputSet<TInput>,
     props: Readonly<ViewCreatorProps<TProps>>,
     options: Readonly<TOptions> | {},
-  ): Readonly<ActionSet<TActions>>;
+  ): ActionSet<TActions>;
 }
 
 export interface DataCreator<
@@ -106,7 +106,7 @@ export interface DataCreator<
     output: Readonly<OutputOrOutputSet<TOutput>>,
     props: Readonly<ViewCreatorProps<TProps>>,
     options: Readonly<TOptions> | {},
-  ): Readonly<OutputOrOutputSet<TData>>;
+  ): OutputOrOutputSet<TData>;
 }
 
 export interface ViewCreator<
