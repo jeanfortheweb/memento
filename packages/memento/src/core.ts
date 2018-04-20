@@ -136,6 +136,7 @@ export type ViewProps<TActions = null, TData = null> = {
 };
 
 export interface ViewState<TActions, TData> {
+  id: string;
   actions: Readonly<ActionSet<TActions>>;
   data: Readonly<TData>;
   observable: Readonly<Observable<TData>>;

@@ -1,6 +1,7 @@
 import { Subscription, merge, Observable } from 'rxjs';
 import { distinctUntilChanged, map, scan, startWith } from 'rxjs/operators';
 import { Component, GetDerivedStateFromProps } from 'react';
+import { generate } from 'shortid';
 import {
   ActionCreator,
   DataCreator,
@@ -49,6 +50,11 @@ function view<TInput, TOutput, TActions, TData, TProps, TOptions>(
         dataCreator ? dataCreator : null,
         options,
       );
+
+      componentWillUnmount() {
+        super.componentWillUnmount();
+        clearProps(this.state.id);
+      }
     };
   };
 }
@@ -89,23 +95,25 @@ namespace view {
 
 export default view;
 
-function memory<TProps>() {
-  let prevProps = {};
+const props = new Map();
 
-  return function(nextProps) {
-    const propsChanged =
-      Object.keys(nextProps)
-        .filter(name => name !== 'children')
-        .every(name => nextProps[name] === prevProps[name]) === false;
+function propsChanged(id, nextProps) {
+  const propsChanged =
+    Object.keys(nextProps).every(
+      name => props.get(id) && nextProps[name] === props.get(id)[name],
+    ) === false;
 
-    if (propsChanged) {
-      prevProps = nextProps;
+  if (propsChanged) {
+    props.set(id, nextProps);
 
-      return true;
-    }
+    return true;
+  }
 
-    return false;
-  };
+  return false;
+}
+
+function clearProps(id) {
+  props.delete(id);
 }
 
 function createGetDerivedStateFromProps<
@@ -125,14 +133,17 @@ function createGetDerivedStateFromProps<
   ViewCreatorProps<TProps>,
   ViewState<TActions, TData>
 > {
-  const propsChanged = memory();
+  return function(nextProps, { id, ...prevState }) {
+    if (!id) {
+      id = generate();
+    }
 
-  return function(nextProps, prevState) {
-    if (propsChanged(nextProps) || !prevState.observable) {
+    if (propsChanged(id, nextProps) || !prevState.observable) {
       const actions = createActions(actionCreator, input, nextProps, options);
       const data = createData(dataCreator, output, nextProps, options);
 
       return {
+        id,
         actions,
         observable: createObservable(data),
         data: undefined as any,
