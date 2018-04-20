@@ -12,9 +12,9 @@ export type InputSet<T extends {}> = {
 
 export type OutputSet<T extends {}> = { [K in keyof T]: Observable<T[K]> };
 
-export type OutputOrOutputSet<T> = T extends { [key: string]: any }
-  ? OutputSet<T>
-  : Observable<T>;
+export type OutputOrOutputSet<T> = T extends any[]
+  ? Observable<T>
+  : T extends { [key: string]: any } ? OutputSet<T> : Observable<T>;
 
 export type ActionSet<TSet> = TSet extends null
   ? null
