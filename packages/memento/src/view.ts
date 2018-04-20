@@ -1,6 +1,6 @@
 import { Subscription, merge, Observable } from 'rxjs';
 import { distinctUntilChanged, map, scan, startWith } from 'rxjs/operators';
-import { Component, GetDerivedStateFromProps } from 'react';
+import { Component } from 'react';
 import { generate } from 'shortid';
 import {
   ActionCreator,
@@ -42,18 +42,50 @@ function view<TInput, TOutput, TActions, TData, TProps, TOptions>(
   dataCreator?: DataCreator<TOutput, TData, TProps, TOptions>,
 ): ViewCreator<TInput, TOutput, TActions, TData, TProps, TOptions> {
   return function create(input, output, options) {
+    const cache = new Map();
+
     return class View extends ViewBase<TActions, TData, TProps> {
-      static getDerivedStateFromProps = createGetDerivedStateFromProps(
-        input,
-        output,
-        actionCreator ? actionCreator : null,
-        dataCreator ? dataCreator : null,
-        options,
-      );
+      static getDerivedStateFromProps(nextProps, { id, ...prevState }) {
+        const propsChanged =
+          !id ||
+          Object.keys(nextProps).every(
+            name => cache.get(id) && nextProps[name] === cache.get(id)[name],
+          ) === false;
+
+        if (propsChanged || !prevState.observable) {
+          cache.set(id, nextProps);
+
+          const data = createData(dataCreator, output, nextProps, options);
+          const actions = createActions(
+            actionCreator,
+            input,
+            nextProps,
+            options,
+          );
+
+          return {
+            id,
+            actions,
+            observable: createObservable(data),
+            data: undefined as any,
+          };
+        }
+
+        return prevState;
+      }
+
+      // istanbul ignore next
+      constructor(props) {
+        super(props);
+
+        this.state = {
+          id: generate(),
+        } as any;
+      }
 
       componentWillUnmount() {
         super.componentWillUnmount();
-        clearProps(this.state.id);
+        cache.delete(this.state.id);
       }
     };
   };
@@ -95,65 +127,6 @@ namespace view {
 
 export default view;
 
-const props = new Map();
-
-function propsChanged(id, nextProps) {
-  const propsChanged =
-    Object.keys(nextProps).every(
-      name => props.get(id) && nextProps[name] === props.get(id)[name],
-    ) === false;
-
-  if (propsChanged) {
-    props.set(id, nextProps);
-
-    return true;
-  }
-
-  return false;
-}
-
-function clearProps(id) {
-  props.delete(id);
-}
-
-function createGetDerivedStateFromProps<
-  TInput extends {},
-  TOutput extends {},
-  TActions extends {},
-  TData extends {},
-  TProps extends {},
-  TOptions extends {}
->(
-  input: InputSet<TInput>,
-  output: OutputOrOutputSet<TOutput>,
-  actionCreator: ActionCreator<TInput, TActions, TProps, TOptions> | null,
-  dataCreator: DataCreator<TOutput, TData, TProps, TOptions> | null,
-  options: TOptions | {},
-): GetDerivedStateFromProps<
-  ViewCreatorProps<TProps>,
-  ViewState<TActions, TData>
-> {
-  return function(nextProps, { id, ...prevState }) {
-    if (!id) {
-      id = generate();
-    }
-
-    if (propsChanged(id, nextProps) || !prevState.observable) {
-      const actions = createActions(actionCreator, input, nextProps, options);
-      const data = createData(dataCreator, output, nextProps, options);
-
-      return {
-        id,
-        actions,
-        observable: createObservable(data),
-        data: undefined as any,
-      };
-    }
-
-    return prevState;
-  };
-}
-
 function createObservable<TData>(
   data: Readonly<OutputOrOutputSet<TData>>,
 ): Observable<TData> {
@@ -180,7 +153,10 @@ function createObservable<TData>(
 }
 
 function createActions<TInput, TActions, TProps, TOptions>(
-  actionCreator: ActionCreator<TInput, TActions, TProps, TOptions> | null,
+  actionCreator:
+    | ActionCreator<TInput, TActions, TProps, TOptions>
+    | null
+    | undefined,
   input: InputSet<TInput>,
   props: Readonly<ViewCreatorProps<TProps>>,
   options: TOptions | {},
@@ -193,7 +169,7 @@ function createActions<TInput, TActions, TProps, TOptions>(
 }
 
 function createData<TOutput, TData, TProps, TOptions>(
-  dataCreator: DataCreator<TOutput, TData, TProps, TOptions> | null,
+  dataCreator: DataCreator<TOutput, TData, TProps, TOptions> | null | undefined,
   output: OutputOrOutputSet<TOutput>,
   props: Readonly<ViewCreatorProps<TProps>>,
   options: TOptions | {},
